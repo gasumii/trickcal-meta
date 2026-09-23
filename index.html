@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>트릭컬 리바이브 PvE 상위권 덱 리포트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ===== 티어 기준은 아래 script 상단 TIERS에서 변경 ===== */
+:root{
+  --bg:#F4F8EE; --paper:#FFFFFF; --ink:#24321E; --muted:#667560; --line:#D8E5CB;
+  --leaf:#4E9A3A; --leaf-soft:#E4F1D9;
+  --광기:#E0555A; --순수:#4FAF50; --냉정:#4A8FE0; --활발:#E9A91E; --우울:#9A6AD6; --미분류:#9AA39A;
+  --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root{ --bg:#161C13; --paper:#1F271B; --ink:#E8F0E0; --muted:#9FB095; --line:#334030; --leaf:#7CC766; --leaf-soft:#27351F; }
+}
+*,*::before,*::after{box-sizing:inherit}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:400 16px/1.65 var(--body);-webkit-font-smoothing:antialiased}
+main{max-width:980px;margin:0 auto;padding:40px 20px 80px}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;letter-spacing:-.01em}
+h2{font-size:1.75rem;line-height:1.2}
+section{margin-top:64px}
+.lead{color:var(--muted);max-width:62ch;margin:.4rem 0 1.4rem}
+a{color:var(--leaf)}
+:focus-visible{outline:3px solid var(--leaf);outline-offset:2px}
+
+/* hero */
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.tag{background:var(--leaf-soft);color:var(--leaf);border-radius:999px;padding:3px 12px;font-size:.85rem;font-weight:500}
+.hero h1{font-size:clamp(2rem,5vw,3.1rem);line-height:1.12}
+.summary{font-family:var(--display);font-size:clamp(1.25rem,2.6vw,1.6rem);line-height:1.4;margin:18px 0 6px;max-width:34ch}
+.summary.auto{color:var(--muted)}
+
+/* 표준 덱 보드 */
+.board{margin-top:32px;background:var(--paper);border:2px solid var(--line);border-radius:28px;padding:22px}
+.board-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.board-head b{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.board-head span{color:var(--muted);font-size:.9rem}
+.slots{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+.slot{position:relative;border-radius:18px;background:color-mix(in srgb,var(--c) 14%,var(--paper));
+  border:2px solid color-mix(in srgb,var(--c) 45%,transparent);padding:30px 10px 12px;min-height:118px;
+  display:flex;flex-direction:column;justify-content:flex-end}
+.slot .hex{position:absolute;top:10px;left:10px;width:20px;height:22px;background:var(--c);
+  clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.slot .nm{font-weight:700;font-size:.95rem;line-height:1.25;word-break:keep-all}
+.slot .pct{font-family:var(--display);font-size:1.5rem;line-height:1.1;color:var(--c)}
+.slot .meter{height:5px;border-radius:3px;background:var(--line);margin-top:6px;overflow:hidden}
+.slot .meter i{display:block;height:100%;background:var(--c)}
+
+/* 티어표 */
+.tiers{display:grid;gap:10px}
+.tier{display:grid;grid-template-columns:110px 1fr;background:var(--paper);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.tier .lab{display:flex;flex-direction:column;justify-content:center;padding:14px;background:var(--t);color:#fff}
+.tier .lab b{font-family:var(--display);font-weight:400;font-size:1.35rem;line-height:1}
+.tier .lab small{opacity:.9;font-size:.78rem}
+.tier .chips{display:flex;flex-wrap:wrap;gap:8px;padding:14px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 12px 4px 8px;
+  background:color-mix(in srgb,var(--c) 13%,var(--paper));border:1px solid color-mix(in srgb,var(--c) 40%,transparent);font-size:.9rem}
+.chip::before{content:"";width:10px;height:11px;background:var(--c);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}
+.chip em{font-style:normal;color:var(--muted);font-size:.8rem}
+.empty{color:var(--muted);font-size:.9rem}
+
+/* 막대 차트 */
+.bars{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:18px 20px}
+.bar{display:grid;grid-template-columns:120px 1fr 92px;gap:12px;align-items:center;padding:5px 0}
+.bar .n{font-size:.92rem;font-weight:500;word-break:keep-all}
+.bar .track{height:14px;background:var(--leaf-soft);border-radius:7px;overflow:hidden}
+.bar .track i{display:block;height:100%;background:var(--c);border-radius:7px}
+.bar .v{text-align:right;font-variant-numeric:tabular-nums;font-size:.9rem}
+.bar .v small{color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:14px;font-size:.85rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend span::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--c)}
+
+/* 교체 패턴 */
+.swaps{display:grid;gap:8px}
+.swap{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:12px 16px}
+.swap .flow{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.swap .arrow{color:var(--muted)}
+.swap .cnt{font-family:var(--display);font-size:1.2rem;white-space:nowrap}
+.swap .cnt small{font-family:var(--body);font-size:.8rem;color:var(--muted)}
+.chip.out{text-decoration:line-through;opacity:.7}
+
+/* 속성 분포 */
+.stack{display:flex;height:34px;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.stack i{background:var(--c);display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;font-weight:700;font-style:normal;min-width:0}
+
+/* 구간 비교 표 */
+.scroll{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:22px}
+table{border-collapse:collapse;width:100%;min-width:520px;font-size:.92rem}
+th,td{padding:10px 14px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+thead th{font-weight:500;color:var(--muted);font-size:.85rem}
+tbody tr:last-child td{border-bottom:0}
+td.heat{background:color-mix(in srgb,var(--leaf) calc(var(--p) * 0.45%),transparent)}
+td.na{color:var(--muted)}
+
+/* 노트 */
+.notes{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.note{background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:16px;padding:14px 16px}
+.note h3{font-size:1.15rem}
+.note .meta{color:var(--muted);font-size:.82rem;margin-bottom:6px}
+.note p{margin:0;font-size:.93rem}
+.meta-comment{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:20px 22px;white-space:pre-line;max-width:70ch}
+
+/* 조사 방법 */
+.method{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:16px 18px;font-size:.92rem}
+.card dl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0}
+.card dt{color:var(--muted)}
+.card dd{margin:0}
+.checks{list-style:none;margin:0;padding:0}
+.checks li{padding:4px 0}
+.checks .ok{color:var(--leaf)}
+.checks .warn{color:#C0392B}
+.error{background:#FDECEC;color:#8A1F1F;border-radius:16px;padding:16px 18px;margin-top:24px}
+footer{margin-top:64px;color:var(--muted);font-size:.85rem}
+
+@media (max-width:640px){
+  main{padding-top:28px}
+  .slots{grid-template-columns:repeat(3,1fr)}
+  .slot{padding-top:40px}
+  .bar{grid-template-columns:92px 1fr 70px;gap:8px}
+  .tier{grid-template-columns:78px 1fr}
+  .swap{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<main>
+  <header class="hero">
+    <div class="tags" id="tags"></div>
+    <h1>트릭컬 리바이브<br>PvE 상위권 덱 리포트</h1>
+    <p class="summary" id="summary">데이터를 불러오는 중입니다.</p>
+    <div class="board" id="board" hidden></div>
+    <div class="error" id="error" hidden></div>
+  </header>
+
+  <section id="s-comment" hidden>
+    <h2>이번 시즌 메타 코멘트</h2>
+    <div class="meta-comment" id="metaComment" style="margin-top:16px"></div>
+  </section>
+
+  <section>
+    <h2>사도 티어</h2>
+    <p class="lead" id="tierLead"></p>
+    <div class="tiers" id="tiers"></div>
+  </section>
+
+  <section>
+    <h2>사도별 채용률</h2>
+    <p class="lead">조사한 덱 중 해당 사도가 들어간 덱의 비율입니다. 막대 색은 사도 속성입니다.</p>
+    <div class="bars" id="bars"></div>
+  </section>
+
+  <section>
+    <h2>표준 덱에서 바뀐 자리</h2>
+    <p class="lead">가장 많이 쓰인 덱을 기준으로, 다른 덱들이 어떤 사도를 빼고 누구를 넣었는지 모았습니다.</p>
+    <div class="swaps" id="swaps"></div>
+  </section>
+
+  <section>
+    <h2>속성 분포</h2>
+    <p class="lead">전체 편성 칸(덱 수 × 9) 중 각 속성이 차지한 비율입니다.</p>
+    <div class="stack" id="stack"></div>
+    <div class="legend" id="stackLegend"></div>
+  </section>
+
+  <section>
+    <h2>순위 구간별 채용률</h2>
+    <p class="lead">순위가 높을수록 채용률이 오르는 사도가 최상위 메타의 핵심입니다.</p>
+    <div class="scroll"><table id="bands"></table></div>
+  </section>
+
+  <section id="s-notes" hidden>
+    <h2>사도 노트</h2>
+    <p class="lead">숫자만으로는 보이지 않는, 직접 써보며 느낀 점입니다.</p>
+    <div class="notes" id="notes"></div>
+  </section>
+
+  <section>
+    <h2>조사 방법</h2>
+    <div class="method" style="margin-top:16px">
+      <div class="card"><dl id="info"></dl></div>
+      <div class="card"><ul class="checks" id="checks"></ul></div>
+    </div>
+  </section>
+
+  <footer>개인이 게임 내 공개 순위 화면을 직접 보고 기록한 비공식 자료입니다. 다른 유저의 닉네임은 기록하지 않았습니다.</footer>
+</main>
+
+<script>
+/* ===== 설정 ===== */
+const TIERS = [                      // 채용률 이상이면 해당 티어
+  { name:"필수",  min:0.90, color:"#2F6B22" },
+  { name:"1티어", min:0.60, color:"#4E9A3A" },
+  { name:"2티어", min:0.30, color:"#78AE63" },
+  { name:"3티어", min:0.10, color:"#9DBF8E" },
+  { name:"비주류", min:0,   color:"#9AA39A" },
+];
+const BANDS = [[1,50],[51,150],[151,300]];
+const ATTRS = ["광기","순수","냉정","활발","우울"];
+
+/* ===== CSV ===== */
+function parseCSV(text){
+  text = text.replace(/^\uFEFF/,"");
+  const rows=[]; let row=[], f="", q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){f+='"';i++} else q=false } else f+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(f); f=""; }
+    else if(c==='\n'||c==='\r'){ if(c==='\r'&&text[i+1]==='\n') i++; row.push(f); rows.push(row); row=[]; f=""; }
+    else f+=c;
+  }
+  if(f!==""||row.length){ row.push(f); rows.push(row); }
+  const head=(rows.shift()||[]).map(h=>h.trim());
+  return rows.filter(r=>r.some(v=>v.trim()!=="")).map(r=>Object.fromEntries(head.map((h,i)=>[h,(r[i]||"").trim()])));
+}
+async function load(path){
+  const res = await fetch(path,{cache:"no-store"});
+  if(!res.ok) throw new Error(path+" 파일을 찾을 수 없습니다 ("+res.status+")");
+  return parseCSV(await res.text());
+}
+
+/* ===== 유틸 ===== */
+const $=id=>document.getElementById(id);
+const pct=(v,d=0)=>(v*100).toFixed(d)+"%";
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+let ATTR={};
+const col=n=>`var(--${ATTRS.includes(ATTR[n])?ATTR[n]:"미분류"})`;
+const chip=(n,extra="",cls="")=>`<span class="chip ${cls}" style="--c:${col(n)}">${esc(n)}${extra}</span>`;
+const tierOf=r=>TIERS.find(t=>r>=t.min);
+
+async function main(){
+  let decksRaw, sado, info;
+  try{
+    [decksRaw, sado, info] = await Promise.all([load("data/decks.csv"),load("data/sado.csv"),load("data/info.csv")]);
+  }catch(e){
+    $("summary").textContent="데이터를 불러오지 못했습니다.";
+    const err=$("error"); err.hidden=false;
+    err.innerHTML=`${esc(e.message)}<br>파일을 더블클릭해서 열면 브라우저 보안 정책 때문에 데이터가 보이지 않습니다. GitHub Pages에 올린 주소로 확인하세요.`;
+    return;
+  }
+
+  /* 정보 */
+  const INFO=Object.fromEntries(info.map(r=>[r["항목"],r["내용"]]));
+  const COMMENT={};
+  sado.forEach(s=>{ const n=s["사도명"]; if(!n) return; ATTR[n]=s["속성"]||""; if(s["코멘트"]) COMMENT[n]=s["코멘트"]; });
+
+  /* 덱 */
+  const slotKeys=Object.keys(decksRaw[0]||{}).filter(k=>/^사도\s*\d+$/.test(k));
+  const decks=decksRaw.map(r=>({
+    rank:parseInt(r["순위"],10), stage:r["단계"], boss:r["보스"],
+    members:slotKeys.map(k=>r[k]).filter(Boolean)
+  })).filter(d=>d.members.length>0);
+  const N=decks.length;
+  if(!N){ $("summary").textContent="decks.csv에 입력된 덱이 없습니다."; return; }
+
+  /* 채용률 */
+  const cnt={};
+  decks.forEach(d=>new Set(d.members).forEach(m=>cnt[m]=(cnt[m]||0)+1));
+  const stats=Object.entries(cnt).map(([n,c])=>({n,c,r:c/N})).sort((a,b)=>b.c-a.c||a.n.localeCompare(b.n,"ko"));
+  const rateOf=Object.fromEntries(stats.map(s=>[s.n,s.r]));
+
+  /* 표준 덱 */
+  const key=d=>[...new Set(d.members)].sort().join("|");
+  const dc={}; decks.forEach(d=>dc[key(d)]=(dc[key(d)]||0)+1);
+  const [stdKey,stdCount]=Object.entries(dc).sort((a,b)=>b[1]-a[1])[0];
+  const std=stdKey.split("|").sort((a,b)=>rateOf[b]-rateOf[a]);
+  const must=stats.filter(s=>s.r>=TIERS[0].min).length;
+
+  /* 태그 */
+  const uniq=a=>[...new Set(a.filter(Boolean))];
+  const ranks=decks.map(d=>d.rank).filter(Number.isFinite);
+  const tags=[INFO["조사일"]&&("조사일 "+INFO["조사일"]), INFO["시즌/콘텐츠명"], ...uniq(decks.map(d=>d.stage)).map(s=>s+"단계"), ...uniq(decks.map(d=>d.boss)), ranks.length&&(`${Math.min(...ranks)}~${Math.max(...ranks)}위 ${N}덱`)].filter(Boolean);
+  $("tags").innerHTML=tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("");
+
+  /* 요약 */
+  const sum=$("summary");
+  if(INFO["한줄요약"]) sum.textContent=INFO["한줄요약"];
+  else { sum.classList.add("auto"); sum.textContent=`필수 ${must}명이 고정되고, 상위 ${N}덱 중 ${stdCount}덱(${pct(stdCount/N)})이 같은 9명으로 편성됐습니다.`; }
+
+  /* 보드 */
+  const board=$("board"); board.hidden=false;
+  board.innerHTML=`<div class="board-head"><b>표준 덱</b><span>${N}덱 중 ${stdCount}덱이 이 9명 그대로 편성, 칸의 숫자는 채용률</span></div>
+  <div class="slots">${std.map(n=>`<div class="slot" style="--c:${col(n)}"><i class="hex" aria-hidden="true"></i>
+    <div class="pct">${pct(rateOf[n])}</div><div class="nm">${esc(n)}</div>
+    <div class="meter"><i style="width:${rateOf[n]*100}%"></i></div></div>`).join("")}</div>`;
+
+  /* 메타 코멘트 */
+  if(INFO["메타 코멘트"]){ $("s-comment").hidden=false; $("metaComment").textContent=INFO["메타 코멘트"]; }
+
+  /* 티어 */
+  $("tierLead").textContent="채용률 기준: "+TIERS.slice(0,-1).map(t=>`${t.name} ${pct(t.min)} 이상`).join(", ")+", 그 외 비주류.";
+  $("tiers").innerHTML=TIERS.map(t=>{
+    const list=stats.filter(s=>tierOf(s.r)===t);
+    return `<div class="tier" style="--t:${t.color}"><div class="lab"><b>${t.name}</b><small>${list.length}명</small></div>
+      <div class="chips">${list.length?list.map(s=>chip(s.n,` <em>${pct(s.r)}</em>`)).join(""):'<span class="empty">해당 없음</span>'}</div></div>`;
+  }).join("");
+
+  /* 막대 */
+  $("bars").innerHTML=stats.map(s=>`<div class="bar" style="--c:${col(s.n)}"><span class="n">${esc(s.n)}</span>
+    <span class="track" role="img" aria-label="${esc(s.n)} 채용률 ${pct(s.r,1)}"><i style="width:${s.r*100}%"></i></span>
+    <span class="v">${pct(s.r,1)} <small>${s.c}덱</small></span></div>`).join("")
+    +`<div class="legend">${[...ATTRS,"미분류"].map(a=>`<span style="--c:var(--${a})">${a}</span>`).join("")}</div>`;
+
+  /* 교체 패턴 */
+  const stdSet=new Set(std), sw={};
+  decks.forEach(d=>{
+    const s=new Set(d.members);
+    const out=std.filter(m=>!s.has(m)), inn=[...s].filter(m=>!stdSet.has(m)).sort((a,b)=>rateOf[b]-rateOf[a]);
+    if(!out.length&&!inn.length) return;
+    const k=out.join("+")+"→"+inn.join("+");
+    (sw[k]=sw[k]||{out,inn,c:0}).c++;
+  });
+  const swList=Object.values(sw).sort((a,b)=>b.c-a.c);
+  $("swaps").innerHTML=swList.length?swList.slice(0,10).map(s=>`<div class="swap"><div class="flow">
+      ${s.out.map(n=>chip(n,"","out")).join("")||'<span class="empty">(빈 자리)</span>'}
+      <span class="arrow" aria-label="대신">→</span>
+      ${s.inn.map(n=>chip(n)).join("")||'<span class="empty">(빈 자리)</span>'}
+    </div><span class="cnt">${s.c}덱 <small>${pct(s.c/N)}</small></span></div>`).join("")
+    :'<p class="empty">모든 덱이 표준 덱과 같습니다.</p>';
+
+  /* 속성 분포 */
+  const ac={}; let tot=0;
+  decks.forEach(d=>d.members.forEach(m=>{ const a=ATTRS.includes(ATTR[m])?ATTR[m]:"미분류"; ac[a]=(ac[a]||0)+1; tot++; }));
+  const aList=[...ATTRS,"미분류"].filter(a=>ac[a]);
+  $("stack").innerHTML=aList.map(a=>`<i style="--c:var(--${a});flex:${ac[a]}" title="${a} ${pct(ac[a]/tot,1)}">${ac[a]/tot>=.08?pct(ac[a]/tot):""}</i>`).join("");
+  $("stackLegend").innerHTML=aList.map(a=>`<span style="--c:var(--${a})">${a} ${pct(ac[a]/tot,1)}</span>`).join("");
+
+  /* 구간 */
+  const bandDecks=BANDS.map(([lo,hi])=>decks.filter(d=>d.rank>=lo&&d.rank<=hi));
+  $("bands").innerHTML=`<thead><tr><th>사도</th><th>전체</th>${BANDS.map(([lo,hi],i)=>`<th>${lo}~${hi}위 <small>(${bandDecks[i].length}덱)</small></th>`).join("")}</tr></thead>
+  <tbody>${stats.filter(s=>s.r>=0.05).map(s=>`<tr><td>${esc(s.n)}</td><td class="heat" style="--p:${s.r*100}">${pct(s.r,1)}</td>${bandDecks.map(bd=>{
+      if(!bd.length) return `<td class="na">미조사</td>`;
+      const r=bd.filter(d=>d.members.includes(s.n)).length/bd.length;
+      return `<td class="heat" style="--p:${r*100}">${pct(r,1)}</td>`;
+    }).join("")}</tr>`).join("")}</tbody>`;
+
+  /* 노트 */
+  const noted=stats.filter(s=>COMMENT[s.n]);
+  if(noted.length){
+    $("s-notes").hidden=false;
+    $("notes").innerHTML=noted.map(s=>`<article class="note" style="--c:${col(s.n)}"><h3>${esc(s.n)}</h3>
+      <div class="meta">${esc(ATTR[s.n]||"미분류")} / ${tierOf(s.r).name} / 채용률 ${pct(s.r,1)}</div><p>${esc(COMMENT[s.n])}</p></article>`).join("");
+  }
+
+  /* 조사 방법 & 데이터 점검 */
+  const infoRows=[["조사일",INFO["조사일"]],["시즌/콘텐츠",INFO["시즌/콘텐츠명"]],["게임 버전",INFO["게임 버전"]],["조사 범위",ranks.length?`${Math.min(...ranks)}~${Math.max(...ranks)}위 (${N}덱)`:""],["기록 기준","유저별 최고 단계 덱 1개"],["조사자",INFO["조사자"]]];
+  $("info").innerHTML=infoRows.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v||"—")}</dd>`).join("");
+
+  const checks=[];
+  const short=decks.filter(d=>d.members.length<slotKeys.length);
+  const dup=decks.filter(d=>new Set(d.members).size!==d.members.length);
+  const unknown={}; decks.forEach(d=>d.members.forEach(m=>{ if(!(m in ATTR)) (unknown[m]=unknown[m]||[]).push(d.rank); }));
+  const rc={}; ranks.forEach(r=>rc[r]=(rc[r]||0)+1); const dupRank=Object.keys(rc).filter(r=>rc[r]>1);
+  const line=(ok,okText,badText)=>checks.push(ok?`<li class="ok">✓ ${okText}</li>`:`<li class="warn">! ${badText}</li>`);
+  line(!short.length,"모든 덱 9명 편성 확인",`빈칸 있는 덱: ${short.map(d=>d.rank+"위").join(", ")}`);
+  line(!dup.length,"덱 내 사도 중복 없음",`사도 중복 덱: ${dup.map(d=>d.rank+"위").join(", ")}`);
+  line(!dupRank.length,"순위 중복 없음",`중복 순위: ${dupRank.join(", ")}`);
+  line(!Object.keys(unknown).length,"모든 사도 이름이 사도 목록과 일치",
+    "사도 목록에 없는 이름: "+Object.entries(unknown).map(([n,r])=>`'${esc(n)}' (${r.join(", ")}위)`).join(", "));
+  $("checks").innerHTML=`<li><b>데이터 점검</b> (페이지가 자동 검사)</li>`+checks.join("");
+}
+main();
+</script>
+</body>
+</html>
