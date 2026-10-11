@@ -12,7 +12,7 @@
 :root{
   --bg:#F4F8EE; --paper:#FFFFFF; --ink:#24321E; --muted:#667560; --line:#D8E5CB;
   --leaf:#4E9A3A; --leaf-soft:#E4F1D9;
-  --광기:#E0555A; --순수:#4FAF50; --냉정:#4A8FE0; --활발:#E9A91E; --우울:#9A6AD6; --미분류:#9AA39A;
+  --광기:#E0555A; --순수:#4FAF50; --냉정:#4A8FE0; --활발:#E9A91E; --우울:#9A6AD6; --공명:#1FA3A3; --미분류:#9AA39A;
   --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   box-sizing:border-box;
@@ -238,7 +238,7 @@ const TIERS = [                      // 채용률 이상이면 해당 티어
   { name:"비주류", min:0,   color:"#9AA39A" },
 ];
 const BANDS = [[1,50],[51,150],[151,300]];
-const ATTRS = ["광기","순수","냉정","활발","우울"];
+const ATTRS = ["광기","순수","냉정","활발","우울","공명"];
 
 /* ===== CSV ===== */
 function parseCSV(text){
@@ -338,7 +338,7 @@ async function main(){
   /* 태그 */
   const uniq=a=>[...new Set(a.filter(Boolean))];
   const ranks=decks.map(d=>d.rank).filter(Number.isFinite);
-  const tags=[INFO["조사일"]&&("조사일 "+INFO["조사일"]), INFO["시즌/콘텐츠명"], ...uniq(decks.map(d=>d.stage)).map(s=>s+"단계"), ...uniq(decks.map(d=>d.boss)), ranks.length&&(`${Math.min(...ranks)}~${Math.max(...ranks)}위 ${N}덱`)].filter(Boolean);
+  const tags=[INFO["조사일"]&&("조사일 "+INFO["조사일"]), INFO["시즌/콘텐츠명"], ...uniq(decks.map(d=>d.stage)).filter(Boolean).map(s=>/단계$/.test(s)?s:s+"단계"), ...uniq(decks.map(d=>d.boss)), ranks.length&&(`${Math.min(...ranks)}~${Math.max(...ranks)}위 ${N}덱`)].filter(Boolean);
   $("tags").innerHTML=tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("");
 
   /* 요약 */
