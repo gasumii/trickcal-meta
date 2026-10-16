@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>덱 계산기 — 트릭컬 PvE 메타</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.calc-grid{display:grid;grid-template-columns:240px minmax(0,1fr);gap:16px;align-items:start}
+.side{display:grid;gap:12px;position:sticky;top:12px}
+.side select{width:100%}
+.side hr{border:0;border-top:1px solid var(--line);margin:2px 0}
+.kv{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;color:var(--muted)}
+.stat{display:grid;gap:0}
+.stat small{color:var(--muted);font-size:.8rem}
+.stat b{font-family:var(--mono);font-size:1.4rem;font-variant-numeric:tabular-nums}
+.main-col{display:grid;gap:14px;min-width:0}
+.slot td{vertical-align:middle}
+.slot select{max-width:132px}
+.slot input[type=number]{width:96px;font-family:var(--mono)}
+.mu{font-size:.8rem;font-weight:700}.mu[data-m="유리"]{color:var(--leaf)}.mu[data-m="불리"]{color:var(--warn)}.mu[data-m="중립"]{color:var(--muted)}
+.bar{height:6px;border-radius:3px;background:var(--leaf);width:0}
+.syn{display:flex;flex-wrap:wrap;gap:8px}
+.syn div{display:grid;justify-items:center;gap:2px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;min-width:76px}
+.syn div b{font-family:var(--mono)}
+.syn div.hit{border-color:var(--leaf);background:var(--leaf-soft)}
+@media (max-width:860px){.calc-grid{grid-template-columns:1fr}.side{position:static}}
+</style>
+</head>
+<body>
+<nav class="sitebar" aria-label="사이트 메뉴"><div class="sitebar-in"><a class="site" href="./">트릭컬 PvE 메타</a><a class="tab" href="./">PvE 기록 분석</a><a class="tab" href="global.html">글로벌 PvE 분석</a><a class="tab" href="mechanics.html">전투 메커니즘</a><a class="tab" href="calculator.html" aria-current="page">덱 계산기</a></div></nav>
+<main>
+  <header><h1>덱 계산기</h1>
+  <p class="lead">시즌을 고르고 사도와 공격력을 넣으면 팀 버프, 성격 시너지, 상성을 합쳐 사도별 딜 지수를 계산합니다. 같은 덱 안에서 누가 얼마나 강해지는지 비교하는 상대값입니다. 기본으로 들어 있는 덱과 공격력은 예시이니 본인 값으로 바꿔 보세요.</p></header>
+  <div class="error" id="error" hidden></div>
+  <div class="calc-grid">
+    <aside class="panel side">
+      <label class="f" for="season">콘텐츠 시즌<select id="season"></select></label>
+      <label class="f" for="enemy">적(보스) 성격<select id="enemy"><option value="자동">자동 (시즌 기준)</option><option>성격 없음</option><option>순수</option><option>냉정</option><option>광기</option><option>활발</option><option>우울</option></select></label>
+      <div class="kv"><span>적용 성격</span><span id="enemyState" class="pill">-</span></div>
+      <div class="kv"><span>성격 시너지</span><span id="synState" class="pill">-</span></div>
+      <hr>
+      <div class="stat"><small>팀 공격력 배율</small><b id="sAtk">-</b></div>
+      <div class="stat"><small>성격 시너지 (전원 피해량·HP)</small><b id="sSyn">-</b></div>
+      <div class="stat"><small>우로스 공격력 부여</small><b id="sGrant">-</b></div>
+      <div class="stat"><small>최고 딜 지수 (스킬)</small><b id="sTop">-</b></div>
+      <p class="note">성격 시너지는 대충돌·대충돌 2.0 beta에서만 적용됩니다. 스킬·어사이드의 성격 조건 효과(우로스 어사이드3 등)는 모든 콘텐츠에서 적용됩니다.</p>
+    </aside>
+    <div class="main-col">
+      <div class="tbl"><table>
+        <thead><tr><th>#</th><th>사도</th><th>어사이드</th><th>고학년</th><th>성격</th><th>공격력 (캐릭터 화면)</th><th>상성</th><th>버프 후 공격력</th><th>피해량 배율</th><th>딜 지수 (일반)</th><th>딜 지수 (스킬)</th><th style="min-width:80px"></th></tr></thead>
+        <tbody id="slots"></tbody>
+      </table></div>
+      <div class="panel" style="display:grid;gap:10px">
+        <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><strong>성격 시너지</strong><span class="note">같은 성격 2·4·6·7·9명마다 +20·55·100·140·200%. 성격별 보너스를 모두 더해 아군 전원이 받습니다.</span></div>
+        <div class="syn" id="syn"></div>
+      </div>
+      <p class="note">계산 근거: 공격력 증가·피해량 버프·성격 시너지는 유저 실측 계산법(디시인사이드 트릭컬 갤러리) 기준으로 합산, 성격 상성 유리 ×1.5 / 불리 ×0.75 (PvE 기준), 우로스 지배의 영역은 최고 공격력 아군의 35%를 전원에게 부여. 미반영: 스킬 계수, 적 방어력, 치명타, 지속시간, 공컷계수 0.8·콘텐츠 히든 피감(모든 사도에 똑같이 곱해져 상대 비교에는 영향 없음). 공격력 칸에는 어사이드 1성 공증이 이미 포함돼 있어 버프 효과가 약간 크게 나올 수 있습니다. 현재 등록된 사도만 고를 수 있습니다. 판정 근거는 <a href="mechanics.html">전투 메커니즘</a>에 있습니다.</p>
+    </div>
+  </div>
+  <footer>개인이 정리한 비공식 계산기입니다. 실제 게임 피해량과 다를 수 있습니다.</footer>
+</main>
+<script src="assets/common.js"></script>
+<script>
+const EXTRA_SEASONS=[{n:"대충돌 (보스 성격 직접 선택)",c:"대충돌",e:""},{n:"대충돌 2.0 beta (보스 성격 직접 선택)",c:"대충돌 2.0 beta",e:""},{n:"심해 대충돌 (보스 성격 직접 선택)",c:"심해 대충돌",e:""}];
+const EXAMPLE=[["우로스",3,1,"순수",8000],["에르핀(왕도)",3,1,"",12000],["비비(신성)",3,1,"순수",9000],["아야",3,1,"",11000],["디아나(왕년)",3,1,"",10000],["실비아",3,1,"",10000]];
+let DATA=[],NAMES=[],SEASONS=[],slots=[];
+const opt=(arr,v)=>arr.map(o=>`<option${o===v?" selected":""}>${esc(o)}</option>`).join("");
+const base=n=>{const r=DATA.find(d=>d.n===n);return r?r.p:"";};
+function buildSlots(){
+  $("slots").innerHTML=slots.map((s,i)=>`<tr class="slot" data-i="${i}"><td>${i+1}</td>
+   <td><select id="n${i}" data-k="name" aria-label="사도 ${i+1}"><option value="">—</option>${opt(NAMES,s.name)}</select></td>
+   <td><select id="a${i}" data-k="aside" aria-label="어사이드">${[0,1,2,3].map(v=>`<option${v==s.aside?" selected":""}>${v}</option>`).join("")}</select></td>
+   <td><input id="h${i}" type="checkbox" data-k="hi" ${s.hi?"checked":""} aria-label="고학년 사용"></td>
+   <td class="pc"></td>
+   <td><input id="g${i}" type="number" min="0" step="100" data-k="atk" value="${s.atk||""}" aria-label="공격력"></td>
+   <td class="mt"></td><td class="num" data-o="buffed"></td><td class="num" data-o="pool"></td><td class="num" data-o="deal"></td><td class="num" data-o="skill"></td><td><div class="bar" data-o="bar"></div></td></tr>`).join("");
+}
+function render(){
+  const ss=SEASONS[+$("season").value]||{c:"기타",e:""};
+  const ev=$("enemy").value, enemy=ev==="자동"?(ss.e||"성격 없음"):ev;
+  $("enemyState").textContent=enemy;
+  const r=calc(DATA,slots.map(s=>({...s})),ss.c,{enemy});
+  $("synState").textContent=r.synOn?"적용":"미적용"; $("synState").className="pill"+(r.synOn?"":" off");
+  $("sAtk").textContent=r.teamAtk.toFixed(2)+"배";
+  $("sSyn").textContent=r.synOn?"+"+r.syn+"%":"0% (미적용)";
+  $("sGrant").textContent=r.grant?fmt(r.grant):"—";
+  const top=Math.max(0,...r.res.map(x=>x.skill)); $("sTop").textContent=top?fmt(top):"—";
+  document.querySelectorAll("#slots tr").forEach(tr=>{
+    const i=+tr.dataset.i,s=slots[i],x=r.res.find(q=>s.name&&q.s.name===s.name),b=base(s.name);
+    tr.querySelector(".pc").innerHTML=!s.name?"":b==="공명"
+      ?`<select id="c${i}" data-k="choose" aria-label="공명 성격 선택"><option value="">선택</option>${opt(["순수","냉정","광기","활발","우울"],s.choose)}</select>`
+      :`<span class="per" data-p="${esc(b)}">${esc(b)}</span>`;
+    const mt=x?x.s.match:""; tr.querySelector(".mt").innerHTML=s.name?`<span class="mu" data-m="${mt}">${mt}</span>`:"";
+    const set=(k,v)=>tr.querySelector(`[data-o="${k}"]`).textContent=v;
+    if(x&&s.atk){set("buffed",fmt(x.buffed));set("pool",x.pool.toFixed(2)+"배");set("deal",fmt(x.deal));set("skill",fmt(x.skill));tr.querySelector('[data-o="bar"]').style.width=(top?x.skill/top*100:0)+"%";}
+    else{["buffed","pool","deal","skill"].forEach(k=>set(k,""));tr.querySelector('[data-o="bar"]').style.width="0";}
+  });
+  $("syn").innerHTML=BASIC.map(p=>{const n=r.counts[p],v=synBonus(n);return `<div class="${v?"hit":""}"><span class="per" data-p="${p}">${p}</span><span>${n}명</span><b>+${v}%</b></div>`}).join("")
+    +`<div class="${r.synTotal?"hit":""}"><span>합계</span><span>전원</span><b>+${r.synTotal}%</b></div>`;
+}
+$("slots").addEventListener("change",e=>{
+  const tr=e.target.closest("tr");if(!tr)return;const s=slots[+tr.dataset.i],k=e.target.dataset.k;
+  s[k]=k==="hi"?e.target.checked:(k==="aside"||k==="atk")?+e.target.value:e.target.value;
+  if(k==="name"){s.choose="";if(!s.atk&&s.name)s.atk=10000;if(!s.name)s.atk=0;buildSlots();}
+  render();
+});
+$("slots").addEventListener("input",e=>{if(e.target.dataset.k==="atk"){slots[+e.target.closest("tr").dataset.i].atk=+e.target.value;render();}});
+$("season").addEventListener("change",render); $("enemy").addEventListener("change",render);
+(async()=>{
+  let sk,seasons=[];
+  try{sk=await load("data/battle/skills.csv");}catch(e){showError(e);return;}
+  try{seasons=await load("data/seasons.csv");}catch(_){}
+  DATA=sk.map(toCalcRow); NAMES=[...new Set(DATA.map(d=>d.n))];
+  SEASONS=[...seasons.filter(s=>s["시즌ID"]).reverse().map(s=>({n:s["표시이름"]||s["시즌ID"],c:s["콘텐츠"],e:s["적 성격"]||""})),...EXTRA_SEASONS];
+  $("season").innerHTML=SEASONS.map((s,i)=>`<option value="${i}">${esc(s.n)}</option>`).join("");
+  const firstClash=SEASONS.findIndex(s=>s.c==="대충돌"); if(firstClash>=0) $("season").value=firstClash;
+  slots=EXAMPLE.filter(a=>NAMES.includes(a[0])).map(a=>({name:a[0],aside:a[1],hi:!!a[2],choose:a[3],atk:a[4],match:"중립"}));
+  while(slots.length<9) slots.push({name:"",aside:0,hi:true,choose:"",atk:0,match:"중립"});
+  buildSlots(); render();
+})();
+</script>
+</body>
+</html>
