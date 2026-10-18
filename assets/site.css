@@ -58,3 +58,11 @@ footer{color:var(--muted);font-size:.85rem}
 .face img{width:100%;height:100%;object-fit:cover;display:block}
 .face b{font-family:var(--display);font-weight:400;color:var(--pc,var(--muted));font-size:calc(var(--fs,36px)*.46);line-height:1}
 .sitebar a.tab.log{margin-left:auto;font-size:.85rem}
+
+/* 검증 현황 요약 (내보내기 스크립트가 숫자를 채움 — 자바스크립트 없이도 보임) */
+.site-sum{background:var(--paper);border:1px solid var(--line);border-left:5px solid var(--leaf);border-radius:16px;padding:14px 18px;display:grid;gap:6px;font-size:.9rem}
+.site-sum p{margin:0}
+.site-sum .sum-h{font-weight:700;font-size:.85rem;color:var(--muted)}
+.site-sum .sum-stat b{font-family:var(--mono);font-size:1.05rem}
+.site-sum .sum-list{margin:0;padding-left:18px;display:grid;gap:2px}
+.site-sum .sum-link{font-size:.85rem}
