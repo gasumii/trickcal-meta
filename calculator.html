@@ -20,9 +20,9 @@
 .main-col{display:grid;gap:14px;min-width:0}
 .slot td{vertical-align:middle}
 .slot select{max-width:132px}
-.slot input[type=number]{width:96px;font-family:var(--mono)}
+.slot input[type=number]{width:100px;font-family:var(--mono)}
 .mu{font-size:.8rem;font-weight:700}.mu[data-m="유리"]{color:var(--leaf)}.mu[data-m="불리"]{color:var(--warn)}.mu[data-m="중립"]{color:var(--muted)}
-.bar{height:6px;border-radius:3px;background:var(--leaf);width:0}
+td.sh{min-width:150px;font-size:.9em;line-height:1.35}td.sh>*{display:block}td.sh summary{cursor:pointer;font-size:.85em}td.sh .give{color:var(--leaf);font-weight:600}
 .eff-low{color:var(--leaf);font-weight:700;border-bottom:2px solid var(--leaf)}
 .syn{display:flex;flex-wrap:wrap;gap:8px}
 .syn div{display:grid;justify-items:center;gap:2px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;min-width:76px}
@@ -78,7 +78,7 @@ details.adv summary{cursor:pointer;font-weight:700}
 <nav class="sitebar" aria-label="사이트 메뉴"><div class="sitebar-in"><a class="site" href="./">트릭컬 PvE 메타</a><a class="tab" href="./">PvE 기록 분석</a><a class="tab" href="global.html">글로벌 PvE 분석</a><a class="tab" href="mechanics.html">전투 메커니즘</a><a class="tab" href="calculator.html" aria-current="page">덱 계산기</a><a class="tab log" href="changelog.html">업데이트 기록</a></div></nav>
 <main>
   <header><h1>덱 계산기</h1>
-  <p class="lead">시즌을 고르고 편성 칸(후열·중열·전열)에 사도를 넣은 뒤 공격력을 적으면 팀 버프, 성격 시너지, 상성을 합쳐 사도별 딜 지수를 계산합니다. 같은 덱 안에서 누가 얼마나 강해지는지 비교하는 상대값입니다. 기본으로 들어 있는 덱과 공격력은 예시이니 본인 값으로 바꿔 보세요.</p></header>
+  <p class="lead">시즌을 고르고 편성 칸(후열·중열·전열)에 사도를 넣은 뒤 공격력·최대 HP를 적으면 팀 버프, 성격 시너지, 상성을 합쳐 사도별 공격력 증가·피해량 증가와 받는 보호막을 보여 줍니다. 기본으로 들어 있는 덱과 공격력은 예시이니 본인 값으로 바꿔 보세요.</p></header>
   <div class="error" id="error" hidden></div>
   <div class="calc-grid">
     <aside class="panel side">
@@ -90,7 +90,7 @@ details.adv summary{cursor:pointer;font-weight:700}
       <div class="stat"><small>팀 공격력 배율</small><b id="sAtk">-</b></div>
       <div class="stat"><small>성격 시너지 (전원 피해량·HP)</small><b id="sSyn">-</b></div>
       <div class="stat"><small>우로스 공격력 부여</small><b id="sGrant">-</b></div>
-      <div class="stat"><small>최고 딜 지수 (스킬)</small><b id="sTop">-</b></div>
+      <div class="stat"><small>팀 보호막 합계 (최대치)</small><b id="sTop">-</b></div>
       <p class="note">성격 시너지는 대충돌·대충돌 2.0 beta에서만 적용됩니다. 스킬·어사이드의 성격 조건 효과(우로스 어사이드3 등)는 모든 콘텐츠에서 적용됩니다.</p>
     </aside>
     <div class="main-col">
@@ -101,7 +101,7 @@ details.adv summary{cursor:pointer;font-weight:700}
         <div class="board-foot"><span class="note">칸을 누르면 그 열에 서는 사도만 보여 줍니다(죠안·티그(영웅)처럼 '모든 열' 사도는 어디든). PvE 기록 분석의 표준 덱에서 '계산기로 열기'를 누르면 그 덱이 채워집니다.</span><span class="note warn" id="warn"></span></div>
       </div>
       <div class="tbl"><table>
-        <thead><tr><th>열</th><th>사도</th><th>어사이드</th><th>고학년</th><th>성격</th><th>공격력 (캐릭터 화면)</th><th>상성</th><th title="캐릭터 화면 공격력 대비 버프로 늘어난 공격력(%) · 아래 작은 숫자는 버프 후 공격력">공격력 증가</th><th title="주는 피해 증가 + 받는 피해 증가 + 성격 시너지를 한 칸에 더한 값">피해량 증가</th><th>딜 지수 (일반)</th><th>딜 지수 (스킬)</th><th style="min-width:80px"></th></tr></thead>
+        <thead><tr><th>열</th><th>사도</th><th>어사이드</th><th>고학년</th><th>성격</th><th title="캐릭터 정보 화면에 보이는 공격력">공격력<br><small class="conf">캐릭터 화면</small></th><th title="캐릭터 정보 화면에 보이는 최대 HP — 보호막 계산에 사용">최대 HP<br><small class="conf">캐릭터 화면</small></th><th>상성</th><th title="캐릭터 화면 공격력 대비 버프로 늘어난 공격력(%) · 아래 작은 숫자는 버프 후 공격력">공격력 증가</th><th title="주는 피해 증가 + 받는 피해 증가 + 성격 시너지를 한 칸에 더한 값">피해량 증가</th><th title="이 사도가 받는 보호막 (버프 후 최대 HP 기준) · 아래 작은 글씨는 주는 사도. 보호막을 주는 사도는 팀 전체에 주는 양도 함께 표시">보호막</th></tr></thead>
         <tbody id="slots"></tbody>
       </table></div>
       <details class="adv" id="adv">
@@ -128,7 +128,7 @@ details.adv summary{cursor:pointer;font-weight:700}
         <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><strong>성격 시너지</strong><span class="note">같은 성격 2·4·6·7·9명마다 +20·55·100·140·200%. 성격별 보너스를 모두 더해 아군 전원이 받습니다.</span></div>
         <div class="syn" id="syn"></div>
       </div>
-      <p class="note">계산 근거: 공격력 증가·피해량 버프·성격 시너지는 유저 실측 계산법(디시인사이드 트릭컬 갤러리) 기준으로 합산, 성격 상성 유리 ×1.5 / 불리 ×0.75 (PvE 기준), 우로스 지배의 영역은 최고 공격력 아군의 35%를 전원에게 부여. 공격력 증가와 피해량 증가 중 <b>낮은 쪽(초록 밑줄)</b>을 올리는 버프가 그 사도에게 더 효율적입니다 — 두 칸은 각각 합연산 후 서로 곱해지므로, 덜 쌓인 칸에 같은 %를 더할수록 최종 딜이 더 많이 오릅니다. 반영: 성격·열·역할·물리/마법 조건이 붙은 버프는 해당 사도에게만, 일반 공격 피해 증가는 일반 딜 지수에만, 받는 스킬 피해 증가는 스킬 딜 지수에만 더함. 미반영: 스킬 계수, 치명타, 지속시간, 공컷계수 0.8·콘텐츠 히든 피감(모든 사도에 똑같이 곱해져 상대 비교에는 영향 없음). 공격력 칸에는 어사이드 1성 공증이 이미 포함돼 있어 버프 효과가 약간 크게 나올 수 있습니다. 현재 등록된 사도만 고를 수 있습니다. 판정 근거는 <a href="mechanics.html">전투 메커니즘</a>에 있습니다.</p>
+      <p class="note">계산 근거: 공격력 증가·피해량 버프·성격 시너지는 유저 실측 계산법(디시인사이드 트릭컬 갤러리) 기준으로 합산, 성격 상성 유리 ×1.5 / 불리 ×0.75 (PvE 기준), 우로스 지배의 영역은 최고 공격력 아군의 35%를 전원에게 부여. 공격력 증가와 피해량 증가 중 <b>낮은 쪽(초록 밑줄)</b>을 올리는 버프가 그 사도에게 더 효율적입니다 — 두 칸은 각각 합연산 후 서로 곱해지므로, 덜 쌓인 칸에 같은 %를 더할수록 최종 딜이 더 많이 오릅니다. 반영: 성격·열·역할·물리/마법 조건이 붙은 버프는 해당 사도에게만, 보호막 칸은 스킬이 모두 발동했을 때의 최대치이며(지속시간이 달라 동시에 겹친다는 보장은 없음), 받는 사도의 버프 후 최대 HP 기준 %로 계산(어사이드·고학년 사용 여부 반영). 처치 시·보호 발동 시처럼 사건이 있어야 생기는 보호막과 'HP가 가장 낮은 아군 1명' 같은 단일 대상 보호막은 합계에서 빼고 따로 표시. 미반영: 스킬 계수, 치명타, 지속시간, 공컷계수 0.8·콘텐츠 히든 피감(모든 사도에 똑같이 곱해져 상대 비교에는 영향 없음). 공격력 칸에는 어사이드 1성 공증이 이미 포함돼 있어 버프 효과가 약간 크게 나올 수 있습니다. 현재 등록된 사도만 고를 수 있습니다. 판정 근거는 <a href="mechanics.html">전투 메커니즘</a>에 있습니다.</p>
     </div>
   </div>
   <dialog class="pick" id="pick" aria-labelledby="pickTitle"><div class="pick-in">
@@ -170,8 +170,9 @@ function buildSlots(){
    <td><input id="h${i}" type="checkbox" data-k="hi" ${s.hi?"checked":""} aria-label="고학년 사용"></td>
    <td class="pc"></td>
    <td><input id="g${i}" type="number" min="0" step="100" data-k="atk" value="${s.atk||""}" aria-label="공격력"></td>
-   <td class="mt"></td><td class="num" data-o="buffed"></td><td class="num" data-o="pool"></td><td class="num" data-o="deal"></td><td class="num" data-o="skill"></td><td><div class="bar" data-o="bar"></div></td></tr>`:"").join("")
-   ||`<tr><td colspan="12" class="note" style="padding:16px">위 편성 칸을 눌러 사도를 넣어 주세요.</td></tr>`;
+   <td><input id="hp${i}" type="number" min="0" step="1000" data-k="hp" value="${s.hp||""}" placeholder="HP" aria-label="최대 HP"></td>
+   <td class="mt"></td><td class="num" data-o="buffed"></td><td class="num" data-o="pool"></td><td class="sh" data-o="shield"></td></tr>`:"").join("")
+   ||`<tr><td colspan="11" class="note" style="padding:16px">위 편성 칸을 눌러 사도를 넣어 주세요.</td></tr>`;
 }
 /* 사도 고르기 창 */
 let pickI=-1,pickP="";
@@ -198,13 +199,24 @@ function place(n){
   closePick(); refresh();
 }
 function refresh(){buildBoard();buildSlots();render();}
-function renderSurvive(ss,withRow){
-  const sv=survive(DATA,withRow,ss.c,{enemySkill:!!$("svAtk").value,always:!!$("svRange").value,enemyInc:+$("svInc").value||0});
+function renderSurvive(sv){
   $("svBody").innerHTML=sv.map(x=>{const i=slots.findIndex(s=>s.name===x.s.name);return `<tr data-i="${i}"><td style="white-space:nowrap">${face(x.s.name,26)} ${esc(x.s.name)}</td>
-    <td><input type="number" min="0" step="1000" data-k="hp" value="${x.s.hp||""}" aria-label="${esc(x.s.name)} 최대 HP"></td>
+    <td class="num">${x.s.hp?fmt(x.s.hp):"—"}</td>
     <td class="num">+${x.hp.toFixed(1)}%</td><td class="num">${x.bHP?fmt(x.bHP):"—"}</td><td class="num">${x.sh?x.sh.toFixed(1)+"%":"—"}</td>
     <td class="num">${x.applied.toFixed(1)}%${x.dr>75?" (상한)":""}</td><td class="num">${x.atkDown?x.atkDown.toFixed(1)+"%":"—"}</td><td class="num"><strong>${x.eff?fmt(x.eff):"—"}</strong></td></tr>`;}).join("")
     ||`<tr><td colspan="8" class="note" style="padding:12px">편성 칸에 사도를 넣어 주세요.</td></tr>`;
+}
+/* 보호막 칸: 받는 양(위) + 주는 양(아래) */
+function shieldCell(o,myHP,bHPof){
+  const lines=[];
+  if(o.recv.length){const tot=o.recv.reduce((a,x)=>a+x.pct,0);
+    lines.push(`<b>${myHP?fmt(myHP*tot/100):"HP의 "+tot.toFixed(0)+"%"}</b>`);
+    lines.push(`<details><summary class="conf">${myHP?"HP의 "+tot.toFixed(0)+"% · ":""}${o.recv.length}개</summary><small class="conf">${o.recv.map(x=>`${esc(x.from)} ${x.pct}%${x.dur?" ("+esc(x.dur)+")":""}`).join("<br>")}</small></details>`);}
+  if(o.give.length){const g=o.give.reduce((a,x)=>a+bHPof(x.to)*x.pct/100,0),n=new Set(o.give.map(x=>x.to)).size;
+    lines.push(`<small class="give" title="이 사도가 편성 아군에게 주는 보호막 합계">→ ${n}명에게 ${g?fmt(g):"(HP 입력)"}</small>`);}
+  o.single.forEach(x=>lines.push(`<small class="give" title="${esc(x.cond)}">→ 지정 대상 HP의 ${x.pct}%</small>`));
+  o.trig.forEach(x=>lines.push(`<small class="conf" title="${esc(x.cond)}">조건부 HP의 ${x.pct}%</small>`));
+  return lines.join("")||`<span class="conf">—</span>`;
 }
 function render(){
   const ss=SEASONS[+$("season").value]||{c:"기타",e:""};
@@ -214,7 +226,10 @@ function render(){
   const r=calc(DATA,withRow,ss.c,{enemy,def:{on:$("defOn").checked,D:+$("defD").value,t:+$("defT").value}});
   $("synMini").innerHTML=`<span class="note">성격</span>`+BASIC.map(p=>{const n=r.counts[p],v=synBonus(n);return n?`<span class="k${v?" hit":""}"><span class="per" data-p="${p}">${p}</span>${n}명${v?` +${v}%`:""}</span>`:"";}).join("")
     +`<span class="k${r.synTotal?" hit":""}">${r.synOn?"시너지 합계 +"+r.synTotal+"%":"시너지 미적용 콘텐츠"}</span>`;
-  renderSurvive(ss,withRow);
+  const svOpt={enemySkill:!!$("svAtk").value,always:!!$("svRange").value,enemyInc:+$("svInc").value||0};
+  const sv=survive(DATA,withRow,ss.c,svOpt); renderSurvive(sv);
+  const SM=shieldMap(DATA,withRow,{}), bHPof=n=>{const q=sv.find(x=>x.s.name===n);return q?q.bHP:0;};
+  const shOf={}; SM.used.forEach(u=>shOf[u.name]=SM.out.get(u));
   const used=slots.filter(s=>s.name);
   const w=[]; const res=used.filter(s=>base(s.name)==="공명").length; if(res>2) w.push(`공명 사도는 최대 2명 (지금 ${res}명)`);
   const hiN=used.filter(s=>s.hi).length; if(ss.c==="대충돌"&&hiN>6) w.push(`대충돌은 고학년 스킬 6명까지 (지금 ${hiN}명)`);
@@ -224,7 +239,8 @@ function render(){
   $("sAtk").textContent=r.teamAtk.toFixed(2)+"배";
   $("sSyn").textContent=r.synOn?"+"+r.syn+"%":"0% (미적용)";
   $("sGrant").textContent=r.grant?fmt(r.grant):"—";
-  const top=Math.max(0,...r.res.map(x=>x.skill)); $("sTop").textContent=top?fmt(top):"—";
+  const teamSh=SM.used.reduce((a,u)=>a+shOf[u.name].recv.reduce((b,x)=>b+bHPof(u.name)*x.pct/100,0),0);
+  $("sTop").textContent=teamSh?fmt(teamSh):(SM.used.some(u=>shOf[u.name].recv.length)?"HP 입력 필요":"—");
   document.querySelectorAll("#slots tr.slot").forEach(tr=>{
     const i=+tr.dataset.i,s=slots[i],x=r.res.find(q=>s.name&&q.s.name===s.name),b=base(s.name);
     tr.querySelector(".pc").innerHTML=!s.name?"":b==="공명"
@@ -234,19 +250,20 @@ function render(){
     const set=(k,v)=>tr.querySelector(`[data-o="${k}"]`).textContent=v;
     if(x&&s.atk){const ap=(x.buffed/(+s.atk)-1)*100,dp=(x.pool-1)*100,low=ap<=dp?"buffed":"pool";
       const bEl=tr.querySelector('[data-o="buffed"]');bEl.innerHTML=`<span${low==="buffed"?' class="eff-low" title="두 % 중 낮은 쪽 — 공격력 버프를 더하는 게 효율이 좋음"':''}>+${Math.round(ap).toLocaleString("ko-KR")}%</span><br><small class="conf">${fmt(x.buffed)}</small>`;
-      tr.querySelector('[data-o="pool"]').classList.toggle("low",low==="pool");{const el=tr.querySelector('[data-o="pool"]');el.innerHTML=`<span${el.classList.contains("low")?' class="eff-low" title="두 % 중 낮은 쪽 — 피해량 버프를 더하는 게 효율이 좋음"':''}>+${Math.round((x.pool-1)*100).toLocaleString("ko-KR")}%</span><br><small class="conf">${x.pool.toFixed(2)}배</small>`;}set("deal",fmt(x.deal));set("skill",fmt(x.skill));tr.querySelector('[data-o="bar"]').style.width=(top?x.skill/top*100:0)+"%";}
-    else{["buffed","pool","deal","skill"].forEach(k=>set(k,""));tr.querySelector('[data-o="pool"]').classList.remove("low");tr.querySelector('[data-o="bar"]').style.width="0";}
+      tr.querySelector('[data-o="pool"]').classList.toggle("low",low==="pool");{const el=tr.querySelector('[data-o="pool"]');el.innerHTML=`<span${el.classList.contains("low")?' class="eff-low" title="두 % 중 낮은 쪽 — 피해량 버프를 더하는 게 효율이 좋음"':''}>+${Math.round((x.pool-1)*100).toLocaleString("ko-KR")}%</span><br><small class="conf">${x.pool.toFixed(2)}배</small>`;}}
+    else{["buffed","pool"].forEach(k=>set(k,""));tr.querySelector('[data-o="pool"]').classList.remove("low");}
+    tr.querySelector('[data-o="shield"]').innerHTML=s.name&&shOf[s.name]?shieldCell(shOf[s.name],bHPof(s.name),bHPof):"";
   });
   $("syn").innerHTML=BASIC.map(p=>{const n=r.counts[p],v=synBonus(n);return `<div class="${v?"hit":""}"><span class="per" data-p="${p}">${p}</span><span>${n}명</span><b>+${v}%</b></div>`}).join("")
     +`<div class="${r.synTotal?"hit":""}"><span>합계</span><span>전원</span><b>+${r.synTotal}%</b></div>`;
 }
 $("slots").addEventListener("change",e=>{
   const tr=e.target.closest("tr");if(!tr||tr.dataset.i===undefined)return;const s=slots[+tr.dataset.i],k=e.target.dataset.k;
-  s[k]=k==="hi"?e.target.checked:(k==="aside"||k==="atk")?+e.target.value:e.target.value;
+  s[k]=k==="hi"?e.target.checked:(k==="aside"||k==="atk"||k==="hp")?+e.target.value:e.target.value;
   if(k==="choose")buildBoard();
   render();
 });
-$("slots").addEventListener("input",e=>{if(e.target.dataset.k==="atk"){slots[+e.target.closest("tr").dataset.i].atk=+e.target.value;render();}});
+$("slots").addEventListener("input",e=>{const k=e.target.dataset.k;if(k==="atk"||k==="hp"){slots[+e.target.closest("tr").dataset.i][k]=+e.target.value;render();}});
 $("board").addEventListener("click",e=>{
   const x=e.target.closest("[data-x]"); if(x){slots[+x.dataset.x]=emptySlot();refresh();return;}
   const c=e.target.closest(".cell"); if(c) openPick(+c.dataset.i);
@@ -256,7 +273,6 @@ $("pickPer").addEventListener("click",e=>{const b=e.target.closest("button[data-
 $("pickQ").addEventListener("input",renderPick); $("pickAll").addEventListener("change",renderPick);
 $("pickClose").addEventListener("click",closePick);
 $("pick").addEventListener("click",e=>{if(e.target===$("pick"))closePick();});
-$("svBody").addEventListener("change",e=>{if(e.target.dataset.k==="hp"){slots[+e.target.closest("tr").dataset.i].hp=+e.target.value;render();}});
 ["defOn","defD","defT","svAtk","svRange","svInc"].forEach(id=>$(id).addEventListener("input",render));
 $("season").addEventListener("change",render); $("enemy").addEventListener("change",render);
 (async()=>{
