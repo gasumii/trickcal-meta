@@ -170,7 +170,7 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem}
 </style>
 </head>
 <body>
-<nav class="sitebar" aria-label="사이트 메뉴"><div class="sitebar-in"><a class="site" href="./">트릭컬 PvE 메타</a><a class="tab" href="./" aria-current="page">PvE 기록 분석</a><a class="tab" href="global.html">글로벌 PvE 분석</a><a class="tab" href="mechanics.html">전투 메커니즘</a><a class="tab" href="calculator.html">덱 계산기</a></div></nav>
+<nav class="sitebar" aria-label="사이트 메뉴"><div class="sitebar-in"><a class="site" href="./">트릭컬 PvE 메타</a><a class="tab" href="./" aria-current="page">PvE 기록 분석</a><a class="tab" href="global.html">글로벌 PvE 분석</a><a class="tab" href="mechanics.html">전투 메커니즘</a><a class="tab" href="calculator.html">덱 계산기</a><a class="tab log" href="changelog.html">업데이트 기록</a></div></nav>
 <main>
   <nav class="gnb" id="gnb" aria-label="콘텐츠 메뉴" hidden><div class="gnb-in" id="gnbIn"></div></nav>
   <header class="hero">
@@ -238,7 +238,7 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem}
     </div>
   </section>
 
-  <footer>개인이 게임 내 공개 순위 화면을 직접 보고 기록한 비공식 자료입니다. 다른 유저의 닉네임은 기록하지 않았습니다.</footer>
+  <footer>개인이 게임 내 공개 순위 화면을 직접 보고 기록한 비공식 자료입니다. 다른 유저의 닉네임은 기록하지 않았습니다. 트릭컬 리바이브의 게임 IP(캐릭터·이미지·명칭 등) 권리는 에피드게임즈에 있으며, 이 사이트는 에피드게임즈와 관계없는 비공식 팬 사이트입니다.</footer>
 </main>
 
 <script>
@@ -361,7 +361,7 @@ async function main(){
 
   /* 보드 */
   const board=$("board"); board.hidden=false;
-  board.innerHTML=`<div class="board-head"><b>표준 덱</b><span>${N}덱 중 ${stdCount}덱이 이 ${slotKeys.length}명 그대로 편성, 칸의 숫자는 채용률</span></div>
+  board.innerHTML=`<div class="board-head"><b>표준 덱</b><span>${N}덱 중 ${stdCount}덱이 이 ${slotKeys.length}명 그대로 편성, 칸의 숫자는 채용률 · <a href="calculator.html?deck=${encodeURIComponent(std.join(","))}">덱 계산기로 열기 →</a></span></div>
   <div class="slots">${std.map(n=>`<div class="slot" style="--c:${col(n)}"><i class="hex" aria-hidden="true"></i>
     <div class="pct">${pct(rateOf[n])}</div><div class="nm">${esc(n)}</div>
     <div class="meter"><i style="width:${rateOf[n]*100}%"></i></div></div>`).join("")}</div>`;

@@ -53,3 +53,8 @@ footer{color:var(--muted);font-size:.85rem}
 .sitebar a.tab[aria-current="page"]{color:var(--ink);border-bottom-color:var(--leaf)}
 .sitebar a.tab:hover{color:var(--ink)}
 @media (max-width:560px){.sitebar .site{display:none}}
+/* 사도 얼굴 (이미지가 없으면 성격 색 이니셜) */
+.face{width:var(--fs,36px);height:var(--fs,36px);border-radius:50%;border:2px solid var(--pc,var(--line));display:inline-grid;place-items:center;overflow:hidden;background:var(--paper);flex:none;vertical-align:middle}
+.face img{width:100%;height:100%;object-fit:cover;display:block}
+.face b{font-family:var(--display);font-weight:400;color:var(--pc,var(--muted));font-size:calc(var(--fs,36px)*.46);line-height:1}
+.sitebar a.tab.log{margin-left:auto;font-size:.85rem}

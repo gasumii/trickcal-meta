@@ -27,14 +27,57 @@
 .syn div{display:grid;justify-items:center;gap:2px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;min-width:76px}
 .syn div b{font-family:var(--mono)}
 .syn div.hit{border-color:var(--leaf);background:var(--leaf-soft)}
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;position:relative}
+.lane{display:grid;gap:8px;align-content:start}
+.lane-h{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--display);font-size:1.05rem}
+.lane-h small{font-family:var(--body);font-size:.75rem;color:var(--muted)}
+.cell{font:inherit;position:relative;display:grid;gap:4px;justify-items:start;align-content:center;min-height:68px;padding:8px 10px;border:2px dashed var(--line);border-radius:14px;background:var(--bg);color:var(--muted);cursor:pointer;text-align:left}
+.cell:hover{border-color:var(--leaf);color:var(--ink)}
+.cell.on{border-style:solid;border-color:var(--pc,var(--line));background:var(--paper);color:var(--ink);box-shadow:inset 4px 0 0 var(--pc,var(--line))}
+.cell .nm{font-weight:700;font-size:.9rem;line-height:1.25;word-break:keep-all;padding-right:18px}
+.cell .x{position:absolute;top:4px;right:6px;width:22px;height:22px;display:grid;place-items:center;border-radius:6px;color:var(--muted);font-size:1rem}
+.cell .x:hover{background:var(--bad-soft);color:var(--bad)}
+.board-foot{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;align-items:center}
+.enemy-side{font-size:.8rem;color:var(--muted)}
+.warn{color:var(--warn);font-weight:700}
+.lane-tag{display:inline-block;font-size:.72rem;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 6px;margin-right:4px}
+dialog.pick{border:1px solid var(--line);border-radius:18px;padding:0;background:var(--paper);color:var(--ink);width:min(720px,calc(100vw - 24px));max-height:min(80vh,720px)}
+dialog.pick::backdrop{background:rgba(20,30,15,.45)}
+.pick-in{display:grid;gap:12px;padding:16px}
+.pick-h{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pick-h strong{font-family:var(--display);font-weight:400;font-size:1.25rem}
+.pick-h button{font:inherit;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:10px;width:36px;height:36px;cursor:pointer}
+.pick-ctl{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.pick-ctl input[type=search]{flex:1 1 180px}
+.pick-ctl label{display:flex;gap:6px;align-items:center;font-size:.85rem;color:var(--muted)}
+.pick-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;overflow:auto;max-height:52vh;padding:2px}
+.pick-list button{font:inherit;display:grid;gap:4px;justify-items:start;text-align:left;padding:8px 10px;border:1px solid var(--line);border-left:5px solid var(--pc,var(--line));border-radius:10px;background:var(--bg);color:var(--ink);cursor:pointer}
+.pick-list button:hover:not(:disabled){border-color:var(--pc,var(--leaf))}
+.pick-list button:disabled{opacity:.45;cursor:not-allowed}
+.pick-list .meta{display:flex;gap:6px;align-items:center;font-size:.72rem;color:var(--muted)}
+.chips button[data-p][aria-pressed="true"]{background:var(--pc);border-color:var(--pc);color:#fff}
+@media (max-width:560px){.board{gap:6px}.cell{min-height:60px;padding:6px 7px}.cell .nm{font-size:.8rem}.lane-h{font-size:.95rem}}
+.cell.on{grid-template-columns:auto 1fr;column-gap:8px;align-items:center}
+.cell.on .face{grid-row:span 2}
+.syn-mini{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.8rem}
+.syn-mini span.k{display:inline-flex;gap:4px;align-items:center;padding:2px 8px;border-radius:999px;border:1px solid var(--line)}
+.syn-mini span.k.hit{border-color:var(--leaf);background:var(--leaf-soft);font-weight:700}
+.pick-list button{grid-template-columns:auto 1fr;column-gap:8px;align-items:center}
+.pick-list button .face{grid-row:span 2}
+details.adv{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:12px 16px}
+details.adv summary{cursor:pointer;font-weight:700}
+.adv-grid{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end;margin:12px 0}
+.adv-grid input[type=number]{width:120px;font-family:var(--mono)}
+.adv-grid .chk{display:flex;gap:6px;align-items:center;font-size:.88rem}
+.sv input[type=number]{width:110px;font-family:var(--mono)}
 @media (max-width:860px){.calc-grid{grid-template-columns:1fr}.side{position:static}}
 </style>
 </head>
 <body>
-<nav class="sitebar" aria-label="사이트 메뉴"><div class="sitebar-in"><a class="site" href="./">트릭컬 PvE 메타</a><a class="tab" href="./">PvE 기록 분석</a><a class="tab" href="global.html">글로벌 PvE 분석</a><a class="tab" href="mechanics.html">전투 메커니즘</a><a class="tab" href="calculator.html" aria-current="page">덱 계산기</a></div></nav>
+<nav class="sitebar" aria-label="사이트 메뉴"><div class="sitebar-in"><a class="site" href="./">트릭컬 PvE 메타</a><a class="tab" href="./">PvE 기록 분석</a><a class="tab" href="global.html">글로벌 PvE 분석</a><a class="tab" href="mechanics.html">전투 메커니즘</a><a class="tab" href="calculator.html" aria-current="page">덱 계산기</a><a class="tab log" href="changelog.html">업데이트 기록</a></div></nav>
 <main>
   <header><h1>덱 계산기</h1>
-  <p class="lead">시즌을 고르고 사도와 공격력을 넣으면 팀 버프, 성격 시너지, 상성을 합쳐 사도별 딜 지수를 계산합니다. 같은 덱 안에서 누가 얼마나 강해지는지 비교하는 상대값입니다. 기본으로 들어 있는 덱과 공격력은 예시이니 본인 값으로 바꿔 보세요.</p></header>
+  <p class="lead">시즌을 고르고 편성 칸(후열·중열·전열)에 사도를 넣은 뒤 공격력을 적으면 팀 버프, 성격 시너지, 상성을 합쳐 사도별 딜 지수를 계산합니다. 같은 덱 안에서 누가 얼마나 강해지는지 비교하는 상대값입니다. 기본으로 들어 있는 덱과 공격력은 예시이니 본인 값으로 바꿔 보세요.</p></header>
   <div class="error" id="error" hidden></div>
   <div class="calc-grid">
     <aside class="panel side">
@@ -50,46 +93,138 @@
       <p class="note">성격 시너지는 대충돌·대충돌 2.0 beta에서만 적용됩니다. 스킬·어사이드의 성격 조건 효과(우로스 어사이드3 등)는 모든 콘텐츠에서 적용됩니다.</p>
     </aside>
     <div class="main-col">
+      <div class="panel" style="display:grid;gap:12px">
+        <div class="board-foot"><strong>편성</strong><span class="enemy-side">← 후열 · 중열 · 전열 → (적은 오른쪽)</span></div>
+        <div class="syn-mini" id="synMini" aria-live="polite"></div>
+        <div class="board" id="board"></div>
+        <div class="board-foot"><span class="note">칸을 누르면 그 열에 서는 사도만 보여 줍니다(죠안·티그(영웅)처럼 '모든 열' 사도는 어디든). PvE 기록 분석의 표준 덱에서 '계산기로 열기'를 누르면 그 덱이 채워집니다.</span><span class="note warn" id="warn"></span></div>
+      </div>
       <div class="tbl"><table>
-        <thead><tr><th>#</th><th>사도</th><th>어사이드</th><th>고학년</th><th>성격</th><th>공격력 (캐릭터 화면)</th><th>상성</th><th>버프 후 공격력</th><th>피해량 배율</th><th>딜 지수 (일반)</th><th>딜 지수 (스킬)</th><th style="min-width:80px"></th></tr></thead>
+        <thead><tr><th>열</th><th>사도</th><th>어사이드</th><th>고학년</th><th>성격</th><th>공격력 (캐릭터 화면)</th><th>상성</th><th>버프 후 공격력</th><th>피해량 배율</th><th>딜 지수 (일반)</th><th>딜 지수 (스킬)</th><th style="min-width:80px"></th></tr></thead>
         <tbody id="slots"></tbody>
       </table></div>
+      <details class="adv" id="adv">
+        <summary>고급 옵션 — 방어력 계산 · 생존 계산</summary>
+        <div class="adv-grid">
+          <label class="chk"><input type="checkbox" id="defOn"> 방어력 계산 켜기</label>
+          <label class="f" for="defD">적 방어력<input id="defD" type="number" min="0" step="1000" value="60000"></label>
+          <label class="f" for="defT">보정 t<input id="defT" type="number" min="0" step="0.01" value="0.4"></label>
+          <span class="note" id="defNote" style="flex:1 1 260px">유효 공격력 = max(0.05×공격력, 0.8×공격력 − t×(적 방어력 − 팀 방깎)/5). t는 PvE 보스 1, 대충돌 0.28~0.48 (유저 실측글 기준).</span>
+        </div>
+        <hr style="border:0;border-top:1px solid var(--line)">
+        <div class="adv-grid">
+          <label class="f" for="svAtk">적 공격 유형<select id="svAtk"><option value="">일반 공격</option><option value="1">스킬</option></select></label>
+          <label class="f" for="svRange">계산 범위<select id="svRange"><option value="1">상시 효과만</option><option value="">전체 (최대치)</option></select></label>
+          <label class="f" for="svInc">적 피해 증가 (%)<input id="svInc" type="number" step="5" value="0"></label>
+        </div>
+        <div class="tbl"><table class="sv">
+          <thead><tr><th>사도</th><th>최대 HP (캐릭터 화면)</th><th>HP 증가</th><th>버프 후 HP</th><th>보호막</th><th>피해 감소 (적용)</th><th>적 공격력 감소</th><th>유효 HP</th></tr></thead>
+          <tbody id="svBody"></tbody>
+        </table></div>
+        <p class="note">생존 계산 규칙 (디시인사이드 트릭컬 갤러리 유저 글 기준): 아군 받는 피해 감소와 적에게 거는 주는 피해 감소를 한 칸에 더해 75%까지만 적용, 적 피해 증가는 그만큼 상쇄, 공격력 감소(독 등)는 따로 곱함. 성격 시너지 HP는 HP 증가에 더함(합연산 가정). 보호막은 받는 사도의 최대 HP 기준(가정). 상대 비교용 지표입니다.</p>
+      </details>
       <div class="panel" style="display:grid;gap:10px">
         <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px"><strong>성격 시너지</strong><span class="note">같은 성격 2·4·6·7·9명마다 +20·55·100·140·200%. 성격별 보너스를 모두 더해 아군 전원이 받습니다.</span></div>
         <div class="syn" id="syn"></div>
       </div>
-      <p class="note">계산 근거: 공격력 증가·피해량 버프·성격 시너지는 유저 실측 계산법(디시인사이드 트릭컬 갤러리) 기준으로 합산, 성격 상성 유리 ×1.5 / 불리 ×0.75 (PvE 기준), 우로스 지배의 영역은 최고 공격력 아군의 35%를 전원에게 부여. 미반영: 스킬 계수, 적 방어력, 치명타, 지속시간, 공컷계수 0.8·콘텐츠 히든 피감(모든 사도에 똑같이 곱해져 상대 비교에는 영향 없음). 공격력 칸에는 어사이드 1성 공증이 이미 포함돼 있어 버프 효과가 약간 크게 나올 수 있습니다. 현재 등록된 사도만 고를 수 있습니다. 판정 근거는 <a href="mechanics.html">전투 메커니즘</a>에 있습니다.</p>
+      <p class="note">계산 근거: 공격력 증가·피해량 버프·성격 시너지는 유저 실측 계산법(디시인사이드 트릭컬 갤러리) 기준으로 합산, 성격 상성 유리 ×1.5 / 불리 ×0.75 (PvE 기준), 우로스 지배의 영역은 최고 공격력 아군의 35%를 전원에게 부여. 반영: 성격·열·역할·물리/마법 조건이 붙은 버프는 해당 사도에게만, 일반 공격 피해 증가는 일반 딜 지수에만, 받는 스킬 피해 증가는 스킬 딜 지수에만 더함. 미반영: 스킬 계수, 치명타, 지속시간, 공컷계수 0.8·콘텐츠 히든 피감(모든 사도에 똑같이 곱해져 상대 비교에는 영향 없음). 공격력 칸에는 어사이드 1성 공증이 이미 포함돼 있어 버프 효과가 약간 크게 나올 수 있습니다. 현재 등록된 사도만 고를 수 있습니다. 판정 근거는 <a href="mechanics.html">전투 메커니즘</a>에 있습니다.</p>
     </div>
   </div>
-  <footer>개인이 정리한 비공식 계산기입니다. 실제 게임 피해량과 다를 수 있습니다.</footer>
+  <dialog class="pick" id="pick" aria-labelledby="pickTitle"><div class="pick-in">
+    <div class="pick-h"><strong id="pickTitle">사도 선택</strong><button type="button" id="pickClose" aria-label="닫기">×</button></div>
+    <div class="chips" id="pickPer"></div>
+    <div class="pick-ctl"><input id="pickQ" type="search" placeholder="이름 검색" aria-label="이름 검색"><label><input type="checkbox" id="pickAll"> 모든 열 보기</label><span class="note" id="pickCnt"></span></div>
+    <div class="pick-list" id="pickList"></div>
+  </div></dialog>
+  <footer>개인이 정리한 비공식 계산기입니다. 실제 게임 피해량과 다를 수 있습니다. 트릭컬 리바이브의 게임 IP(캐릭터·이미지·명칭 등) 권리는 에피드게임즈에 있으며, 이 사이트는 에피드게임즈와 관계없는 비공식 팬 사이트입니다.</footer>
 </main>
 <script src="assets/common.js"></script>
 <script>
 const EXTRA_SEASONS=[{n:"대충돌 (보스 성격 직접 선택)",c:"대충돌",e:""},{n:"대충돌 2.0 beta (보스 성격 직접 선택)",c:"대충돌 2.0 beta",e:""},{n:"심해 대충돌 (보스 성격 직접 선택)",c:"심해 대충돌",e:""}];
 const EXAMPLE=[["우로스",3,1,"순수",8000],["에르핀(왕도)",3,1,"",12000],["비비(신성)",3,1,"순수",9000],["아야",3,1,"",11000],["디아나(왕년)",3,1,"",10000],["실비아",3,1,"",10000]];
-let DATA=[],NAMES=[],SEASONS=[],slots=[];
+let DATA=[],NAMES=[],SEASONS=[],slots=[],DECK_NOTE="";
+const ROWS=["후열","중열","전열"],PERS=["순수","냉정","광기","활발","우울","공명"];
+const rowOf=i=>ROWS[Math.floor(i/3)];
 const opt=(arr,v)=>arr.map(o=>`<option${o===v?" selected":""}>${esc(o)}</option>`).join("");
 const base=n=>{const r=DATA.find(d=>d.n===n);return r?r.p:"";};
+const locOf=n=>(SADO_INFO[n]||{})["위치"]||((DATA.find(d=>d.n===n)||{}).loc)||"";
+const fitsRow=(n,row)=>{const l=locOf(n);return !l||l===row||l==="모든 열";};
+const shownPer=s=>{const b=base(s.name);return b==="공명"?(s.choose||"공명"):b;};
+const pcVar=perVar;
+const emptySlot=()=>({name:"",aside:3,hi:true,choose:"",atk:0,hp:0,match:"중립"});
+function buildBoard(){
+  $("board").innerHTML=ROWS.map((row,ri)=>{
+    const n=slots.slice(ri*3,ri*3+3).filter(s=>s.name).length;
+    return `<div class="lane"><div class="lane-h">${row}<small>${n}/3</small></div>`+[0,1,2].map(k=>{
+      const i=ri*3+k,s=slots[i];
+      if(!s.name) return `<button type="button" class="cell" data-i="${i}" aria-label="${row} ${k+1}번 칸 비어 있음, 사도 고르기">+ ${row}</button>`;
+      const p=shownPer(s);
+      return `<button type="button" class="cell on" data-i="${i}" style="--pc:${pcVar(p)}" aria-label="${row} ${k+1}번 칸 ${esc(s.name)}, 바꾸기">${face(s.name,40,p)}<span class="nm">${esc(s.name)}</span><span><span class="per" data-p="${esc(p)}">${esc(p)}</span></span><span class="x" data-x="${i}" role="button" aria-label="${esc(s.name)} 빼기">×</span></button>`;
+    }).join("")+`</div>`;}).join("");
+}
 function buildSlots(){
-  $("slots").innerHTML=slots.map((s,i)=>`<tr class="slot" data-i="${i}"><td>${i+1}</td>
-   <td><select id="n${i}" data-k="name" aria-label="사도 ${i+1}"><option value="">—</option>${opt(NAMES,s.name)}</select></td>
+  $("slots").innerHTML=slots.map((s,i)=>s.name?`<tr class="slot" data-i="${i}"><td><span class="lane-tag">${rowOf(i)}</span></td>
+   <td style="white-space:nowrap"><strong>${esc(s.name)}</strong></td>
    <td><select id="a${i}" data-k="aside" aria-label="어사이드">${[0,1,2,3].map(v=>`<option${v==s.aside?" selected":""}>${v}</option>`).join("")}</select></td>
    <td><input id="h${i}" type="checkbox" data-k="hi" ${s.hi?"checked":""} aria-label="고학년 사용"></td>
    <td class="pc"></td>
    <td><input id="g${i}" type="number" min="0" step="100" data-k="atk" value="${s.atk||""}" aria-label="공격력"></td>
-   <td class="mt"></td><td class="num" data-o="buffed"></td><td class="num" data-o="pool"></td><td class="num" data-o="deal"></td><td class="num" data-o="skill"></td><td><div class="bar" data-o="bar"></div></td></tr>`).join("");
+   <td class="mt"></td><td class="num" data-o="buffed"></td><td class="num" data-o="pool"></td><td class="num" data-o="deal"></td><td class="num" data-o="skill"></td><td><div class="bar" data-o="bar"></div></td></tr>`:"").join("")
+   ||`<tr><td colspan="12" class="note" style="padding:16px">위 편성 칸을 눌러 사도를 넣어 주세요.</td></tr>`;
+}
+/* 사도 고르기 창 */
+let pickI=-1,pickP="";
+function openPick(i){
+  pickI=i; $("pickTitle").textContent=`${rowOf(i)} ${i%3+1}번 칸`; $("pickQ").value=""; $("pickAll").checked=false;
+  renderPick(); const d=$("pick"); if(d.showModal) d.showModal(); else d.setAttribute("open","");
+}
+function closePick(){const d=$("pick"); if(d.close) d.close(); else d.removeAttribute("open");}
+function renderPick(){
+  const row=rowOf(pickI),all=$("pickAll").checked,q=$("pickQ").value.trim();
+  $("pickPer").innerHTML=[`<button type="button" aria-pressed="${pickP===""}" data-pp="">전체</button>`,...PERS.map(p=>`<button type="button" data-pp="${p}" data-p="${p}" style="--pc:${pcVar(p)}" aria-pressed="${pickP===p}">${p}</button>`)].join("");
+  const used=new Set(slots.filter((s,j)=>s.name&&j!==pickI).map(s=>s.name));
+  const order=n=>PERS.indexOf(base(n));
+  const list=NAMES.filter(n=>(all||fitsRow(n,row))&&(!pickP||base(n)===pickP)&&(!q||n.includes(q)))
+    .sort((a,b)=>order(a)-order(b)||a.localeCompare(b,"ko"));
+  $("pickCnt").textContent=`${list.length}명`;
+  $("pickList").innerHTML=list.map(n=>{const p=base(n),u=used.has(n);
+    return `<button type="button" data-n="${esc(n)}" style="--pc:${pcVar(p)}" ${u?"disabled":""}>${face(n,34)}<strong>${esc(n)}</strong><span class="meta"><span class="per" data-p="${esc(p)}">${esc(p)}</span>${esc(locOf(n))}${u?" · 편성됨":""}</span></button>`;}).join("")
+    ||`<p class="note">조건에 맞는 사도가 없습니다. '모든 열 보기'를 켜 보세요.</p>`;
+}
+function place(n){
+  const s=slots[pickI]; const keep=s.name===n;
+  slots[pickI]={...emptySlot(),...(keep?s:{}),name:n,atk:keep?s.atk:(s.atk||10000)};
+  closePick(); refresh();
+}
+function refresh(){buildBoard();buildSlots();render();}
+function renderSurvive(ss,withRow){
+  const sv=survive(DATA,withRow,ss.c,{enemySkill:!!$("svAtk").value,always:!!$("svRange").value,enemyInc:+$("svInc").value||0});
+  $("svBody").innerHTML=sv.map(x=>{const i=slots.findIndex(s=>s.name===x.s.name);return `<tr data-i="${i}"><td style="white-space:nowrap">${face(x.s.name,26)} ${esc(x.s.name)}</td>
+    <td><input type="number" min="0" step="1000" data-k="hp" value="${x.s.hp||""}" aria-label="${esc(x.s.name)} 최대 HP"></td>
+    <td class="num">+${x.hp.toFixed(1)}%</td><td class="num">${x.bHP?fmt(x.bHP):"—"}</td><td class="num">${x.sh?x.sh.toFixed(1)+"%":"—"}</td>
+    <td class="num">${x.applied.toFixed(1)}%${x.dr>75?" (상한)":""}</td><td class="num">${x.atkDown?x.atkDown.toFixed(1)+"%":"—"}</td><td class="num"><strong>${x.eff?fmt(x.eff):"—"}</strong></td></tr>`;}).join("")
+    ||`<tr><td colspan="8" class="note" style="padding:12px">편성 칸에 사도를 넣어 주세요.</td></tr>`;
 }
 function render(){
   const ss=SEASONS[+$("season").value]||{c:"기타",e:""};
   const ev=$("enemy").value, enemy=ev==="자동"?(ss.e||"성격 없음"):ev;
   $("enemyState").textContent=enemy;
-  const r=calc(DATA,slots.map(s=>({...s})),ss.c,{enemy});
+  const withRow=slots.map((s,i)=>({...s,row:rowOf(i)}));
+  const r=calc(DATA,withRow,ss.c,{enemy,def:{on:$("defOn").checked,D:+$("defD").value,t:+$("defT").value}});
+  $("synMini").innerHTML=`<span class="note">성격</span>`+BASIC.map(p=>{const n=r.counts[p],v=synBonus(n);return n?`<span class="k${v?" hit":""}"><span class="per" data-p="${p}">${p}</span>${n}명${v?` +${v}%`:""}</span>`:"";}).join("")
+    +`<span class="k${r.synTotal?" hit":""}">${r.synOn?"시너지 합계 +"+r.synTotal+"%":"시너지 미적용 콘텐츠"}</span>`;
+  renderSurvive(ss,withRow);
+  const used=slots.filter(s=>s.name);
+  const w=[]; const res=used.filter(s=>base(s.name)==="공명").length; if(res>2) w.push(`공명 사도는 최대 2명 (지금 ${res}명)`);
+  const hiN=used.filter(s=>s.hi).length; if(ss.c==="대충돌"&&hiN>6) w.push(`대충돌은 고학년 스킬 6명까지 (지금 ${hiN}명)`);
+  if(DECK_NOTE) w.push(DECK_NOTE);
+  $("warn").textContent=w.join(" · ");
   $("synState").textContent=r.synOn?"적용":"미적용"; $("synState").className="pill"+(r.synOn?"":" off");
   $("sAtk").textContent=r.teamAtk.toFixed(2)+"배";
   $("sSyn").textContent=r.synOn?"+"+r.syn+"%":"0% (미적용)";
   $("sGrant").textContent=r.grant?fmt(r.grant):"—";
   const top=Math.max(0,...r.res.map(x=>x.skill)); $("sTop").textContent=top?fmt(top):"—";
-  document.querySelectorAll("#slots tr").forEach(tr=>{
+  document.querySelectorAll("#slots tr.slot").forEach(tr=>{
     const i=+tr.dataset.i,s=slots[i],x=r.res.find(q=>s.name&&q.s.name===s.name),b=base(s.name);
     tr.querySelector(".pc").innerHTML=!s.name?"":b==="공명"
       ?`<select id="c${i}" data-k="choose" aria-label="공명 성격 선택"><option value="">선택</option>${opt(["순수","냉정","광기","활발","우울"],s.choose)}</select>`
@@ -103,24 +238,40 @@ function render(){
     +`<div class="${r.synTotal?"hit":""}"><span>합계</span><span>전원</span><b>+${r.synTotal}%</b></div>`;
 }
 $("slots").addEventListener("change",e=>{
-  const tr=e.target.closest("tr");if(!tr)return;const s=slots[+tr.dataset.i],k=e.target.dataset.k;
+  const tr=e.target.closest("tr");if(!tr||tr.dataset.i===undefined)return;const s=slots[+tr.dataset.i],k=e.target.dataset.k;
   s[k]=k==="hi"?e.target.checked:(k==="aside"||k==="atk")?+e.target.value:e.target.value;
-  if(k==="name"){s.choose="";if(!s.atk&&s.name)s.atk=10000;if(!s.name)s.atk=0;buildSlots();}
+  if(k==="choose")buildBoard();
   render();
 });
 $("slots").addEventListener("input",e=>{if(e.target.dataset.k==="atk"){slots[+e.target.closest("tr").dataset.i].atk=+e.target.value;render();}});
+$("board").addEventListener("click",e=>{
+  const x=e.target.closest("[data-x]"); if(x){slots[+x.dataset.x]=emptySlot();refresh();return;}
+  const c=e.target.closest(".cell"); if(c) openPick(+c.dataset.i);
+});
+$("pickList").addEventListener("click",e=>{const b=e.target.closest("button[data-n]");if(b&&!b.disabled)place(b.dataset.n);});
+$("pickPer").addEventListener("click",e=>{const b=e.target.closest("button[data-pp]");if(!b)return;pickP=b.dataset.pp;renderPick();});
+$("pickQ").addEventListener("input",renderPick); $("pickAll").addEventListener("change",renderPick);
+$("pickClose").addEventListener("click",closePick);
+$("pick").addEventListener("click",e=>{if(e.target===$("pick"))closePick();});
+$("svBody").addEventListener("change",e=>{if(e.target.dataset.k==="hp"){slots[+e.target.closest("tr").dataset.i].hp=+e.target.value;render();}});
+["defOn","defD","defT","svAtk","svRange","svInc"].forEach(id=>$(id).addEventListener("input",render));
 $("season").addEventListener("change",render); $("enemy").addEventListener("change",render);
 (async()=>{
   let sk,seasons=[];
-  try{sk=await load("data/battle/skills.csv");}catch(e){showError(e);return;}
+  try{[sk]=await Promise.all([load("data/battle/skills.csv"),loadSadoInfo()]);}catch(e){showError(e);return;}
   try{seasons=await load("data/seasons.csv");}catch(_){}
   DATA=sk.map(toCalcRow); NAMES=[...new Set(DATA.map(d=>d.n))];
   SEASONS=[...seasons.filter(s=>s["시즌ID"]).reverse().map(s=>({n:s["표시이름"]||s["시즌ID"],c:s["콘텐츠"],e:s["적 성격"]||""})),...EXTRA_SEASONS];
   $("season").innerHTML=SEASONS.map((s,i)=>`<option value="${i}">${esc(s.n)}</option>`).join("");
   const firstClash=SEASONS.findIndex(s=>s.c==="대충돌"); if(firstClash>=0) $("season").value=firstClash;
-  slots=EXAMPLE.filter(a=>NAMES.includes(a[0])).map(a=>({name:a[0],aside:a[1],hi:!!a[2],choose:a[3],atk:a[4],match:"중립"}));
-  while(slots.length<9) slots.push({name:"",aside:0,hi:true,choose:"",atk:0,match:"중립"});
-  buildSlots(); render();
+  slots=Array.from({length:9},emptySlot);
+  const putIn=(name,o)=>{const l=locOf(name);const order=l==="모든 열"||!l?[2,1,0]:[ROWS.indexOf(l)];
+    for(const ri of order){const j=[0,1,2].map(k=>ri*3+k).find(j=>!slots[j].name);if(j!==undefined){slots[j]={...emptySlot(),...o,name};return true;}}return false;};
+  const q=new URLSearchParams(location.search).get("deck");
+  if(q){const miss=[];q.split(",").map(x=>x.trim()).filter(Boolean).forEach(n=>{if(!NAMES.includes(n)||!putIn(n,{atk:10000}))miss.push(n);});
+    DECK_NOTE=miss.length?`DB에 아직 없거나 칸이 없는 사도: ${miss.join(", ")}`:"";}
+  else EXAMPLE.filter(a=>NAMES.includes(a[0])).forEach(a=>putIn(a[0],{aside:a[1],hi:!!a[2],choose:a[3],atk:a[4]}));
+  refresh();
 })();
 </script>
 </body>

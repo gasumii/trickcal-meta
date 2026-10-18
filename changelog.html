@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>업데이트 기록 — 트릭컬 PvE 메타</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.log{display:grid;gap:0;border-left:2px solid var(--line);margin-left:6px}
+.log article{position:relative;padding:0 0 18px 20px}
+.log article::before{content:"";position:absolute;left:-7px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--paper);border:2px solid var(--leaf)}
+.log time{font-family:var(--mono);font-size:.85rem;color:var(--muted)}
+.log ul{margin:4px 0 0;padding-left:18px}
+.log li{margin:2px 0}
+</style>
+</head>
+<body>
+<nav class="sitebar" aria-label="사이트 메뉴"><div class="sitebar-in"><a class="site" href="./">트릭컬 PvE 메타</a><a class="tab" href="./">PvE 기록 분석</a><a class="tab" href="global.html">글로벌 PvE 분석</a><a class="tab" href="mechanics.html">전투 메커니즘</a><a class="tab" href="calculator.html">덱 계산기</a><a class="tab log" href="changelog.html" aria-current="page">업데이트 기록</a></div></nav>
+<main>
+  <header><h1>업데이트 기록</h1><p class="lead">데이터와 기능이 언제 무엇이 바뀌었는지 남깁니다. 처음 이해와 다르게 확인된 내용은 <a href="mechanics.html#fix">정정 기록</a>에 따로 있습니다.</p></header>
+  <div class="error" id="error" hidden></div>
+  <div class="log" id="log"></div>
+  <footer>개인이 정리한 비공식 자료입니다. 트릭컬 리바이브의 게임 IP(캐릭터·이미지·명칭 등) 권리는 에피드게임즈에 있으며, 이 사이트는 에피드게임즈와 관계없는 비공식 팬 사이트입니다.</footer>
+</main>
+<script src="assets/common.js"></script>
+<script>
+(async()=>{let L;try{L=await load("data/changelog.csv");}catch(e){showError(e);return;}
+  const by={};L.forEach(r=>(by[r["날짜"]]=by[r["날짜"]]||[]).push(r));
+  $("log").innerHTML=Object.keys(by).sort().reverse().map(d=>`<article><time datetime="${esc(d)}">${esc(d)}</time><ul>${by[d].map(r=>`<li><strong>${esc(r["구분"])}</strong> — ${esc(r["내용"])}</li>`).join("")}</ul></article>`).join("");
+})();
+</script>
+</body>
+</html>
