@@ -63,6 +63,16 @@
 .detail .hyp div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:.9rem}
 .detail .empty{color:var(--muted);font-style:italic}
 a.exl{display:inline-block;font-size:.75rem;font-weight:700;margin-right:4px;text-decoration:none;border:1px solid var(--leaf);border-radius:6px;padding:0 6px}
+td.cond{min-width:13ch;max-width:24ch}
+#skills td.memo{min-width:26ch}
+td.val{min-width:20ch;max-width:30ch}
+td.val span{display:block}
+td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line)}
+.mt{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.mt.long{cursor:pointer}
+.mt.long:not(.open)::after{content:""}
+.mt.open{display:block}
+.mt-more{display:block;font-size:.74rem;color:var(--leaf);cursor:pointer;margin-top:2px}
 </style>
 </head>
 <body>
@@ -197,7 +207,7 @@ const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일
     $("cnt").textContent=`${rows.length}개 효과 / 전체 ${SK.length} · 사도 ${NAMES.length}명`;
     $("skills").innerHTML=rows.map(s=>`<tr><td class="num" style="text-align:left">${esc(s.ID)}</td><td style="white-space:nowrap">${face(s["사도"],24)} ${esc(s["사도"])} <span class="per" data-p="${esc(s["성격"])}">${esc(s["성격"])}</span></td>
       <td style="white-space:nowrap">${esc(s["스킬 구분"])}${s["스킬명"]?`<br><span class="conf">${esc(s["스킬명"])}</span>`:""}</td><td>${esc(s["효과 유형"])}${s["상태 이름"]?`<br><span class="conf">${esc(s["상태 이름"])}</span>`:""}</td><td style="white-space:nowrap">${esc(s["대상"])}</td>
-      <td>${esc(s["발동 조건"])}</td><td>${esc(s["수치"])}</td><td style="white-space:nowrap">${esc(s["지속"])}</td><td class="conf">${esc(s["확실도"])}${s["근거 유형"]?`<br><span style="white-space:normal">${esc(s["근거 유형"])}</span>`:""}</td><td class="memo">${(EXP_OF[s.ID]||[]).map(e=>`<a class="exl" href="#exp=${e}">${e}</a>`).join("")}${esc(s["검증 포인트"])}</td></tr>`).join("");
+      <td class="cond">${esc(s["발동 조건"])}</td><td class="val">${vals(s["수치"])}</td><td style="white-space:nowrap">${esc(s["지속"])}</td><td class="conf">${esc(s["확실도"])}${s["근거 유형"]?`<br><span style="white-space:normal">${esc(s["근거 유형"])}</span>`:""}</td><td class="memo">${(EXP_OF[s.ID]||[]).map(e=>`<a class="exl" href="#exp=${e}">${e}</a>`).join("")}${memo(s["검증 포인트"])}</td></tr>`).join("");
   }
   renderSk();
   /* 사도 카드 */
@@ -292,6 +302,10 @@ const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일
   /* 정정 */
   $("fixes").innerHTML=FIXES.map(f=>`<div class="panel"><dl class="fix"><dt>${esc(f["날짜"])}</dt><dd><strong>${esc(f["항목"])}</strong></dd><dt>처음 이해</dt><dd>${esc(f["처음 이해"])}</dd><dt>확인 결과</dt><dd>${esc(f["확인 결과"])}</dd><dt>반영</dt><dd>${esc(f["반영"])}</dd></dl></div>`).join("");
 })();
+</script>
+<script>
+function vals(v){v=v==null?"":String(v);const p=v.split(" / ").map(x=>x.trim()).filter(Boolean);return p.length>1?p.map(x=>`<span>${esc(x)}</span>`).join(""):esc(v);}
+function memo(v){v=v==null?"":String(v);if(v.length<=110)return esc(v);return `<span class="mt long" onclick="this.classList.toggle('open');this.nextElementSibling.textContent=this.classList.contains('open')?'접기':'더 보기'">${esc(v)}</span><span class="mt-more" onclick="this.previousElementSibling.click()">더 보기</span>`;}
 </script>
 </body>
 </html>
