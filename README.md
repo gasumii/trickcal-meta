@@ -9,8 +9,8 @@
 - `index.html` — PvE 기록 분석 페이지 (수정할 필요 없음)
 - `global.html`, `mechanics.html`, `calculator.html` — 나머지 탭 페이지
 - `assets/site.css`, `assets/common.js` — 새 탭 공통 스타일·CSV 읽기·덱 계산 규칙
-- `data/battle/skills.csv` — 사도 스킬 판정표 (효과 1개 = 1줄, 게임 원문 제외) — 2026-10-18 기준 사도 40명 · 효과 721줄
-- `data/battle/terms.csv` — 상태·용어 사전 (92개)
+- `data/battle/skills.csv` — 사도 스킬 판정표 (효과 1개 = 1줄, 게임 원문 제외) — 2026-10-24 기준 사도 128명 · 효과 1,690줄
+- `data/battle/terms.csv` — 상태·용어 사전 (123개)
 - `data/battle/sado_info.csv` — 사도별 성격·열·역할·공격 타입·얼굴 이미지 파일명
 - `data/battle/gimmicks.csv`, `gimmick_tags.csv` — 보스 기믹과 대응 태그별 사도 (엑셀에서 자동 계산된 값)
 - `data/battle/icons.csv` — 버프·디버프 아이콘 사전 (아카라이브 「버프/디버프 총 정리」 + DB 연결 메모)
