@@ -73,6 +73,18 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
 .mt.long:not(.open)::after{content:""}
 .mt.open{display:block}
 .mt-more{display:block;font-size:.74rem;color:var(--leaf);cursor:pointer;margin-top:2px}
+.items{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))}
+.item{display:grid;gap:8px;align-content:start}
+.item h3{font-size:1.1rem;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.item h3 small{font-family:var(--body);font-size:.76rem;color:var(--muted)}
+.item .eff{display:grid;grid-template-columns:1fr;gap:2px;padding:8px 10px;border-radius:10px;background:var(--bg)}
+.item .eff b{font-size:.88rem}.item .eff .v{font-family:var(--mono);font-size:.92rem}
+.item .eff .d{font-size:.78rem;color:var(--muted)}
+.imp{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:6px;background:var(--bad-soft);color:var(--bad);white-space:nowrap}
+.gr{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:6px;border:1px solid var(--line);color:var(--muted)}
+.gr[data-g="전설"]{border-color:#B07AE0;color:#8A4FC8}.gr[data-g="희귀"]{border-color:#4A8FE0;color:#2F6FC0}
+.item .att{font-size:.78rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
+.item.nodata{opacity:.75}
 </style>
 </head>
 <body>
@@ -80,13 +92,14 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
 <main>
   <header><h1>전투 메커니즘</h1>
   <p class="lead">스킬 설명을 효과 단위로 나눠 대상·조건·수치를 정리하고, 설명만으로 알 수 없는 부분은 실험으로 확인합니다. <a href="calculator.html">덱 계산기</a>의 규칙은 모두 여기서 나옵니다.</p></header>
-  <!--SUMMARY--><div class="site-sum"><p class="sum-h">전투 메커니즘 DB · 검증 현황</p><p class="sum-stat">사도 <b>128</b>명 · 효과 <b>1,690</b>줄 · 상태·용어 <b>123</b>개 · 검증 사례 <b>17</b>건 (실행·검증 완료 <b>2</b>건) · 성장 대조 <b>16</b>개 수치</p><p class=sum-h>대표 검증 사례</p><ul class=sum-list><li><a href="mechanics.html#exp=EXP-04">EXP-04</a> 셀리네 — 고학년 스킬 시전 중 무적 상태에서 공격받으면 어사이드2 SP 회복(10)이 발동하는가? <span class="conf">[설계 완료]</span></li><li><a href="mechanics.html#exp=EXP-05">EXP-05</a> 시온 더 다크불릿 — 마탄 0~4개 상태에서 저학년을 쓰면 '5개일 때 피해량 36% 증가'가 적용되는가? 몇 발을 쏘는가? <span class="conf">[설계 완료]</span></li><li><a href="mechanics.html#exp=EXP-06">EXP-06</a> 이드 — 웨이브 시작 6초 무적 중 적의 CC·디버프가 이드에게 걸리는가? <span class="conf">[설계 완료]</span></li></ul><p class="sum-link"><a href="mechanics.html">전투 메커니즘 전체 보기 →</a></p></div><!--/SUMMARY-->
+  <!--SUMMARY--><div class="site-sum"><p class="sum-h">전투 메커니즘 DB · 검증 현황</p><p class="sum-stat">사도 <b>136</b>명 · 효과 <b>1,804</b>줄 · 상태·용어 <b>130</b>개 · 아티팩트 <b>86</b>종 · 스펠 <b>44</b>종 · 검증 사례 <b>17</b>건 (실행·검증 완료 <b>2</b>건) · 성장 대조 <b>16</b>개 수치</p><p class=sum-h>대표 검증 사례</p><ul class=sum-list><li><a href="mechanics.html#exp=EXP-04">EXP-04</a> 셀리네 — 고학년 스킬 시전 중 무적 상태에서 공격받으면 어사이드2 SP 회복(10)이 발동하는가? <span class="conf">[설계 완료]</span></li><li><a href="mechanics.html#exp=EXP-05">EXP-05</a> 시온 더 다크불릿 — 마탄 0~4개 상태에서 저학년을 쓰면 '5개일 때 피해량 36% 증가'가 적용되는가? 몇 발을 쏘는가? <span class="conf">[설계 완료]</span></li><li><a href="mechanics.html#exp=EXP-06">EXP-06</a> 이드 — 웨이브 시작 6초 무적 중 적의 CC·디버프가 이드에게 걸리는가? <span class="conf">[설계 완료]</span></li></ul><p class="sum-link"><a href="mechanics.html">전투 메커니즘 전체 보기 →</a></p></div><!--/SUMMARY-->
   <div class="error" id="error" hidden></div>
   <div class="subtabs" role="tablist">
     <button role="tab" aria-selected="true" data-sub="cases">검증 사례</button>
     <button role="tab" aria-selected="false" data-sub="exp">실험 기록</button>
     <button role="tab" aria-selected="false" data-sub="skills">스킬 판정표</button>
     <button role="tab" aria-selected="false" data-sub="cards">사도 카드</button>
+    <button role="tab" aria-selected="false" data-sub="items">아티팩트·스펠</button>
     <button role="tab" aria-selected="false" data-sub="gimmick">보스 기믹</button>
     <button role="tab" aria-selected="false" data-sub="icons">아이콘 사전</button>
     <button role="tab" aria-selected="false" data-sub="terms">상태·용어 사전</button>
@@ -100,6 +113,7 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
         <label class="f" for="ftype">효과 유형<select id="ftype"><option value="">전체</option></select></label>
         <label class="f" for="fq" style="flex:1 1 220px">검색<input id="fq" type="search" placeholder="예: 무적, 방어력, 존속"></label>
         <span class="note" id="cnt"></span>
+        <a class="note" id="cardHint" href="#items" hidden></a>
       </div>
     </div>
     <div class="tbl" style="max-height:640px"><table>
@@ -113,6 +127,21 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
     <p class="note">사도 한 명의 효과를 스킬별로 모아 봅니다. 수치는 스킬 Lv10 기준(게임 미리보기·나무위키 대조)입니다.</p>
     <div class="panel"><div class="chips faces" id="cardChips"></div></div>
     <div id="card"></div>
+  </section>
+
+  <section id="sub-items" class="sub" hidden>
+    <p class="note">전투 준비 때 고르는 아티팩트(착용 사도만)와 스펠(모든 사도)을 효과 1개 = 1줄로 정리했습니다. 레벨을 고르면 수치가 Lv1 + (레벨−1) × 레벨당 증가로 바뀝니다(최대 Lv12, 게임 화면으로 검증). 무적·CC처럼 판정에 중요한 효과는 빨간 배지로 표시합니다. 애착 효과는 국내에서 잘 쓰이지 않아 참고로만 적었습니다.</p>
+    <div class="panel" style="display:grid;gap:12px">
+      <div class="chips" id="itKind"></div>
+      <div class="chips" id="itGrade"></div>
+      <div class="controls">
+        <label class="f" for="itLv">레벨<select id="itLv"></select></label>
+        <label class="f" for="itq" style="flex:1 1 220px">검색<input id="itq" type="search" placeholder="예: 무적, 기절, 눈속임, 보호막, 엘다인"></label>
+        <label class="f" style="align-self:end;flex-direction:row;display:flex;gap:6px;align-items:center"><input type="checkbox" id="itImp"> 무적·CC 등 판정 중요만</label>
+        <span class="note" id="itCnt"></span>
+      </div>
+    </div>
+    <div class="items" id="items"></div>
   </section>
 
   <section id="sub-gimmick" class="sub" hidden>
@@ -306,6 +335,52 @@ const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일
 <script>
 function vals(v){v=v==null?"":String(v);const p=v.split(" / ").map(x=>x.trim()).filter(Boolean);return p.length>1?p.map(x=>`<span>${esc(x)}</span>`).join(""):esc(v);}
 function memo(v){v=v==null?"":String(v);if(v.length<=110)return esc(v);return `<span class="mt long" onclick="this.classList.toggle('open');this.nextElementSibling.textContent=this.classList.contains('open')?'접기':'더 보기'">${esc(v)}</span><span class="mt-more" onclick="this.previousElementSibling.click()">더 보기</span>`;}
+</script>
+<script>
+(async()=>{
+  const CD=await opt("cards"); if(!CD.length) return;
+  let kind="",grade=""; const L=$("itLv");
+  L.innerHTML=Array.from({length:12},(_,i)=>`<option value="${i+1}"${i===0?" selected":""}>Lv${i+1}${i===11?" (최대)":""}</option>`).join("");
+  $("itKind").innerHTML=[["","전체"],["아티팩트","아티팩트"],["스펠","스펠 (모든 사도)"]].map(([k,t],i)=>`<button aria-pressed="${i===0}" data-k="${k}">${t}</button>`).join("");
+  const grades=[...new Set(CD.map(c=>c["등급"]))];
+  $("itGrade").innerHTML=[`<button aria-pressed="true" data-g="">모든 등급</button>`,...grades.map(g=>`<button aria-pressed="false" data-g="${esc(g)}">${esc(g)}</button>`)].join("");
+  const pick=(box,attr,set)=>box.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;set(b.dataset[attr]);box.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));render();});
+  pick($("itKind"),"k",v=>kind=v); pick($("itGrade"),"g",v=>grade=v);
+  [L,$("itq"),$("itImp")].forEach(x=>x.addEventListener(x.type==="checkbox"||x.tagName==="SELECT"?"change":"input",render));
+  const ALIAS={"CC":["기절","침묵","도발","넉백","속박","행동불가","CC"],"회피":["눈속임","타겟 불가"],"생존":["무적","생존","보호막","회복"]};
+  const hit=(c,q)=>{if(!q)return true;const t=Object.values(c).join(" ");return (ALIAS[q]||[q]).some(k=>t.includes(k));};
+  const SEC=new Set(["무적","타겟 불가","기절","침묵","도발","넉백","속박","행동불가"]);
+  const val=(c,lv)=>{const a=parseFloat(c["Lv1"]);if(isNaN(a))return "";const st=parseFloat(c["레벨당"]);const known=!isNaN(st);
+    const v=Math.round((a+(lv-1)*(known?st:0))*100)/100;
+    const unit=SEC.has(c["효과 유형"])||/초$/.test(c["효과"])?"초":/고정값|SP 회복량|SP 감소량|학년 +1|아티팩트 2개|성격 +1/.test(c["효과"]+c["발동 조건"])?"":"%";
+    let s=/10배/.test(c["효과"])?`${v}~${Math.round(v*1000)/100}${unit}`:`${v}${unit}`;
+    if(lv>1&&!known) s+=` <span class="d">(성장 미확인 — Lv1 값)</span>`; return s;};
+  const label=c=>c["효과"].replace(/\s*\(Lv1\)$/,"").replace(/\s+[\d.]+$/,"").replace(/\s*[\d.]+%$/,"");
+  window.CARD_MATCH=q=>CD.filter(c=>hit(c,q)).length;
+  function render(){
+    const lv=+L.value,q=$("itq").value.trim(),imp=$("itImp").checked;
+    const rows=CD.filter(c=>(!kind||c["종류"]===kind)&&(!grade||c["등급"]===grade)&&hit(c,q)&&(!imp||c["판정 중요"]));
+    const by=new Map();rows.forEach(c=>{const k=c["종류"]+"|"+c["이름"];by.has(k)||by.set(k,[]);by.get(k).push(c);});
+    const all=new Map();CD.forEach(c=>{const k=c["종류"]+"|"+c["이름"];all.has(k)||all.set(k,[]);all.get(k).push(c);});
+    $("itCnt").textContent=`${by.size}개 카드 · 효과 ${rows.length}줄 / 전체 ${all.size}개`;
+    $("items").innerHTML=[...by.entries()].map(([k,rs])=>{const f=all.get(k)[0],nod=/정보 없음/.test(f["효과"]+f["검증 포인트"])||!f["효과"];
+      const att=all.get(k).find(x=>x["애착 효과"]&&!/^—/.test(x["애착 효과"]));
+      const imps=[...new Set(all.get(k).map(x=>x["판정 중요"]).filter(Boolean))];
+      return `<article class="panel item${nod?" nodata":""}"><h3>${esc(f["이름"])} <span class="gr" data-g="${esc(f["등급"])}">${esc(f["등급"])}</span>${f["코스트"]?`<small>코스트 ${esc(f["코스트"])}</small>`:""}<small>${esc(f["종류"])}</small>${imps.map(i=>`<span class="imp">${esc(i)}</span>`).join("")}</h3>
+      ${nod?`<p class="note">아직 수치 정보가 없습니다(게임 화면 확인 예정).${f["검증 포인트"]?" "+esc(f["검증 포인트"]):""}</p>`:
+        rs.map(c=>`<div class="eff"><b>${esc(c["효과 유형"])}${c["판정 중요"]?` <span class="imp">${esc(c["판정 중요"])}</span>`:""}</b><span><span class="v">${val(c,lv)}</span> ${esc(label(c))}</span>
+        <span class="d">${esc([c["대상"],c["발동 조건"],c["지속"]&&c["지속"]!=="-"?"지속 "+c["지속"]:"",c["중첩"]].filter(Boolean).join(" · "))}</span>
+        ${c["검증 포인트"]?`<span class="d">검증: ${esc(c["검증 포인트"])}</span>`:""}
+        <span class="d">${esc(c["확실도"])} · ${esc(c["출처"])}${c["화면 확인"]?` · 화면 ${esc(c["화면 확인"])}`:""}</span></div>`).join("")}
+      ${att?`<div class="att">애착 효과(참고): ${esc(att["애착 효과"])}</div>`:""}</article>`;}).join("")||`<p class="note">해당하는 카드가 없습니다.</p>`;
+  }
+  render();
+  /* 스킬 판정표 검색 → 아티팩트·스펠 결과 연결 */
+  const hint=$("cardHint");
+  const upd=()=>{const q=$("fq").value.trim(),n=q?CARD_MATCH(q):0;hint.hidden=!n;if(n)hint.textContent=`아티팩트·스펠에서 '${q}' ${n}줄 보기 →`;};
+  $("fq").addEventListener("input",upd);
+  hint.addEventListener("click",e=>{e.preventDefault();$("itq").value=$("fq").value.trim();document.querySelector('.subtabs [data-sub="items"]').click();render();scrollTo(0,0);});
+})();
 </script>
 </body>
 </html>
