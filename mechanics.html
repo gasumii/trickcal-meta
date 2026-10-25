@@ -72,6 +72,8 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
 .mt.long{cursor:pointer}
 .mt.long:not(.open)::after{content:""}
 .mt.open{display:block}
+#skills mark{background:#ffe27a;color:#1d1d1b;padding:0 1px;border-radius:3px}
+.ment{display:inline-block;white-space:nowrap;margin-top:4px;font-size:.72rem;color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:0 5px}
 .mt-more{display:block;font-size:.74rem;color:var(--leaf);cursor:pointer;margin-top:2px}
 .items{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))}
 .item{display:grid;gap:8px;align-content:start}
@@ -92,7 +94,7 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
 <main>
   <header><h1>전투 메커니즘</h1>
   <p class="lead">스킬 설명을 효과 단위로 나눠 대상·조건·수치를 정리하고, 설명만으로 알 수 없는 부분은 실험으로 확인합니다. <a href="calculator.html">덱 계산기</a>의 규칙은 모두 여기서 나옵니다.</p></header>
-  <!--SUMMARY--><div class="site-sum"><p class="sum-h">전투 메커니즘 DB · 검증 현황</p><p class="sum-stat">사도 <b>136</b>명 · 효과 <b>1,804</b>줄 · 상태·용어 <b>130</b>개 · 아티팩트 <b>86</b>종 · 스펠 <b>44</b>종 · 검증 사례 <b>17</b>건 (실행·검증 완료 <b>2</b>건) · 성장 대조 <b>16</b>개 수치</p><p class=sum-h>대표 검증 사례</p><ul class=sum-list><li><a href="mechanics.html#exp=EXP-04">EXP-04</a> 셀리네 — 고학년 스킬 시전 중 무적 상태에서 공격받으면 어사이드2 SP 회복(10)이 발동하는가? <span class="conf">[설계 완료]</span></li><li><a href="mechanics.html#exp=EXP-05">EXP-05</a> 시온 더 다크불릿 — 마탄 0~4개 상태에서 저학년을 쓰면 '5개일 때 피해량 36% 증가'가 적용되는가? 몇 발을 쏘는가? <span class="conf">[설계 완료]</span></li><li><a href="mechanics.html#exp=EXP-06">EXP-06</a> 이드 — 웨이브 시작 6초 무적 중 적의 CC·디버프가 이드에게 걸리는가? <span class="conf">[설계 완료]</span></li></ul><p class="sum-link"><a href="mechanics.html">전투 메커니즘 전체 보기 →</a></p></div><!--/SUMMARY-->
+  <!--SUMMARY--><div class="site-sum"><p class="sum-h">전투 메커니즘 DB · 검증 현황</p><p class="sum-stat">사도 <b>136</b>명 · 효과 <b>1,883</b>줄 · 상태·용어 <b>130</b>개 · 아티팩트 <b>86</b>종 · 스펠 <b>44</b>종 · 검증 사례 <b>17</b>건 (실행·검증 완료 <b>2</b>건) · 성장 대조 <b>16</b>개 수치</p><p class=sum-h>대표 검증 사례</p><ul class=sum-list><li><a href="mechanics.html#exp=EXP-04">EXP-04</a> 셀리네 — 고학년 스킬 시전 중 무적 상태에서 공격받으면 어사이드2 SP 회복(10)이 발동하는가? <span class="conf">[설계 완료]</span></li><li><a href="mechanics.html#exp=EXP-05">EXP-05</a> 시온 더 다크불릿 — 마탄 0~4개 상태에서 저학년을 쓰면 '5개일 때 피해량 36% 증가'가 적용되는가? 몇 발을 쏘는가? <span class="conf">[설계 완료]</span></li><li><a href="mechanics.html#exp=EXP-06">EXP-06</a> 이드 — 웨이브 시작 6초 무적 중 적의 CC·디버프가 이드에게 걸리는가? <span class="conf">[설계 완료]</span></li></ul><p class="sum-link"><a href="mechanics.html">전투 메커니즘 전체 보기 →</a></p></div><!--/SUMMARY-->
   <div class="error" id="error" hidden></div>
   <div class="subtabs" role="tablist">
     <button role="tab" aria-selected="true" data-sub="cases">검증 사례</button>
@@ -112,6 +114,7 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
       <div class="controls">
         <label class="f" for="ftype">효과 유형<select id="ftype"><option value="">전체</option></select></label>
         <label class="f" for="fq" style="flex:1 1 220px">검색<input id="fq" type="search" placeholder="예: 무적, 방어력, 존속"></label>
+        <label class="note" style="display:flex;gap:6px;align-items:center;white-space:nowrap"><input id="fmemo" type="checkbox">검증 포인트까지 검색</label>
         <span class="note" id="cnt"></span>
         <a class="note" id="cardHint" href="#items" hidden></a>
       </div>
@@ -229,14 +232,17 @@ const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일
   chips.innerHTML=[`<button aria-pressed="true" data-n="">전체</button>`,...NAMES.map(n=>`<button aria-pressed="false" data-n="${esc(n)}">${esc(n)}</button>`)].join("");
   chips.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;fName=b.dataset.n;chips.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderSk();});
   $("ftype").innerHTML+=[...new Set(SK.map(s=>s["효과 유형"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ko")).map(t=>`<option>${esc(t)}</option>`).join("");
-  $("ftype").addEventListener("change",renderSk); $("fq").addEventListener("input",renderSk);
+  $("ftype").addEventListener("change",renderSk); $("fq").addEventListener("input",renderSk); $("fmemo").addEventListener("change",renderSk);
   function renderSk(){
     const t=$("ftype").value,q=$("fq").value.trim();
-    const rows=SK.filter(s=>(!fName||s["사도"]===fName)&&(!t||s["효과 유형"]===t)&&(!q||Object.values(s).join(" ").includes(q)));
-    $("cnt").textContent=`${rows.length}개 효과 / 전체 ${SK.length} · 사도 ${NAMES.length}명`;
+    const rows=SK.filter(s=>(!fName||s["사도"]===fName)&&(!t||s["효과 유형"]===t)&&(!q||hit(s,q)));
+    const memoOnly=q&&!$("fmemo").checked?SK.filter(s=>(!fName||s["사도"]===fName)&&(!t||s["효과 유형"]===t)&&!hit(s,q)&&(s["검증 포인트"]||"").includes(q)).length:0;
+    const main=q?rows.filter(s=>isMain(s,q)).length:0; if(q) rows.sort((a,b)=>isMain(b,q)-isMain(a,q));
+    $("cnt").textContent=(q?`효과·상태 일치 ${main} · 언급만 ${rows.length-main} · `:"")+(memoOnly?`검증 포인트에만 나온 ${memoOnly}개 제외 · `:"")+`${rows.length}개 효과 / 전체 ${SK.length} · 사도 ${NAMES.length}명`;
+    const H=v=>hl(esc(v),q);
     $("skills").innerHTML=rows.map(s=>`<tr><td class="num" style="text-align:left">${esc(s.ID)}</td><td style="white-space:nowrap">${face(s["사도"],24)} ${esc(s["사도"])} <span class="per" data-p="${esc(s["성격"])}">${esc(s["성격"])}</span></td>
-      <td style="white-space:nowrap">${esc(s["스킬 구분"])}${s["스킬명"]?`<br><span class="conf">${esc(s["스킬명"])}</span>`:""}</td><td>${esc(s["효과 유형"])}${s["상태 이름"]?`<br><span class="conf">${esc(s["상태 이름"])}</span>`:""}</td><td style="white-space:nowrap">${esc(s["대상"])}</td>
-      <td class="cond">${esc(s["발동 조건"])}</td><td class="val">${vals(s["수치"])}</td><td style="white-space:nowrap">${esc(s["지속"])}</td><td class="conf">${esc(s["확실도"])}${s["근거 유형"]?`<br><span style="white-space:normal">${esc(s["근거 유형"])}</span>`:""}</td><td class="memo">${(EXP_OF[s.ID]||[]).map(e=>`<a class="exl" href="#exp=${e}">${e}</a>`).join("")}${memo(s["검증 포인트"])}</td></tr>`).join("");
+      <td style="white-space:nowrap">${esc(s["스킬 구분"])}${s["스킬명"]?`<br><span class="conf">${H(s["스킬명"])}</span>`:""}</td><td>${H(s["효과 유형"])}${s["상태 이름"]?`<br><span class="conf">${H(s["상태 이름"])}</span>`:""}${q&&!isMain(s,q)?`<br><span class="ment">'${esc(q)}' 언급 · ${whereHit(s,q)}</span>`:""}</td><td style="white-space:nowrap">${H(s["대상"])}</td>
+      <td class="cond">${H(s["발동 조건"])}</td><td class="val">${vals(s["수치"],q)}</td><td style="white-space:nowrap">${H(s["지속"])}</td><td class="conf">${esc(s["확실도"])}${s["근거 유형"]?`<br><span style="white-space:normal">${esc(s["근거 유형"])}</span>`:""}</td><td class="memo">${(EXP_OF[s.ID]||[]).map(e=>`<a class="exl" href="#exp=${e}">${e}</a>`).join("")}${memo(s["검증 포인트"],$("fmemo").checked?q:"")}</td></tr>`).join("");
   }
   renderSk();
   /* 사도 카드 */
@@ -333,8 +339,13 @@ const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일
 })();
 </script>
 <script>
-function vals(v){v=v==null?"":String(v);const p=v.split(" / ").map(x=>x.trim()).filter(Boolean);return p.length>1?p.map(x=>`<span>${esc(x)}</span>`).join(""):esc(v);}
-function memo(v){v=v==null?"":String(v);if(v.length<=110)return esc(v);return `<span class="mt long" onclick="this.classList.toggle('open');this.nextElementSibling.textContent=this.classList.contains('open')?'접기':'더 보기'">${esc(v)}</span><span class="mt-more" onclick="this.previousElementSibling.click()">더 보기</span>`;}
+const SEARCH_COLS=["ID","사도","성격","위치","스킬 구분","스킬명","효과 유형","대상","발동 조건","수치","지속","중첩·갱신","상태 이름","피해 분류"];
+function hit(s,q){const cols=document.getElementById("fmemo").checked?SEARCH_COLS.concat(["검증 포인트"]):SEARCH_COLS;return cols.some(c=>(s[c]||"").includes(q));}
+function hl(h,q){if(!q)return h;const e=esc(q);return h.split(e).join(`<mark>${e}</mark>`);}
+function isMain(s,q){const g=s["효과 유형"]||"";return g.includes(q)||((s["상태 이름"]||"").includes(q)&&!["CC 면역","디버프 해제","버프 해제"].includes(g))?1:0;}
+function whereHit(s,q){const lab={"스킬명":"스킬 이름","대상":"대상","발동 조건":"발동 조건","수치":"수치","지속":"지속","중첩·갱신":"중첩·갱신","피해 분류":"피해 분류","사도":"사도 이름","스킬 구분":"스킬 구분","검증 포인트":"검증 포인트"};const cols=Object.keys(lab).filter(c=>(c!=="검증 포인트"||document.getElementById("fmemo").checked)&&(s[c]||"").includes(q));return cols.map(c=>lab[c]).join(", ");}
+function vals(v,q){v=v==null?"":String(v);const p=v.split(" / ").map(x=>x.trim()).filter(Boolean);return p.length>1?p.map(x=>`<span>${hl(esc(x),q)}</span>`).join(""):hl(esc(v),q);}
+function memo(v,q){v=v==null?"":String(v);if(v.length<=110)return hl(esc(v),q);return `<span class="mt long" onclick="this.classList.toggle('open');this.nextElementSibling.textContent=this.classList.contains('open')?'접기':'더 보기'">${hl(esc(v),q)}</span><span class="mt-more" onclick="this.previousElementSibling.click()">더 보기</span>`;}
 </script>
 <script>
 (async()=>{
