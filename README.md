@@ -9,7 +9,7 @@
 - `index.html` — PvE 기록 분석 페이지 (수정할 필요 없음)
 - `global.html`, `mechanics.html`, `calculator.html` — 나머지 탭 페이지
 - `assets/site.css`, `assets/common.js` — 새 탭 공통 스타일·CSV 읽기·덱 계산 규칙
-- `data/battle/cards.csv` — 아티팩트·스펠 (효과 1개 = 1줄, Lv1·레벨당 증가·판정 중요 표시) — 아티팩트 86종 · 스펠 44종
+- `data/battle/cards.csv` — 아티팩트·스펠 (효과 1개 = 1줄, Lv1·레벨당 증가·판정 중요 표시) — 아티팩트 89종 · 스펠 44종 (전부 게임 카드 화면으로 수치 확인)
 - `data/battle/skills.csv` — 사도 스킬 판정표 (효과 1개 = 1줄, 게임 원문 제외) — 2026-10-25 기준 사도 136명 · 효과 1,883줄
 - `data/battle/terms.csv` — 상태·용어 사전 (123개)
 - `data/battle/sado_info.csv` — 사도별 성격·열·역할·공격 타입·얼굴 이미지 파일명
