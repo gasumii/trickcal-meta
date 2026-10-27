@@ -226,6 +226,12 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem}
     <div class="legend" id="stackLegend"></div>
   </section>
 
+  <section id="s-reso" hidden>
+    <h2>공명 사도 성격 선택</h2>
+    <p class="lead">공명 사도는 대충돌 계열에서 성격을 골라 편성합니다. 위 채용률·티어는 성격과 상관없이 한 사도로 합쳐 셌고, 성격 분포는 고른 성격대로 셌습니다.</p>
+    <div class="scroll"><table id="reso"></table></div>
+  </section>
+
   <section>
     <h2>순위 구간별 채용률</h2>
     <p class="lead">순위가 높을수록 채용률이 오르는 사도가 최상위 메타의 핵심입니다.</p>
@@ -233,8 +239,8 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem}
   </section>
 
   <section id="s-notes" hidden>
-    <h2>사도 노트</h2>
-    <p class="lead">숫자만으로는 보이지 않는, 직접 써보며 느낀 점입니다.</p>
+    <h2 id="notesH">사도 노트</h2>
+    <p class="lead" id="notesLead">숫자만으로는 보이지 않는, 직접 써보며 느낀 점입니다.</p>
     <div class="notes" id="notes"></div>
   </section>
 
@@ -293,7 +299,7 @@ const chip=(n,extra="",cls="")=>`<span class="chip ${cls}" style="--c:${col(n)}"
 const tierOf=r=>TIERS.find(t=>r>=t.min);
 
 async function main(){
-  let decksRaw, sado, info, seasons=[], cur=null, prev=null, prevRaw=null;
+  let decksRaw, sado, info, seasons=[], cur=null, prev=null, prevRaw=null, seasonNotes=[];
   try{
     try{ seasons=(await load("data/seasons.csv")).filter(r=>r["시즌ID"]); }catch(_){ seasons=[]; }
     if(seasons.length){
@@ -305,6 +311,7 @@ async function main(){
       const base="data/seasons/"+cur["시즌ID"]+"/";
       [decksRaw, sado, info] = await Promise.all([load(base+"decks.csv"),load("data/sado.csv"),load(base+"info.csv")]);
       if(prev){ try{ prevRaw=await load("data/seasons/"+prev["시즌ID"]+"/decks.csv"); }catch(_){ prevRaw=null; } }
+      try{ seasonNotes=(await load(base+"notes.csv")).filter(r=>r["사도명"]&&r["평가"]); }catch(_){ seasonNotes=[]; }
       let contents=[];
       try{ contents=(await load("data/contents.csv")).map(r=>r["콘텐츠"]).filter(Boolean); }catch(_){}
       seasons.forEach(r=>{ if(r["콘텐츠"]&&!contents.includes(r["콘텐츠"])) contents.push(r["콘텐츠"]); });
@@ -336,10 +343,13 @@ async function main(){
 
   /* 덱 */
   const slotKeys=Object.keys(decksRaw[0]||{}).filter(k=>/^사도\s*\d+$/.test(k));
-  const decks=decksRaw.map(r=>({
-    rank:parseInt(r["순위"],10), stage:r["단계"], boss:r["보스"],
-    members:slotKeys.map(k=>r[k]).filter(Boolean)
-  })).filter(d=>d.members.length>0);
+  /* 공명 사도: '우로스[공명:활발]'처럼 성격을 붙여 기록 → 채용률·티어는 사도 하나로 합치고, 성격 분포는 고른 성격으로 셈 */
+  const RESO=/\[공명:([^\]]+)\]$/;
+  const baseName=n=>n.replace(RESO,"");
+  const decks=decksRaw.map(r=>{
+    const raw=slotKeys.map(k=>r[k]).filter(Boolean);
+    return { rank:parseInt(r["순위"],10), stage:r["단계"], boss:r["보스"], raw, members:raw.map(baseName) };
+  }).filter(d=>d.members.length>0);
   const N=decks.length;
   if(!N){ $("summary").textContent="decks.csv에 입력된 덱이 없습니다."; return; }
 
@@ -369,7 +379,11 @@ async function main(){
 
   /* 보드 */
   const board=$("board"); board.hidden=false;
-  board.innerHTML=`<div class="board-head"><b>표준 덱</b><span>${N}덱 중 ${stdCount}덱이 이 ${slotKeys.length}명 그대로 편성, 칸의 숫자는 채용률 · <a href="calculator.html?deck=${encodeURIComponent(std.join(","))}">덱 계산기로 열기 →</a></span></div>
+  /* 계산기 링크: 표준 덱과 같은 9명인 덱 중 가장 많은 실제 기록(공명 성격 포함) */
+  const rc2={}; decks.filter(d=>key(d)===stdKey).forEach(d=>{ const k=d.raw.join(","); rc2[k]=(rc2[k]||0)+1; });
+  const stdRaw=(Object.entries(rc2).sort((a,b)=>b[1]-a[1])[0]||[std.join(",")])[0];
+  const calcHref=`calculator.html?deck=${encodeURIComponent(stdRaw)}${cur?`&s=${encodeURIComponent(cur["시즌ID"])}`:""}`;
+  board.innerHTML=`<div class="board-head"><b>표준 덱</b><span>${N}덱 중 ${stdCount}덱이 이 ${slotKeys.length}명 그대로 편성, 칸의 숫자는 채용률 · <a href="${calcHref}">덱 계산기로 열기 →</a></span></div>
   <div class="slots">${std.map(n=>`<div class="slot" style="--c:${col(n)}"><i class="hex" aria-hidden="true"></i>
     <div class="pct">${pct(rateOf[n])}</div><div class="nm">${esc(n)}</div>
     <div class="meter"><i style="width:${rateOf[n]*100}%"></i></div></div>`).join("")}</div>`;
@@ -425,7 +439,7 @@ async function main(){
 
   /* 성격 분포 */
   const ac={}; let tot=0;
-  decks.forEach(d=>d.members.forEach(m=>{ const a=ATTRS.includes(ATTR[m])?ATTR[m]:"미분류"; ac[a]=(ac[a]||0)+1; tot++; }));
+  decks.forEach(d=>d.raw.forEach(m=>{ const a=ATTRS.includes(ATTR[m])?ATTR[m]:"미분류"; ac[a]=(ac[a]||0)+1; tot++; }));
   const aList=[...ATTRS,"미분류"].filter(a=>ac[a]);
   $("stack").innerHTML=aList.map(a=>`<i style="--c:var(--${a});flex:${ac[a]}" title="${a} ${pct(ac[a]/tot,1)}">${ac[a]/tot>=.08?pct(ac[a]/tot):""}</i>`).join("");
   const ENEMY=((cur&&cur["적 성격"])||INFO["적 성격"]||"").trim();
@@ -450,25 +464,53 @@ async function main(){
       return `<td class="heat" style="--p:${r*100}">${pct(r,1)}</td>`;
     }).join("")}</tr>`).join("")}</tbody>`;
 
-  /* 노트 */
-  const noted=stats.filter(s=>COMMENT[s.n]);
-  if(noted.length){
+  /* 공명 성격 선택 */
+  const resoBases=uniq(decks.flatMap(d=>d.raw.filter(m=>RESO.test(m)).map(baseName)));
+  if(resoBases.length){
+    $("s-reso").hidden=false;
+    const rows=[];
+    resoBases.forEach(b=>{
+      const vs=uniq(decks.flatMap(d=>d.raw.filter(m=>baseName(m)===b&&RESO.test(m))));
+      const vr=v=>decks.filter(d=>d.raw.includes(v)).length;
+      vs.sort((x,y)=>vr(y)-vr(x)).forEach((v,i)=>{
+        const p=v.match(RESO)[1];
+        rows.push(`<tr><td>${i===0?`<b>${esc(b)}</b>`:""}</td><td><span class="chip" style="--c:var(--${ATTRS.includes(p)?p:"미분류"})">${esc(p)}</span></td><td class="heat" style="--p:${vr(v)/N*100}">${pct(vr(v)/N,1)}</td>${bandDecks.map(bd=>{
+          if(!bd.length) return `<td class="na">미조사</td>`;
+          const r=bd.filter(d=>d.raw.includes(v)).length/bd.length; return `<td class="heat" style="--p:${r*100}">${pct(r,1)}</td>`;
+        }).join("")}</tr>`);
+      });
+    });
+    $("reso").innerHTML=`<thead><tr><th>사도</th><th>고른 성격</th><th>전체</th>${BANDS.map(([lo,hi],i)=>`<th>${lo}~${hi}위 <small>(${bandDecks[i].length}덱)</small></th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody>`;
+  }
+
+  /* 노트: 시즌별 평가(notes.csv)가 있으면 그것을, 없으면 사도 목록 코멘트 */
+  if(seasonNotes.length){
     $("s-notes").hidden=false;
-    $("notes").innerHTML=noted.map(s=>`<article class="note" style="--c:${col(s.n)}"><h3>${esc(s.n)}</h3>
-      <div class="meta">${esc(ATTR[s.n]||"미분류")} / ${tierOf(s.r).name} / 채용률 ${pct(s.r,1)}</div><p>${esc(COMMENT[s.n])}</p></article>`).join("");
+    $("notesH").textContent="사도별 평가";
+    $("notesLead").textContent="이번 시즌 채용 데이터와 전투 메커니즘 DB(스킬 판정표)의 효과를 맞춰 본 평가입니다. 해석이 들어간 부분은 '~로 보인다'로 구분했습니다.";
+    const list=seasonNotes.map(r=>({n:r["사도명"],t:r["평가"],r:rateOf[r["사도명"]]||0})).sort((a,b)=>b.r-a.r);
+    $("notes").innerHTML=list.map(s=>`<article class="note" style="--c:${col(s.n)}"><h3>${esc(s.n)}</h3>
+      <div class="meta">${esc(ATTR[s.n]||"미분류")} / ${tierOf(s.r).name} / 채용률 ${pct(s.r,1)}</div><p>${esc(s.t)}</p></article>`).join("");
+  }else{
+    const noted=stats.filter(s=>COMMENT[s.n]);
+    if(noted.length){
+      $("s-notes").hidden=false;
+      $("notes").innerHTML=noted.map(s=>`<article class="note" style="--c:${col(s.n)}"><h3>${esc(s.n)}</h3>
+        <div class="meta">${esc(ATTR[s.n]||"미분류")} / ${tierOf(s.r).name} / 채용률 ${pct(s.r,1)}</div><p>${esc(COMMENT[s.n])}</p></article>`).join("");
+    }
   }
 
   $("stackLead").textContent=`전체 편성 칸(덱 수 × ${slotKeys.length}) 중 각 성격이 차지한 비율입니다.`;
   if(cur) document.title=`${cur["표시이름"]||cur["시즌ID"]} — 트릭컬 리바이브 PvE 상위권 덱 리포트`;
 
   /* 조사 방법 & 데이터 점검 */
-  const infoRows=[["조사일",INFO["조사일"]],["시즌/콘텐츠",INFO["시즌/콘텐츠명"]],["보스 성격",((cur&&cur["적 성격"])||INFO["적 성격"]||"")],["게임 버전",INFO["게임 버전"]],["조사 범위",ranks.length?`${Math.min(...ranks)}~${Math.max(...ranks)}위 (${N}덱)`:""],["기록 기준","유저별 최고 단계 덱 1개"],["조사자",INFO["조사자"]]];
+  const infoRows=[["조사일",INFO["조사일"]],["시즌/콘텐츠",INFO["시즌/콘텐츠명"]],["보스 성격",((cur&&cur["적 성격"])||INFO["적 성격"]||"")],["게임 버전",INFO["게임 버전"]],["조사 범위",ranks.length?`${Math.min(...ranks)}~${Math.max(...ranks)}위 (${N}덱 · ${INFO["순위 구간"]||"상위 1% 미만"})`:""],["기록 기준","유저별 최고 단계 덱 1개"],["조사자",INFO["조사자"]]];
   $("info").innerHTML=infoRows.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v||"—")}</dd>`).join("");
 
   const checks=[];
   const short=decks.filter(d=>d.members.length<slotKeys.length);
   const dup=decks.filter(d=>new Set(d.members).size!==d.members.length);
-  const unknown={}; decks.forEach(d=>d.members.forEach(m=>{ if(!(m in ATTR)) (unknown[m]=unknown[m]||[]).push(d.rank); }));
+  const unknown={}; decks.forEach(d=>d.raw.forEach(m=>{ if(!(m in ATTR)) (unknown[m]=unknown[m]||[]).push(d.rank); }));
   const rc={}; ranks.forEach(r=>rc[r]=(rc[r]||0)+1); const dupRank=Object.keys(rc).filter(r=>rc[r]>1);
   const line=(ok,okText,badText)=>checks.push(ok?`<li class="ok">✓ ${okText}</li>`:`<li class="warn">! ${badText}</li>`);
   line(!short.length,`모든 덱 ${slotKeys.length}명 편성 확인`,`빈칸 있는 덱: ${short.map(d=>d.rank+"위").join(", ")}`);
