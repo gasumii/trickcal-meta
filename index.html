@@ -6,7 +6,8 @@
 <title>트릭컬 리바이브 PvE 상위권 덱 리포트</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Jua&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <style>
 /* ===== 티어 기준은 아래 script 상단 TIERS에서 변경 ===== */
 :root{
@@ -14,7 +15,7 @@
   --leaf:#4E9A3A; --leaf-soft:#E4F1D9;
   --광기:#E0555A; --순수:#4FAF50; --냉정:#4A8FE0; --활발:#E9A91E; --우울:#9A6AD6; --공명:#1FA3A3; --미분류:#9AA39A;
   --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"Pretendard Variable","Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -111,8 +112,9 @@ td.na{color:var(--muted)}
 .note{background:var(--paper);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:16px;padding:18px 20px}
 .note h3{font-size:1.2rem}
 .note .meta{color:var(--muted);font-size:.88rem;margin-bottom:10px}
-.note p{margin:0;font-size:1.02rem;line-height:1.8;color:var(--ink)}
-.meta-comment{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:24px 28px;max-width:72ch;font-size:1.08rem;line-height:1.9}
+.note p{margin:0;font-size:1.02rem;line-height:1.8;color:var(--ink);font-weight:500}
+.note p b,.meta-comment b{font-weight:650}
+.meta-comment{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:24px 28px;max-width:72ch;font-size:1.08rem;line-height:1.9;font-weight:500}
 .meta-comment p{margin:0 0 .9em}
 .meta-comment p:last-child{margin-bottom:0}
 
@@ -295,6 +297,7 @@ async function load(path){
 const $=id=>document.getElementById(id);
 const pct=(v,d=0)=>(v*100).toFixed(d)+"%";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const numB=s=>esc(s).replace(/(\d+(?:[.,]\d+)?(?:~\d+(?:[.,]\d+)?)?(?:%p|%|초|덱|위|명|배)?)/g,(m,x)=>/[%초덱위명배p]$/.test(x)||x.includes("~")?`<b>${x}</b>`:x); // 수치만 굵게
 let ATTR={};
 const col=n=>`var(--${ATTRS.includes(ATTR[n])?ATTR[n]:"미분류"})`;
 const chip=(n,extra="",cls="")=>`<span class="chip ${cls}" style="--c:${col(n)}">${esc(n)}${extra}</span>`;
@@ -406,7 +409,7 @@ async function main(){
   }
 
   /* 메타 코멘트 */
-  if(INFO["메타 코멘트"]){ $("s-comment").hidden=false; $("metaComment").innerHTML=INFO["메타 코멘트"].split(/\n+/).filter(s=>s.trim()).map(s=>`<p>${esc(s.trim())}</p>`).join(""); }
+  if(INFO["메타 코멘트"]){ $("s-comment").hidden=false; $("metaComment").innerHTML=INFO["메타 코멘트"].split(/\n+/).filter(s=>s.trim()).map(s=>`<p>${numB(s.trim())}</p>`).join(""); }
 
   /* 티어 */
   $("tierLead").textContent="채용률 기준: "+TIERS.slice(0,-1).map(t=>`${t.name} ${pct(t.min)} 이상`).join(", ")+", 그 외 비주류.";
@@ -492,7 +495,7 @@ async function main(){
     $("notesLead").textContent="이번 시즌 채용 데이터와 전투 메커니즘 DB(스킬 판정표)의 효과를 맞춰 본 평가입니다. 해석이 들어간 부분은 '~로 보인다'로 구분했습니다.";
     const list=seasonNotes.map(r=>({n:r["사도명"],t:r["평가"],r:rateOf[r["사도명"]]||0})).sort((a,b)=>b.r-a.r);
     $("notes").innerHTML=list.map(s=>`<article class="note" style="--c:${col(s.n)}"><h3>${esc(s.n)}</h3>
-      <div class="meta">${esc(ATTR[s.n]||"미분류")} / ${tierOf(s.r).name} / 채용률 ${pct(s.r,1)}</div><p>${esc(s.t)}</p></article>`).join("");
+      <div class="meta">${esc(ATTR[s.n]||"미분류")} / ${tierOf(s.r).name} / 채용률 ${pct(s.r,1)}</div><p>${numB(s.t)}</p></article>`).join("");
   }else{
     const noted=stats.filter(s=>COMMENT[s.n]);
     if(noted.length){

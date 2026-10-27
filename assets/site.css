@@ -4,7 +4,7 @@
   --leaf:#4E9A3A; --leaf-soft:#E4F1D9; --warn:#B5651D; --bad-soft:#FBE3E3; --bad:#B23B3F;
   --광기:#E0555A; --순수:#4FAF50; --냉정:#4A8FE0; --활발:#E9A91E; --우울:#9A6AD6; --공명:#1FA3A3; --미분류:#9AA39A;
   --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
-  --body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --body:"Pretendard Variable","Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --mono:ui-monospace,"SFMono-Regular",Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){
