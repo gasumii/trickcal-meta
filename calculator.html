@@ -280,14 +280,18 @@ $("season").addEventListener("change",render); $("enemy").addEventListener("chan
   try{[sk]=await Promise.all([load("data/battle/skills.csv"),loadSadoInfo()]);}catch(e){showError(e);return;}
   try{seasons=await load("data/seasons.csv");}catch(_){}
   DATA=sk.map(toCalcRow); NAMES=[...new Set(DATA.map(d=>d.n))];
-  SEASONS=[...seasons.filter(s=>s["시즌ID"]).reverse().map(s=>({n:s["표시이름"]||s["시즌ID"],c:s["콘텐츠"],e:s["적 성격"]||""})),...EXTRA_SEASONS];
+  SEASONS=[...seasons.filter(s=>s["시즌ID"]).reverse().map(s=>({id:s["시즌ID"],n:s["표시이름"]||s["시즌ID"],c:s["콘텐츠"],e:s["적 성격"]||""})),...EXTRA_SEASONS];
   $("season").innerHTML=SEASONS.map((s,i)=>`<option value="${i}">${esc(s.n)}</option>`).join("");
-  const firstClash=SEASONS.findIndex(s=>s.c==="대충돌"); if(firstClash>=0) $("season").value=firstClash;
+  const wantS=new URLSearchParams(location.search).get("s"), byId=SEASONS.findIndex(s=>s.id&&s.id===wantS);
+  const firstClash=SEASONS.findIndex(s=>s.c==="대충돌");
+  if(byId>=0) $("season").value=byId; else if(firstClash>=0) $("season").value=firstClash;
   slots=Array.from({length:9},emptySlot);
   const putIn=(name,o)=>{const l=locOf(name);const order=l==="모든 열"||!l?[2,1,0]:[ROWS.indexOf(l)];
     for(const ri of order){const j=[0,1,2].map(k=>ri*3+k).find(j=>!slots[j].name);if(j!==undefined){slots[j]={...emptySlot(),...o,name};return true;}}return false;};
   const q=new URLSearchParams(location.search).get("deck");
-  if(q){const miss=[];q.split(",").map(x=>x.trim()).filter(Boolean).forEach(n=>{if(!NAMES.includes(n)||!putIn(n,{atk:10000}))miss.push(n);});
+  if(q){const miss=[];q.split(",").map(x=>x.trim()).filter(Boolean).forEach(raw=>{
+      const m=raw.match(/^(.+)\[공명:([^\]]+)\]$/), n=m?m[1]:raw, o=m?{atk:10000,choose:m[2]}:{atk:10000};
+      if(!NAMES.includes(n)||!putIn(n,o))miss.push(raw);});
     DECK_NOTE=miss.length?`DB에 아직 없거나 칸이 없는 사도: ${miss.join(", ")}`:"";}
   else EXAMPLE.filter(a=>NAMES.includes(a[0])).forEach(a=>putIn(a[0],{aside:a[1],hi:!!a[2],choose:a[3],atk:a[4]}));
   refresh();
