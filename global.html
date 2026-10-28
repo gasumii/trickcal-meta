@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="utf-8">
@@ -8,16 +8,97 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
-<link rel="stylesheet" href="assets/site.css">
-
+<link rel="stylesheet" href="assets/report.css">
+<style>
+.site-sum{margin-top:14px;background:var(--paper,#fff);border:1px solid var(--line,#D8E5CB);border-left:5px solid var(--leaf,#4E9A3A);border-radius:16px;padding:14px 18px;display:grid;gap:6px;font-size:.9rem}
+.site-sum p{margin:0}.site-sum .sum-h{font-weight:700;font-size:.85rem;color:var(--muted,#667560)}
+.site-sum .sum-stat b{font-family:ui-monospace,Consolas,monospace;font-size:1.05rem}
+.site-sum .sum-list{margin:0;padding-left:18px;display:grid;gap:2px}.site-sum .conf{font-size:.76rem;color:var(--muted,#667560)}
+.sitebar a.tab.log{margin-left:auto;font-size:.85rem}
+</style>
 </head>
 <body>
 <nav class="sitebar" aria-label="사이트 메뉴"><div class="sitebar-in"><a class="site" href="./">트릭컬 PvE 메타</a><a class="tab" href="./">PvE 기록 분석</a><a class="tab" href="global.html" aria-current="page">글로벌 PvE 분석</a><a class="tab" href="mechanics.html">전투 메커니즘</a><a class="tab" href="calculator.html">덱 계산기</a><a class="tab log" href="changelog.html">업데이트 기록</a></div></nav>
 <main>
-  <header><h1>글로벌 PvE 분석</h1>
-  <p class="lead">글로벌 서버 PvE 상위권 덱을 기록하고 한국 서버와 비교하는 페이지입니다. 번역 차이와 출시 시점 차이가 메타에 주는 영향도 함께 정리할 예정입니다.</p></header>
-  <div class="panel"><strong>준비 중</strong><p class="note" style="margin-top:6px">첫 글로벌 시즌 기록을 정리하는 중입니다. 한국 서버 기록은 <a href="./">PvE 기록 분석</a>에서 볼 수 있습니다.</p></div>
-  <footer>개인이 게임 내 공개 순위 화면을 직접 보고 기록한 비공식 자료입니다. 트릭컬 리바이브의 게임 IP(캐릭터·이미지·명칭 등) 권리는 에피드게임즈에 있으며, 이 사이트는 에피드게임즈와 관계없는 비공식 팬 사이트입니다.</footer>
+  <nav class="gnb" id="gnb" aria-label="콘텐츠 메뉴" hidden><div class="gnb-in" id="gnbIn"></div></nav>
+  <header class="hero">
+        <div class="tags" id="tags"></div>
+    <h1>트릭컬 리바이브 글로벌<br>PvE 상위권 덱 리포트</h1>
+    <p class="summary" id="summary">데이터를 불러오는 중입니다.</p>
+    <div class="board" id="board" hidden></div>
+    <div class="error" id="error" hidden></div>
+  </header>
+  
+  <section id="s-compare" hidden>
+    <h2>한국 서버와 비교</h2>
+    <p class="lead" id="cmpLead"></p>
+    <div class="scroll"><table class="cmp" id="cmp"></table></div>
+  </section>
+
+  <section id="s-comment" hidden>
+    <h2>이번 시즌 메타 코멘트</h2>
+    <div class="meta-comment" id="metaComment" style="margin-top:16px"></div>
+  </section>
+
+  <section>
+    <h2>사도 티어</h2>
+    <p class="lead" id="tierLead"></p>
+    <div class="tiers" id="tiers"></div>
+  </section>
+
+  <section>
+    <h2>사도별 채용률</h2>
+    <p class="lead">조사한 덱 중 해당 사도가 들어간 덱의 비율입니다. 막대 색은 사도 성격입니다.</p>
+    <div class="bars" id="bars"></div>
+  </section>
+
+  <section>
+    <h2>표준 덱에서 바뀐 자리</h2>
+    <p class="lead">가장 많이 쓰인 덱을 기준으로, 다른 덱들이 어떤 사도를 빼고 누구를 넣었는지 모았습니다.</p>
+    <div class="swaps" id="swaps"></div>
+  </section>
+
+  <section>
+    <h2>성격 분포</h2>
+    <p class="lead" id="stackLead">전체 편성 칸 중 각 성격이 차지한 비율입니다.</p>
+    <p class="lead matchup" id="matchLead" hidden></p>
+    <div class="stack" id="stack"></div>
+    <div class="legend" id="stackLegend"></div>
+  </section>
+
+  <section id="s-reso" hidden>
+    <h2>공명 사도 성격 선택</h2>
+    <p class="lead">공명 사도는 대충돌 계열에서 성격을 골라 편성합니다. 위 채용률·티어는 성격과 상관없이 한 사도로 합쳐 셌고, 성격 분포는 고른 성격대로 셌습니다.</p>
+    <div class="scroll"><table id="reso"></table></div>
+  </section>
+
+  <section>
+    <h2>순위 구간별 채용률</h2>
+    <p class="lead">순위가 높을수록 채용률이 오르는 사도가 최상위 메타의 핵심입니다.</p>
+    <div class="scroll"><table id="bands"></table></div>
+  </section>
+
+  <section id="s-notes" hidden>
+    <h2 id="notesH">사도 노트</h2>
+    <p class="lead" id="notesLead">숫자만으로는 보이지 않는, 직접 써보며 느낀 점입니다.</p>
+    <div class="notes" id="notes"></div>
+  </section>
+
+  <section>
+    <h2>조사 방법</h2>
+    <div class="method" style="margin-top:16px">
+      <div class="card"><dl id="info"></dl></div>
+      <div class="card"><ul class="checks" id="checks"></ul></div>
+    </div>
+  </section>
+
+  <footer>개인이 게임 내 공개 순위 화면을 직접 보고 기록한 비공식 자료입니다. 다른 유저의 닉네임은 기록하지 않았습니다. 사도 이름은 한국 서버 표기로 통일했습니다. 트릭컬 리바이브의 게임 IP(캐릭터·이미지·명칭 등) 권리는 에피드게임즈에 있으며, 이 사이트는 에피드게임즈와 관계없는 비공식 팬 사이트입니다.</footer>
 </main>
+
+<script>
+window.REPORT_CFG={root:"data/global/",compare:"kr",attrFallback:true,bands:[[1,50],[51,100]],
+  brand:"글로벌 덱 리포트",brandHref:"global.html",titleSuffix:"트릭컬 리바이브 글로벌 PvE 상위권 덱 리포트"};
+</script>
+<script src="assets/report.js"></script>
 </body>
 </html>

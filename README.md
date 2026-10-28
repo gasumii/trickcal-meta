@@ -2,13 +2,14 @@
 
 게임 내 PvE 순위 화면의 상위권 덱을 직접 기록하고, 사도 채용률·티어·메타를 정리한 사이트입니다.
 
-상단 탭: **PvE 기록 분석**(`index.html`) / **글로벌 PvE 분석**(`global.html`, 준비 중) / **전투 메커니즘**(`mechanics.html` — 스킬 판정표·사도 카드·보스 기믹·아이콘 사전·상태·용어 사전·검증 사례·실험 기록·정정 기록) / **덱 계산기**(`calculator.html` — 편성 판·고급 옵션) / 업데이트 기록(`changelog.html`)
+상단 탭: **PvE 기록 분석**(`index.html`) / **글로벌 PvE 분석**(`global.html`) / **전투 메커니즘**(`mechanics.html` — 스킬 판정표·사도 카드·보스 기믹·아이콘 사전·상태·용어 사전·검증 사례·실험 기록·정정 기록) / **덱 계산기**(`calculator.html` — 편성 판·고급 옵션) / 업데이트 기록(`changelog.html`)
 콘텐츠(대충돌, 프론티어 등)가 끝날 때마다 시즌 단위로 데이터를 쌓고, 같은 콘텐츠의 이전 시즌과 채용률 변화를 자동으로 비교합니다.
 
 ## 파일 구성
 - `index.html` — PvE 기록 분석 페이지 (수정할 필요 없음)
 - `global.html`, `mechanics.html`, `calculator.html` — 나머지 탭 페이지
 - `assets/site.css`, `assets/common.js` — 새 탭 공통 스타일·CSV 읽기·덱 계산 규칙
+- `assets/report.css`, `assets/report.js` — PvE 덱 리포트 화면(한국 `index.html`·글로벌 `global.html` 공용). 글로벌은 `global.html`의 `REPORT_CFG`로 데이터 폴더·한국 비교·순위 구간을 바꿈
 - `data/battle/cards.csv` — 아티팩트·스펠 (효과 1개 = 1줄, Lv1·레벨당 증가·판정 중요 표시) — 아티팩트 89종 · 스펠 44종 (전부 게임 카드 화면으로 수치 확인)
 - `data/battle/skills.csv` — 사도 스킬 판정표 (효과 1개 = 1줄, 게임 원문 제외) — 2026-10-25 기준 사도 136명 · 효과 1,883줄
 - `data/battle/terms.csv` — 상태·용어 사전 (123개)
@@ -28,6 +29,7 @@
 - `data/seasons/<시즌ID>/info.csv` — 조사 정보, 한줄요약, 메타 코멘트
 - `data/seasons/<시즌ID>/notes.csv` — (선택) 시즌별 사도 평가 (사도명, 평가). 있으면 '사도별 평가' 섹션에 채용률 순으로 보이고, 없으면 `sado.csv` 코멘트를 '사도 노트'로 보여줌
 - `data/seasons/_template/` — 새 시즌을 만들 때 복사할 빈 양식
+- `data/global/seasons.csv`, `data/global/seasons/<시즌ID>/` — 글로벌 서버 시즌 (한국과 같은 형식). 사도 이름은 한국 표기로 통일, 성격은 `sado.csv`에 없으면 전투 메커니즘 DB(`sado_info.csv`)에서 가져옴. '한국 서버와 비교'는 같은 콘텐츠의 한국 최신 시즌과 자동 비교
 - `docs/전투판정DB_작성방법.md` — 스킬 판정표를 만들고 검증한 절차
 
 ## 새 시즌 추가 방법
