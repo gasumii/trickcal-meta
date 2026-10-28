@@ -16,6 +16,22 @@
 .site-sum .sum-list{margin:0;padding-left:18px;display:grid;gap:2px}.site-sum .conf{font-size:.76rem;color:var(--muted,#667560)}
 .sitebar a.tab.log{margin-left:auto;font-size:.85rem}
 </style>
+<style>
+.sk-sum td{text-align:left;vertical-align:top}.sk-sum td.n{text-align:right;white-space:nowrap}
+.sk-sum td.d{min-width:280px;font-size:.88rem}
+.sk-h{margin:28px 0 10px;font-size:1.05rem}
+.sk-pat{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.sk-pat article{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:.9rem}
+.sk-pat h4{margin:0 0 6px;font-size:.98rem}.sk-pat p{margin:4px 0}.sk-pat .who{color:var(--muted);font-size:.84rem}
+.sk-pat .mean{border-top:1px dashed var(--line);padding-top:6px;margin-top:8px}
+.sk-det details{background:var(--paper);border:1px solid var(--line);border-radius:16px;margin:8px 0;overflow:hidden}
+.sk-det summary{cursor:pointer;padding:12px 16px;font-weight:600;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sk-det summary small{font-weight:400;color:var(--muted)}
+.sk-det table{font-size:.86rem;min-width:860px}.sk-det td,.sk-det th{text-align:left;vertical-align:top}
+.sk-det td.nm small{display:block;color:var(--muted)}
+.badge{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.78rem;white-space:nowrap;background:color-mix(in srgb,var(--b) 16%,transparent);color:var(--b);font-weight:600}
+.sk-src{margin-top:14px;font-size:.84rem;color:var(--muted)}
+</style>
 </head>
 <body>
 <nav class="sitebar" aria-label="사이트 메뉴"><div class="sitebar-in"><a class="site" href="./">트릭컬 PvE 메타</a><a class="tab" href="./">PvE 기록 분석</a><a class="tab" href="global.html" aria-current="page">글로벌 PvE 분석</a><a class="tab" href="mechanics.html">전투 메커니즘</a><a class="tab" href="calculator.html">덱 계산기</a><a class="tab log" href="changelog.html">업데이트 기록</a></div></nav>
@@ -84,6 +100,19 @@
     <div class="notes" id="notes"></div>
   </section>
 
+
+  <section id="s-skill" hidden>
+    <h2>국내·글로벌 스킬 차이</h2>
+    <p class="lead" id="skLead"></p>
+    <div class="scroll"><table class="sk-sum" id="skSum"></table></div>
+    <h3 class="sk-h">공통 패턴</h3>
+    <div class="sk-pat" id="skPat"></div>
+    <h3 class="sk-h">사도별 상세</h3>
+    <p class="lead">사도를 누르면 스킬별 국내·글로벌 수치가 펼쳐집니다. '확인 필요'는 위키에 수치가 없어 게임 화면으로 확인할 항목입니다.</p>
+    <div class="sk-det" id="skDet"></div>
+    <p class="note sk-src" id="skSrc"></p>
+  </section>
+
   <section>
     <h2>조사 방법</h2>
     <div class="method" style="margin-top:16px">
@@ -100,5 +129,27 @@ window.REPORT_CFG={root:"data/global/",compare:"kr",attrFallback:true,bands:[[1,
   brand:"글로벌 덱 리포트",brandHref:"global.html",titleSuffix:"트릭컬 리바이브 글로벌 PvE 상위권 덱 리포트"};
 </script>
 <script src="assets/report.js"></script>
+<script>
+(async()=>{
+  const B={"같음":"#7A8475","수치 상향":"#2F8A3A","수치 하향":"#C8454B","효과 변경":"#3A78C8","글로벌 전용":"#8A5BC8","확인 필요":"#C98A12"};
+  const badge=t=>`<span class="badge" style="--b:${B[t]||"#7A8475"}">${esc(t||"—")}</span>`;
+  let S,D,P; try{ [S,D,P]=await Promise.all([load("data/global/skill_diff_summary.csv"),load("data/global/skill_diff.csv"),load("data/global/skill_patterns.csv")]); }catch(_){ return; }
+  if(!S.length) return; $("s-skill").hidden=false;
+  try{ (await load("data/battle/sado_info.csv")).forEach(r=>{ if(r["사도"]&&r["성격"]&&!ATTR[r["사도"]]) ATTR[r["사도"]]=r["성격"]; }); }catch(_){}
+  const tot={}; D.forEach(r=>tot[r["차이 유형"]]=(tot[r["차이 유형"]]||0)+1);
+  $("skLead").textContent=`글로벌 채용 상위 ${S.length}명의 스킬을 국내 전투 메커니즘 DB(Lv10)와 줄 단위로 비교했습니다 (${D.length}줄: `+Object.entries(tot).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} ${v}`).join(" · ")+"). 어사이드1과 PvP 수치는 제외했습니다.";
+  const K=["효과 변경","글로벌 전용","수치 상향","수치 하향","확인 필요"];
+  $("skSum").innerHTML=`<thead><tr><th>사도</th><th>채용률</th><th>성향</th><th>핵심 차이</th>${K.map(k=>`<th>${badge(k)}</th>`).join("")}</tr></thead><tbody>`+
+    S.map(r=>`<tr><td>${chip(r["사도"])}<br><small style="color:var(--muted)">${esc(r["영문명"])}</small></td><td class="n">${pct(+r["글로벌 채용률"])}</td><td>${esc(r["성향"])}</td><td class="d">${esc(r["핵심 차이"])}${r["국내 성격·열·역할"]!==r["글로벌 성격·열·역할"]?`<br><small style="color:var(--muted)">국내 ${esc(r["국내 성격·열·역할"])} → 글로벌 ${esc(r["글로벌 성격·열·역할"])}</small>`:""}</td>${K.map(k=>`<td class="n">${esc(r[k]||"0")}</td>`).join("")}</tr>`).join("")+`</tbody>`;
+  $("skPat").innerHTML=P.map(r=>`<article><h4>${esc(r["패턴"])}</h4><p>${numB(r["내용"])}</p><p class="who">${esc(r["해당 사도"])}</p>${r["의미"]?`<p class="mean">${esc(r["의미"])}</p>`:""}</article>`).join("");
+  const by={}; D.forEach(r=>(by[r["사도"]]=by[r["사도"]]||[]).push(r));
+  $("skDet").innerHTML=S.map(s=>{ const L=by[s["사도"]]||[]; const c={}; L.forEach(r=>c[r["차이 유형"]]=(c[r["차이 유형"]]||0)+1);
+    return `<details><summary>${chip(s["사도"])} <small>${esc(s["영문명"])} · ${L.length}줄</small> ${Object.entries(c).map(([k,v])=>`${badge(k)}<small>${v}</small>`).join(" ")}</summary>
+    <div class="scroll" style="border:0;border-radius:0;border-top:1px solid var(--line)"><table><thead><tr><th>구분</th><th>스킬명 (국내 / 글로벌)</th><th>국내 (Lv10)</th><th>글로벌 (Lv10)</th><th>재사용</th><th>차이</th><th>비고</th></tr></thead><tbody>`+
+    L.map(r=>`<tr><td>${esc(r["구분"])}</td><td class="nm">${esc(r["국내 스킬명"]||"—")}<small>${esc(r["글로벌 스킬명"])}</small></td><td>${esc(r["국내 (Lv10)"])}</td><td>${esc(r["글로벌 (Lv10)"])}</td><td>${r["국내 재사용"]||r["글로벌 재사용"]?`${esc(r["국내 재사용"]||"—")} → ${esc(r["글로벌 재사용"]||"—")}`:""}</td><td>${badge(r["차이 유형"])}</td><td>${esc(r["비고"])}</td></tr>`).join("")+`</tbody></table></div></details>`; }).join("");
+  const src=[...new Set(S.map(r=>r["출처"]).filter(u=>/^https?:/.test(u)))];
+  $("skSrc").innerHTML=`국내 값: 전투 메커니즘 DB(skills.csv) Lv10 계산용 값, Lv10 값이 없는 칸은 DB 기록값. 글로벌 값: 글로벌 위키(<a href="https://lootandwaifus.com/" rel="noopener">lootandwaifus.com</a>) Lv10을 요약한 값(2026.10.29 확인) — 게임 화면으로 대조한 사도는 네르. 글로벌 미보유 사도는 게임에서 어사이드 화면을 볼 수 없어, 어사이드 '확인 필요' 칸은 보유 전까지 위키 기준입니다.`;
+})();
+</script>
 </body>
 </html>
