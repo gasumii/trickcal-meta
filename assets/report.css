@@ -151,6 +151,7 @@ footer{margin-top:64px;color:var(--muted);font-size:.85rem}
 .cmp th,.cmp td{padding:8px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
 .cmp th:first-child,.cmp td:first-child{text-align:left}
 .cmp thead th{background:var(--leaf-soft);font-weight:700}
+.cmp-note{color:var(--muted);font-size:.9rem;margin:.6rem 0 0}
 .up{color:#2E8B3E;font-weight:700} .down{color:#C84B4B;font-weight:700}
 /* 사이트 상단 탭 (모든 페이지 공통) */
 .sitebar{border-bottom:1px solid var(--line);background:var(--paper)}

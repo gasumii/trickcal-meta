@@ -149,16 +149,22 @@ async function main(){
     const pk=Object.keys(prevRaw[0]).filter(k=>/^사도\s*\d+$/.test(k));
     const pd=prevRaw.map(r=>pk.map(k=>r[k]).filter(Boolean)).filter(m=>m.length);
     const pc={}; pd.forEach(m=>new Set(m).forEach(x=>pc[x]=(pc[x]||0)+1));
-    const names=[...new Set([...Object.keys(pc),...Object.keys(cnt)])];
+    /* 글로벌 비교: 글로벌에 아직 출시되지 않은 사도는 채용률 0%가 아니라 '고를 수 없음'이라 표에서 제외 (CFG.root/unreleased.csv) */
+    let unreleased=[];
+    if(CFG.compare==="kr"){ try{ unreleased=(await load(CFG.root+"unreleased.csv")).map(r=>r["사도명"]).filter(Boolean); }catch(_){ unreleased=[]; } }
+    const names=[...new Set([...Object.keys(pc),...Object.keys(cnt)])].filter(n=>!unreleased.includes(n));
     const rows=names.map(n=>({n,a:(pc[n]||0)/pd.length,b:rateOf[n]||0})).map(o=>({...o,d:o.b-o.a}))
       .filter(o=>Math.abs(o.d)>=0.05).sort((x,y)=>Math.abs(y.d)-Math.abs(x.d)).slice(0,15);
     $("s-compare").hidden=false;
     $("cmpLead").textContent=CFG.compare==="kr"
-      ?`한국 서버 ${prev["표시이름"]||prev["시즌ID"]} (${pd.length}덱) → 글로벌 서버 ${cur["표시이름"]||cur["시즌ID"]} (${N}덱). 같은 콘텐츠에서 채용률이 5%p 이상 다른 사도를 차이 폭 순으로 보여줍니다. 출시 순서·보유 사도 차이가 드러나는 지점입니다.`
+      ?`한국 서버 ${prev["표시이름"]||prev["시즌ID"]} (${pd.length}덱) → 글로벌 서버 ${cur["표시이름"]||cur["시즌ID"]} (${N}덱). 같은 콘텐츠에서 두 서버에 모두 출시된 사도 중 채용률이 5%p 이상 다른 사도를 차이 폭 순으로 보여줍니다.`
       :`${prev["표시이름"]||prev["시즌ID"]} (${pd.length}덱) → ${cur["표시이름"]||cur["시즌ID"]} (${N}덱). 채용률이 5%p 이상 바뀐 사도를 변화 폭 순으로 보여줍니다. 패치 노트에 없는 변화라면 확인이 필요한 지점입니다.`;
     $("cmp").innerHTML=`<thead><tr><th>사도</th><th>${CFG.compare==="kr"?"한국":"이전"}</th><th>${CFG.compare==="kr"?"글로벌":"이번"}</th><th>${CFG.compare==="kr"?"차이":"변화"}</th></tr></thead><tbody>`+
       (rows.length?rows.map(o=>`<tr><td>${chip(o.n)}</td><td>${pct(o.a)}</td><td>${pct(o.b)}</td><td class="${o.d>0?'up':'down'}">${o.d>0?'▲':'▼'} ${(Math.abs(o.d)*100).toFixed(0)}%p</td></tr>`).join("")
        :`<tr><td colspan="4">5%p 이상 바뀐 사도가 없습니다.</td></tr>`)+`</tbody>`;
+    const krOnly=unreleased.filter(n=>pc[n]);
+    const note=$("cmpNote");
+    if(note&&krOnly.length){ note.hidden=false; note.innerHTML=`글로벌 미출시라 비교에서 제외: ${krOnly.map(n=>esc(n)).join(" · ")}`; }
   }
 
   /* 메타 코멘트 */
