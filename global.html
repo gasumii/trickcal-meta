@@ -17,8 +17,23 @@
 .sitebar a.tab.log{margin-left:auto;font-size:.85rem}
 </style>
 <style>
-.sk-sum td{text-align:left;vertical-align:top}.sk-sum td.n{text-align:right;white-space:nowrap}
-.sk-sum td.d{min-width:280px;font-size:.88rem}
+.sk-sum{min-width:0;table-layout:fixed}
+.sk-sum th,.sk-sum td{text-align:left;vertical-align:top}
+.sk-sum th.c-who,.sk-sum td.who{width:150px}.sk-sum th.c-rate,.sk-sum td.n{width:76px;text-align:right;white-space:nowrap}.sk-sum th.c-mix,.sk-sum td.mix{width:270px}
+.sk-sum td.d{font-size:.88rem;word-break:keep-all;overflow-wrap:anywhere}
+.sk-sum .who small{display:block;color:var(--muted)}
+.sk-sum .tag{display:inline-block;margin-top:4px;font-size:.76rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:0 8px}
+.sk-sum .mix-in{display:flex;flex-wrap:wrap;gap:5px}
+.sk-sum .mix-in .badge b{font-variant-numeric:tabular-nums;margin-left:4px}
+@media (max-width:760px){
+  .sk-sum,.sk-sum tbody,.sk-sum tr,.sk-sum td{display:block;width:auto!important}
+  .sk-sum thead{display:none}
+  .sk-sum tr{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .sk-sum tbody tr:last-child{border-bottom:0}
+  .sk-sum td{padding:0;border:0}
+  .sk-sum td.n{text-align:right}
+  .sk-sum td.d,.sk-sum td.mix{grid-column:1 / -1}
+}
 .sk-h{margin:28px 0 10px;font-size:1.05rem}
 .sk-pat{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
 .sk-pat article{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:.9rem}
@@ -27,7 +42,7 @@
 .sk-det details{background:var(--paper);border:1px solid var(--line);border-radius:16px;margin:8px 0;overflow:hidden}
 .sk-det summary{cursor:pointer;padding:12px 16px;font-weight:600;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .sk-det summary small{font-weight:400;color:var(--muted)}
-.sk-det table{font-size:.86rem;min-width:860px}.sk-det td,.sk-det th{text-align:left;vertical-align:top}
+.sk-det table{font-size:.86rem;min-width:720px;table-layout:fixed}.sk-det td{word-break:keep-all;overflow-wrap:anywhere}.sk-det td,.sk-det th{text-align:left;vertical-align:top}
 .sk-det td.nm small{display:block;color:var(--muted)}
 .badge{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.78rem;white-space:nowrap;background:color-mix(in srgb,var(--b) 16%,transparent);color:var(--b);font-weight:600}
 .sk-src{margin-top:14px;font-size:.84rem;color:var(--muted)}
@@ -139,8 +154,8 @@ window.REPORT_CFG={root:"data/global/",compare:"kr",attrFallback:true,bands:[[1,
   const tot={}; D.forEach(r=>tot[r["차이 유형"]]=(tot[r["차이 유형"]]||0)+1);
   $("skLead").textContent=`글로벌 채용 상위 ${S.length}명의 스킬을 국내 전투 메커니즘 DB(Lv10)와 줄 단위로 비교했습니다 (${D.length}줄: `+Object.entries(tot).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} ${v}`).join(" · ")+"). 어사이드1과 PvP 수치는 제외했습니다.";
   const K=["효과 변경","글로벌 전용","수치 상향","수치 하향","확인 필요"];
-  $("skSum").innerHTML=`<thead><tr><th>사도</th><th>채용률</th><th>성향</th><th>핵심 차이</th>${K.map(k=>`<th>${badge(k)}</th>`).join("")}</tr></thead><tbody>`+
-    S.map(r=>`<tr><td>${chip(r["사도"])}<br><small style="color:var(--muted)">${esc(r["영문명"])}</small></td><td class="n">${pct(+r["글로벌 채용률"])}</td><td>${esc(r["성향"])}</td><td class="d">${esc(r["핵심 차이"])}${r["국내 성격·열·역할"]!==r["글로벌 성격·열·역할"]?`<br><small style="color:var(--muted)">국내 ${esc(r["국내 성격·열·역할"])} → 글로벌 ${esc(r["글로벌 성격·열·역할"])}</small>`:""}</td>${K.map(k=>`<td class="n">${esc(r[k]||"0")}</td>`).join("")}</tr>`).join("")+`</tbody>`;
+  $("skSum").innerHTML=`<thead><tr><th class="c-who">사도</th><th class="c-rate">채용률</th><th>핵심 차이</th><th class="c-mix">차이 구성</th></tr></thead><tbody>`+
+    S.map(r=>`<tr><td class="who">${chip(r["사도"])}<small>${esc(r["영문명"])}</small>${r["성향"]?`<span class="tag">${esc(r["성향"])}</span>`:""}</td><td class="n">${pct(+r["글로벌 채용률"])}</td><td class="d">${esc(r["핵심 차이"])}${r["국내 성격·열·역할"]!==r["글로벌 성격·열·역할"]?`<br><small style="color:var(--muted)">국내 ${esc(r["국내 성격·열·역할"])} → 글로벌 ${esc(r["글로벌 성격·열·역할"])}</small>`:""}</td><td class="mix"><div class="mix-in">${K.filter(k=>+(r[k]||0)>0).map(k=>`<span class="badge" style="--b:${B[k]}">${esc(k)}<b>${esc(r[k])}</b></span>`).join("")||`<span class="badge" style="--b:${B["같음"]}">차이 없음</span>`}</div></td></tr>`).join("")+`</tbody>`;
   $("skPat").innerHTML=P.map(r=>`<article><h4>${esc(r["패턴"])}</h4><p>${numB(r["내용"])}</p><p class="who">${esc(r["해당 사도"])}</p>${r["의미"]?`<p class="mean">${esc(r["의미"])}</p>`:""}</article>`).join("");
   const by={}; D.forEach(r=>(by[r["사도"]]=by[r["사도"]]||[]).push(r));
   $("skDet").innerHTML=S.map(s=>{ const L=by[s["사도"]]||[]; const c={}; L.forEach(r=>c[r["차이 유형"]]=(c[r["차이 유형"]]||0)+1);
