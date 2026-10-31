@@ -12,7 +12,7 @@
 - `assets/report.css`, `assets/report.js` — PvE 덱 리포트 화면(한국 `index.html`·글로벌 `global.html` 공용). 글로벌은 `global.html`의 `REPORT_CFG`로 데이터 폴더·한국 비교·순위 구간을 바꿈
 - `data/battle/cards.csv` — 아티팩트·스펠 (효과 1개 = 1줄, Lv1·레벨당 증가·판정 중요 표시) — 아티팩트 89종 · 스펠 44종 (전부 게임 카드 화면으로 수치 확인)
 - `data/battle/skills.csv` — 사도 스킬 판정표 (효과 1개 = 1줄, 게임 원문 제외) — 2026-10-25 기준 사도 136명 · 효과 1,883줄
-- `data/battle/terms.csv` — 상태·용어 사전 (123개)
+- `data/battle/terms.csv` — 상태·용어 사전 (130개)
 - `data/battle/sado_info.csv` — 사도별 성격·열·역할·공격 타입·얼굴 이미지 파일명
 - `data/battle/gimmicks.csv`, `gimmick_tags.csv` — 보스 기믹과 대응 태그별 사도 (엑셀에서 자동 계산된 값)
 - `data/battle/icons.csv` — 버프·디버프 아이콘 사전 (아카라이브 「버프/디버프 총 정리」 + DB 연결 메모)
@@ -20,7 +20,7 @@
 - `data/battle/checks.csv` — 스킬 설명 점검 묶음 (손으로 관리)
 - `data/changelog.csv` — 업데이트 기록 (손으로 관리)
 - `assets/sado/<사도명>.png` — 사도 얼굴 아이콘 96×96 (없으면 성격 색 이니셜로 표시)
-- `data/battle/experiments.csv` — 실험 기록 (상태: 예정/진행/완료)
+- `data/battle/experiments.csv` — 실험 기록 EXP-01~14 (포트폴리오 보고서와 같은 번호. 직접 실측 12건 + 문서 대조 2건, 결론 분류별로 걸러 보기. 증거 시각은 전투 타이머 남은 시간)
 - `data/battle/fixes.csv` — 정정 기록
 - `data/contents.csv` — 상단 메뉴에 고정으로 보일 콘텐츠 목록 (대충돌, 프론티어, 대충돌 2.0 beta). 기록이 없어도 메뉴는 보임
 - `data/seasons.csv` — 시즌 목록 (시즌ID, 표시이름, 콘텐츠, 적 성격, 조사일). **아래로 갈수록 최신**, 맨 아래 시즌이 첫 화면. 표시이름은 메뉴에 그대로 나옴 (예: `26년 9월 · 크레용사용(순수)`)

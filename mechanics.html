@@ -95,7 +95,7 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
 <main>
   <header><h1>전투 메커니즘</h1>
   <p class="lead">스킬 설명을 효과 단위로 나눠 대상·조건·수치를 정리하고, 설명만으로 알 수 없는 부분은 실험으로 확인합니다. <a href="calculator.html">덱 계산기</a>의 규칙은 모두 여기서 나옵니다.</p></header>
-  <!--SUMMARY--><div class="site-sum"><p class="sum-h">전투 메커니즘 DB · 검증 현황</p><p class="sum-stat">사도 <b>136</b>명 · 효과 <b>1,883</b>줄 · 상태·용어 <b>130</b>개 · 아티팩트 <b>89</b>종 · 스펠 <b>44</b>종 · 검증 사례 <b>14</b>건 (실행·검증 완료 <b>14</b>건) · 성장 대조 <b>16</b>개 수치</p><p class=sum-h>대표 검증 사례</p><ul class=sum-list><li><a href="mechanics.html#exp=EXP-01">EXP-01</a> 벨라 · 비비(신성) — 벨라가 영속을 가진 채 쓰러지면 영속과 비비(신성) 어사이드3 중 무엇이 먼저 소모되나? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-02">EXP-02</a> 셀리네 — 고학년 스킬 시전 중 무적 상태에서 공격받으면 어사이드2 SP 회복(10)이 발동하는가? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-03">EXP-03</a> 다야 — 쓰라림이 남은 적에게 쓰라림을 다시 걸면 갱신·덮어쓰기·별도 중첩 중 무엇인가? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-04">EXP-04</a> 공통 (스펠) — 깜짝 상자는 기절 면역 보스에게 최대 HP 비례 피해를 주는가? <span class="conf">[검증 완료]</span></li></ul><p class="sum-link"><a href="mechanics.html">전투 메커니즘 전체 보기 →</a></p></div><!--/SUMMARY-->
+  <!--SUMMARY--><div class="site-sum"><p class="sum-h">전투 메커니즘 DB · 검증 현황</p><p class="sum-stat">사도 <b>136</b>명 · 효과 <b>1,883</b>줄 · 상태·용어 <b>130</b>개 · 아티팩트 <b>89</b>종 · 스펠 <b>44</b>종 · 검증 사례 <b>14</b>건 (직접 실측 <b>12</b>건: 정상 동작 확인 7 · 표기 개선 제안 5 / 문서 대조 2) · 성장 대조 <b>16</b>개 수치</p><p class=sum-h>대표 검증 사례</p><ul class=sum-list><li><a href="mechanics.html#exp=EXP-01">EXP-01</a> 벨라 · 비비(신성) — 벨라가 영속을 가진 채 쓰러지면 영속과 비비(신성) 어사이드3 중 무엇이 먼저 소모되나? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-02">EXP-02</a> 셀리네 — 고학년 스킬 시전 중 무적 상태에서 공격받으면 어사이드2 SP 회복(10)이 발동하는가? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-03">EXP-03</a> 다야 — 쓰라림이 남은 적에게 쓰라림을 다시 걸면 갱신·덮어쓰기·별도 중첩 중 무엇인가? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-04">EXP-04</a> 공통 (스펠) — 깜짝 상자는 기절 면역 보스에게 최대 HP 비례 피해를 주는가? <span class="conf">[검증 완료]</span></li></ul><p class="sum-link"><a href="mechanics.html">전투 메커니즘 전체 보기 →</a></p></div><!--/SUMMARY-->
   <div class="error" id="error" hidden></div>
   <div class="subtabs" role="tablist">
     <button role="tab" aria-selected="true" data-sub="cases">검증 사례</button>
@@ -192,7 +192,7 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
   </section>
 
   <section id="sub-exp" class="sub" hidden>
-    <p class="note">각 실험은 검증 목적 · 질문 · 사전 조건 · 경쟁 가설 · 절차 · 관찰값 · 결론 · 한계 · QA 활용(회귀 TC 후보) 순서로 기록합니다. 관찰값은 실제로 실행한 뒤에만 적습니다.</p>
+    <p class="note">각 실험은 검증 목적 · 질문 · 사전 조건 · 경쟁 가설 · 절차 · 관찰값 · 결론 · 한계 · QA 활용(회귀 TC 후보) 순서로 기록합니다. 관찰값은 실제로 실행한 뒤에만 적습니다. 증거의 시각(예: 02:49)은 촬영 시각이 아니라 전투 화면 왼쪽 위 타이머의 남은 시간이라, 같은 판에서는 숫자가 작을수록 나중 장면입니다. QA 활용 앞의 R-번호는 회귀 테스트 항목 번호(R-1~R-10, HP 기준선 3건은 R-6 하나)이고, 결론의 '표기 개선 제안 n번'은 아래 스킬 설명 점검 표 맨 위 줄의 번호와 같습니다.</p>
     <div class="chips" id="expChips"></div>
     <div id="expDetail"></div>
     <div class="exps" id="exps"></div>
@@ -318,10 +318,10 @@ const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일
     <dl><dt>목적</dt><dd>${esc(x["검증 목적"])}</dd><dt>${esc(x["가설 A"])}</dt><dd>${esc(x["A 예상"])}</dd><dt>${esc(x["가설 B"])}</dt><dd>${esc(x["B 예상"])}</dd>${x["결론"]?`<dt>결론</dt><dd>${esc(x["결론"])}</dd>`:""}</dl>
     <a class="more" href="#exp=${encodeURIComponent(x["실험ID"])}">절차·관찰값·한계 자세히 →</a></article>`;
   $("reps").innerHTML=EXPS.filter(x=>x["대표"]==="O").map(x=>card(x,true)).join("")||`<p class="note">대표 사례가 아직 없습니다.</p>`;
-  let expSt="";const sts=[...new Set(EXPS.map(x=>x["상태"]))];
-  $("expChips").innerHTML=[`<button aria-pressed="true" data-s="">전체 ${EXPS.length}</button>`,...sts.map(t=>`<button aria-pressed="false" data-s="${esc(t)}">${esc(t)} ${EXPS.filter(x=>x["상태"]===t).length}</button>`)].join("");
+  let expSt="";const sts=[...new Set(EXPS.map(x=>x["결론 분류"]||x["상태"]))];
+  $("expChips").innerHTML=[`<button aria-pressed="true" data-s="">전체 ${EXPS.length}</button>`,...sts.map(t=>`<button aria-pressed="false" data-s="${esc(t)}">${esc(t)} ${EXPS.filter(x=>(x["결론 분류"]||x["상태"])===t).length}</button>`)].join("");
   $("expChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;expSt=b.dataset.s;$("expChips").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderExps();});
-  function renderExps(){$("exps").innerHTML=EXPS.filter(x=>!expSt||x["상태"]===expSt).map(x=>card(x,x["대표"]==="O")).join("");}
+  function renderExps(){$("exps").innerHTML=EXPS.filter(x=>!expSt||(x["결론 분류"]||x["상태"])===expSt).map(x=>card(x,x["대표"]==="O")).join("");}
   renderExps();
   const v=(t)=>t?esc(t):`<span class="empty">실행 후 기록</span>`;
   window.showExp=id=>{const x=EXPS.find(e=>e["실험ID"]===id);if(!x){$("expDetail").innerHTML="";return;}
