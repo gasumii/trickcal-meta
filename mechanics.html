@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>전투 메커니즘 — 트릭컬 PvE 메타</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="assets/site.css">
+<style>
+.sub{display:grid;gap:14px}
+.controls{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:end}
+.exps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:12px}
+.exp{display:grid;gap:8px;align-content:start}
+.exp h3{font-size:1.1rem}
+.exp dl,.fix{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:0;font-size:.88rem}
+.exp dt,.fix dt{color:var(--muted)}
+.exp dd,.fix dd{margin:0}
+.fixes{display:grid;gap:12px}
+.chips.faces button{display:inline-flex;align-items:center;gap:6px;padding:3px 12px 3px 3px}
+/* 사도 카드 */
+.card-head{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.card-head h2{font-size:1.6rem}
+.card-head .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:.85rem;color:var(--muted)}
+.card-head .meta span.t{border:1px solid var(--line);border-radius:6px;padding:0 8px}
+.skillbox{display:grid;gap:6px}
+.skillbox h3{font-size:1.1rem;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.skillbox h3 small{font-family:var(--body);font-size:.8rem;color:var(--muted)}
+.eff{display:grid;grid-template-columns:minmax(110px,150px) 1fr;gap:2px 12px;padding:8px 0;border-top:1px solid var(--line);font-size:.88rem}
+.eff b{font-weight:700}
+.eff .d{color:var(--muted);font-size:.82rem}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px 20px;align-items:start}
+.skillbox{align-content:start}
+/* 보스 기믹 */
+.gm{display:grid;gap:8px;align-content:start}
+.gm h3{font-size:1.15rem}
+.gm .who{display:flex;flex-wrap:wrap;gap:6px}
+.gm .who span{display:inline-flex;align-items:center;gap:4px;font-size:.8rem;border:1px solid var(--line);border-radius:999px;padding:1px 8px 1px 1px}
+.gm dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:0;font-size:.88rem}
+.gm dt{color:var(--muted)}.gm dd{margin:0}
+.src{font-size:.78rem;color:var(--muted)}
+/* 검증 사례 */
+.growth{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:12px}
+.gcard{display:grid;gap:6px}
+.gcard .top{display:flex;gap:8px;align-items:center}
+.gcard svg{width:100%;height:auto;display:block}
+.gcard .nums{font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--muted);align-items:center}
+.legend i{display:inline-block;width:22px;height:0;border-top:2px solid var(--leaf);vertical-align:middle;margin-right:6px}
+.legend i.dash{border-top:2px dashed var(--muted)}
+.tag-bad{color:var(--warn);font-weight:700;font-size:.78rem}
+.exp .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pill.st-done{background:var(--leaf-soft);color:var(--leaf)}
+.pill.cls{background:transparent;border:1px solid var(--leaf);color:var(--ink)}
+.exp.rep{border-left:5px solid var(--leaf)}
+.exp a.more{font-size:.85rem}
+.detail{display:grid;gap:12px;border-left:5px solid var(--leaf)}
+.detail h2{font-size:1.4rem}
+.detail dl{display:grid;grid-template-columns:minmax(110px,150px) 1fr;gap:8px 16px;margin:0;font-size:.92rem}
+.detail dt{color:var(--muted);font-weight:500}.detail dd{margin:0;white-space:pre-line}
+.detail .hyp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:10px}
+.detail .hyp div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:.9rem}
+.detail .empty{color:var(--muted);font-style:italic}
+a.exl{display:inline-block;font-size:.75rem;font-weight:700;margin-right:4px;text-decoration:none;border:1px solid var(--leaf);border-radius:6px;padding:0 6px}
+td.cond{min-width:13ch;max-width:24ch}
+#skills td.memo{min-width:26ch}
+td.val{min-width:20ch;max-width:30ch}
+td.val span{display:block}
+td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line)}
+.mt{display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.mt.long{cursor:pointer}
+.mt.long:not(.open)::after{content:""}
+.mt.open{display:block}
+#skills mark{background:#ffe27a;color:#1d1d1b;padding:0 1px;border-radius:3px}
+.ment{display:inline-block;white-space:nowrap;margin-top:4px;font-size:.72rem;color:var(--muted);border:1px dashed var(--line);border-radius:6px;padding:0 5px}
+.mt-more{display:block;font-size:.74rem;color:var(--leaf);cursor:pointer;margin-top:2px}
+.items{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))}
+.item{display:grid;gap:8px;align-content:start}
+.item h3{font-size:1.1rem;display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.item h3 small{font-family:var(--body);font-size:.76rem;color:var(--muted)}
+.item .eff{display:grid;grid-template-columns:1fr;gap:2px;padding:8px 10px;border-radius:10px;background:var(--bg)}
+.item .eff b{font-size:.88rem}.item .eff .v{font-family:var(--mono);font-size:.92rem}
+.item .eff .d{font-size:.78rem;color:var(--muted)}
+.imp{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:6px;background:var(--bad-soft);color:var(--bad);white-space:nowrap}
+.gr{display:inline-block;font-size:.72rem;font-weight:700;padding:1px 8px;border-radius:6px;border:1px solid var(--line);color:var(--muted)}
+.gr[data-g="전설"]{border-color:#B07AE0;color:#8A4FC8}.gr[data-g="희귀"]{border-color:#4A8FE0;color:#2F6FC0}
+.item .att{font-size:.78rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
+.item.nodata{opacity:.75}
+</style>
+</head>
+<body>
+<nav class="sitebar" aria-label="사이트 메뉴"><div class="sitebar-in"><a class="site" href="./">트릭컬 PvE 메타</a><a class="tab" href="./">PvE 기록 분석</a><a class="tab" href="global.html">글로벌 PvE 분석</a><a class="tab" href="mechanics.html" aria-current="page">전투 메커니즘</a><a class="tab" href="calculator.html">덱 계산기</a><a class="tab log" href="changelog.html">업데이트 기록</a></div></nav>
+<main>
+  <header><h1>전투 메커니즘</h1>
+  <p class="lead">스킬 설명을 효과 단위로 나눠 대상·조건·수치를 정리하고, 설명만으로 알 수 없는 부분은 실험으로 확인합니다. <a href="calculator.html">덱 계산기</a>의 규칙은 모두 여기서 나옵니다.</p></header>
+  <!--SUMMARY--><div class="site-sum"><p class="sum-h">전투 메커니즘 DB · 검증 현황</p><p class="sum-stat">사도 <b>136</b>명 · 효과 <b>1,883</b>줄 · 상태·용어 <b>130</b>개 · 아티팩트 <b>89</b>종 · 스펠 <b>44</b>종 · 검증 사례 <b>14</b>건 (실행·검증 완료 <b>14</b>건) · 성장 대조 <b>16</b>개 수치</p><p class=sum-h>대표 검증 사례</p><ul class=sum-list><li><a href="mechanics.html#exp=EXP-01">EXP-01</a> 벨라 · 비비(신성) — 벨라가 영속을 가진 채 쓰러지면 영속과 비비(신성) 어사이드3 중 무엇이 먼저 소모되나? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-02">EXP-02</a> 셀리네 — 고학년 스킬 시전 중 무적 상태에서 공격받으면 어사이드2 SP 회복(10)이 발동하는가? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-03">EXP-03</a> 다야 — 쓰라림이 남은 적에게 쓰라림을 다시 걸면 갱신·덮어쓰기·별도 중첩 중 무엇인가? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-04">EXP-04</a> 공통 (스펠) — 깜짝 상자는 기절 면역 보스에게 최대 HP 비례 피해를 주는가? <span class="conf">[검증 완료]</span></li></ul><p class="sum-link"><a href="mechanics.html">전투 메커니즘 전체 보기 →</a></p></div><!--/SUMMARY-->
+  <div class="error" id="error" hidden></div>
+  <div class="subtabs" role="tablist">
+    <button role="tab" aria-selected="true" data-sub="cases">검증 사례</button>
+    <button role="tab" aria-selected="false" data-sub="exp">실험 기록</button>
+    <button role="tab" aria-selected="false" data-sub="skills">스킬 판정표</button>
+    <button role="tab" aria-selected="false" data-sub="cards">사도 카드</button>
+    <button role="tab" aria-selected="false" data-sub="items">아티팩트·스펠</button>
+    <button role="tab" aria-selected="false" data-sub="gimmick">보스 기믹</button>
+    <button role="tab" aria-selected="false" data-sub="icons">아이콘 사전</button>
+    <button role="tab" aria-selected="false" data-sub="terms">상태·용어 사전</button>
+    <button role="tab" aria-selected="false" data-sub="fix">정정 기록</button>
+  </div>
+
+  <section id="sub-skills" class="sub" hidden>
+    <div class="panel" style="display:grid;gap:12px">
+      <div class="chips" id="chips"></div>
+      <div class="controls">
+        <label class="f" for="ftype">효과 유형<select id="ftype"><option value="">전체</option></select></label>
+        <label class="f" for="fq" style="flex:1 1 220px">검색<input id="fq" type="search" placeholder="예: 무적, 방어력, 존속"></label>
+        <label class="note" style="display:flex;gap:6px;align-items:center;white-space:nowrap"><input id="fmemo" type="checkbox">검증 포인트까지 검색</label>
+        <span class="note" id="cnt"></span>
+        <a class="note" id="cardHint" href="#items" hidden></a>
+      </div>
+    </div>
+    <div class="tbl" style="max-height:640px"><table>
+      <thead><tr><th>ID</th><th>사도</th><th>구분</th><th>효과 유형</th><th>대상</th><th>발동 조건</th><th>수치</th><th>지속</th><th>확실도 · 근거</th><th>검증 포인트</th></tr></thead>
+      <tbody id="skills"></tbody>
+    </table></div>
+    <p class="note">확실도(동작을 얼마나 확인했나) — 설명 기준: 스킬 설명을 구조화했을 뿐 실제 동작은 따로 확인하지 않음 / 추정: 설명이 모호해 해석으로 정리 / 화면 확인: 게임 화면으로 수치·표시를 확인 / 실측 확인: 실험으로 동작을 확인(실험 기록 연결) / 미확정: 여러 해석이 가능해 추가 검증 필요. 근거(무엇을 봤나)는 확실도 아래에 따로 적습니다: 게임 설명 · 스킬 강화 미리보기 · 게임 화면 확인 · 나무위키 대조 · 커뮤니티 자료. 모든 값은 국내 서버 기준이며, 게임 스킬 원문은 싣지 않습니다.</p>
+  </section>
+
+  <section id="sub-cards" class="sub" hidden>
+    <p class="note">사도 한 명의 효과를 스킬별로 모아 봅니다. 수치는 스킬 Lv10 기준(게임 미리보기·나무위키 대조)입니다.</p>
+    <div class="panel"><div class="chips faces" id="cardChips"></div></div>
+    <div id="card"></div>
+  </section>
+
+  <section id="sub-items" class="sub" hidden>
+    <p class="note">전투 준비 때 고르는 아티팩트(착용 사도만)와 스펠(모든 사도)을 효과 1개 = 1줄로 정리했습니다. 레벨을 고르면 수치가 Lv1 + (레벨−1) × 레벨당 증가로 바뀝니다(최대 Lv12, 게임 화면으로 검증). 무적·CC처럼 판정에 중요한 효과는 빨간 배지로 표시합니다. 애착 효과는 국내에서 잘 쓰이지 않아 참고로만 적었습니다.</p>
+    <div class="panel" style="display:grid;gap:12px">
+      <div class="chips" id="itKind"></div>
+      <div class="chips" id="itGrade"></div>
+      <div class="controls">
+        <label class="f" for="itLv">레벨<select id="itLv"></select></label>
+        <label class="f" for="itq" style="flex:1 1 220px">검색<input id="itq" type="search" placeholder="예: 무적, 기절, 눈속임, 보호막, 엘다인"></label>
+        <label class="f" style="align-self:end;flex-direction:row;display:flex;gap:6px;align-items:center"><input type="checkbox" id="itImp"> 무적·CC 등 판정 중요만</label>
+        <span class="note" id="itCnt"></span>
+      </div>
+    </div>
+    <div class="items" id="items"></div>
+  </section>
+
+  <section id="sub-gimmick" class="sub" hidden>
+    <p class="note">보스 기믹과 대응 방법, 그 대응에 맞는 효과를 가진 사도를 스킬 판정표에서 자동으로 찾아 보여 줍니다(괄호 안 숫자 = 해당 효과 줄 수, 우로스 열반은 1회 감소량 초). 교주의 권능·시즌 규칙은 시즌마다 달라 제외했습니다.</p>
+    <div class="chips" id="gmChips"></div>
+    <div class="exps" id="gimmicks"></div>
+    <h2 style="font-size:1.3rem">대응 태그별 사도</h2>
+    <div class="tbl"><table><thead><tr><th>대응 태그</th><th>판정 기준</th><th>사도</th><th>쓰이는 기믹</th></tr></thead><tbody id="gtags"></tbody></table></div>
+  </section>
+
+  <section id="sub-icons" class="sub" hidden>
+    <p class="note">버프·디버프 아이콘 83개의 효과를 정리한 유저 자료를 바탕으로, 이 DB의 스킬 설명과 어긋나거나 근거가 되는 부분을 연결했습니다. 게임 스킬 설명과 다르면 게임 설명을 기준으로 봅니다. 출처: <a href="https://arca.live/b/trickcal/120778351" rel="noopener">아카라이브 트릭컬 채널 「버프/디버프 총 정리」 (2024-11-08)</a></p>
+    <div class="controls"><div class="chips" id="icChips"></div><label class="f" for="icq" style="flex:1 1 200px">검색<input id="icq" type="search" placeholder="예: 기절, 보호막"></label></div>
+    <div class="tbl" style="max-height:640px"><table><thead><tr><th>번호</th><th>이름</th><th>구분</th><th>효과 (자료 기준)</th><th>수치</th><th>DB 연결·검증 메모</th></tr></thead><tbody id="icons"></tbody></table></div>
+  </section>
+
+  <section id="sub-terms" class="sub" hidden>
+    <p class="note">트릭컬은 같은 효과에도 고유 상태 이름(존속·신성 등)을 씁니다. 상태 이름을 표준 효과 유형으로 묶어두면 사도가 달라도 같은 기준으로 비교할 수 있습니다.</p>
+    <div class="chips" id="termChips"></div>
+    <div class="tbl"><table>
+      <thead><tr><th>이름</th><th>구분</th><th>표준 효과 유형</th><th>처음 확인한 사도</th><th>확실도</th><th>검증 포인트</th></tr></thead>
+      <tbody id="terms"></tbody>
+    </table></div>
+  </section>
+
+  <section id="sub-cases" class="sub">
+    <div style="display:grid;gap:10px">
+      <h2 style="font-size:1.3rem">대표 검증 사례</h2>
+      <p class="note">스킬 설명만으로 판정할 수 없는 부분을 가설 → 절차 → 관찰 → 결론으로 검증합니다. 결과는 <b>정상 동작 확인 · 판정 미확정 · 표기 개선 제안 · 결함 의심(재현 근거가 있을 때만) · 문서 차이 확인</b>으로 나누고, 의도된 동작인지 알 수 없으면 결함으로 단정하지 않습니다. 직접 실측·검증을 마친 실험만 올리고, 연습장이 없어 모든 실측은 보스전에서 진행했습니다.</p>
+      <div class="exps" id="reps"></div>
+      <p class="note"><a href="#exp" data-go="exp">실험 기록 전체 보기 →</a></p>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
+      <h2 style="font-size:1.3rem">스킬 성장 대조 — 게임 화면 vs 나무위키</h2>
+      <p class="note">나무위키 Lv1·Lv10 값을 같은 폭으로 나누면 중간 레벨 값을 추정할 수 있다고 봤는데, 게임에서 본 중간 레벨 값이 그 직선과 맞지 않는 경우가 있었습니다. 스킬 강화 미리보기로 Lv10을 직접 보고 판정했습니다. 비선형 = 나무위키 Lv10은 맞고 후반 레벨 증가폭이 큼 / 문서 불일치 = 게임 Lv10과 나무위키 Lv10이 다름.</p>
+      <div class="legend"><span><i class="dash"></i>나무위키 Lv1→Lv10 직선</span><span><i></i>게임 (Lv1 · 중간 레벨 · Lv10)</span><span id="gCnt"></span></div>
+      <div class="growth" id="growth"></div>
+    </div>
+    <div class="panel" style="display:grid;gap:10px">
+      <h2 style="font-size:1.3rem">스킬 설명 점검</h2>
+      <p class="note">사도 설명을 한 줄씩 나누며 발견한 표기·해석 문제를 유형별로 묶었습니다. 의도된 동작인지 확인되지 않은 것은 결함이 아니라 '표기 개선 제안' 또는 '판정 미확정'으로 분류합니다. 같은 문제가 다른 사도에게도 있는지 DB 전체를 다시 확인했습니다.</p>
+      <div class="tbl"><table><thead><tr><th>유형</th><th>분류</th><th>건수</th><th>내용</th><th>사도</th><th>상태 · 실험</th></tr></thead><tbody id="checks"></tbody></table></div>
+    </div>
+  </section>
+
+  <section id="sub-exp" class="sub" hidden>
+    <p class="note">각 실험은 검증 목적 · 질문 · 사전 조건 · 경쟁 가설 · 절차 · 관찰값 · 결론 · 한계 · QA 활용(회귀 TC 후보) 순서로 기록합니다. 관찰값은 실제로 실행한 뒤에만 적습니다.</p>
+    <div class="chips" id="expChips"></div>
+    <div id="expDetail"></div>
+    <div class="exps" id="exps"></div>
+  </section>
+
+  <section id="sub-fix" class="sub" hidden>
+    <p class="note">처음 이해와 다르게 확인된 내용을 지우지 않고 남깁니다.</p>
+    <div class="fixes" id="fixes"></div>
+  </section>
+  <footer>개인이 게임 내 스킬 설명과 공개 자료를 보고 정리한 비공식 자료입니다. 출처: 게임 내 스킬 설명, 나무위키 트릭컬 리바이브 사도·성격·콘텐츠 문서(Lv1/Lv10 수치 대조), 아카라이브 트릭컬 채널·디시인사이드 트릭컬 갤러리 유저 글(데미지 공식, 버프/디버프 총 정리, 보스 데이터). 트릭컬 리바이브의 게임 IP(캐릭터·이미지·명칭 등) 권리는 에피드게임즈에 있으며, 이 사이트는 에피드게임즈와 관계없는 비공식 팬 사이트입니다.</footer>
+</main>
+<script src="assets/common.js"></script>
+<script>
+document.querySelectorAll(".subtabs button").forEach(b=>b.addEventListener("click",()=>{
+  document.querySelectorAll(".subtabs button").forEach(x=>x.setAttribute("aria-selected",x===b));
+  document.querySelectorAll(".sub").forEach(s=>s.hidden=s.id!=="sub-"+b.dataset.sub);
+  if(!location.hash.startsWith("#"+b.dataset.sub+"=")) history.replaceState(null,"","#"+b.dataset.sub);
+}));
+document.addEventListener("click",e=>{const a=e.target.closest("[data-go]");if(a){e.preventDefault();document.querySelector(`.subtabs [data-sub="${a.dataset.go}"]`).click();scrollTo(0,0);}});
+function fromHash(){const h=location.hash.slice(1),h0=h.split("=")[0]; if(h0){const b=document.querySelector(`.subtabs [data-sub="${h0}"]`); if(b) b.click();} if(h.startsWith("exp=")&&window.showExp){history.replaceState(null,"","#"+h);showExp(decodeURIComponent(h.slice(4)));}}
+addEventListener("hashchange",fromHash); fromHash();
+const opt=async n=>{try{return await load("data/battle/"+n+".csv");}catch(_){return [];}};
+const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일반 공격 (강화)","어사이드2","어사이드3"];
+(async()=>{
+  let SK,TERMS,EXPS,FIXES,GM,GT,IC,GR,CK;
+  try{[SK,TERMS,EXPS,FIXES]=await Promise.all(["skills","terms","experiments","fixes"].map(n=>load("data/battle/"+n+".csv")));}
+  catch(e){showError(e);return;}
+  [GM,GT,IC,GR,CK]=await Promise.all(["gimmicks","gimmick_tags","icons","growth","checks"].map(opt));
+  await loadSadoInfo();
+  const NAMES=[...new Set(SK.map(s=>s["사도"]))];
+  /* 효과 ID → 관련 실험 */
+  window.EXP_OF={};
+  EXPS.forEach(x=>{const ids=[];(x["관련 ID"]||"").replace(/SK-(\d+)((?:·\d+)*)/g,(m,a,b)=>{ids.push(a);(b||"").split("·").filter(Boolean).forEach(n=>ids.push(n));});
+    ids.forEach(n=>{const k="SK-"+String(n).padStart(3,"0");(EXP_OF[k]=EXP_OF[k]||[]).includes(x["실험ID"])||EXP_OF[k].push(x["실험ID"]);});});
+  /* 스킬 판정표 */
+  let fName="";
+  const chips=$("chips");
+  chips.innerHTML=[`<button aria-pressed="true" data-n="">전체</button>`,...NAMES.map(n=>`<button aria-pressed="false" data-n="${esc(n)}">${esc(n)}</button>`)].join("");
+  chips.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;fName=b.dataset.n;chips.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderSk();});
+  $("ftype").innerHTML+=[...new Set(SK.map(s=>s["효과 유형"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ko")).map(t=>`<option>${esc(t)}</option>`).join("");
+  $("ftype").addEventListener("change",renderSk); $("fq").addEventListener("input",renderSk); $("fmemo").addEventListener("change",renderSk);
+  function renderSk(){
+    const t=$("ftype").value,q=$("fq").value.trim();
+    const rows=SK.filter(s=>(!fName||s["사도"]===fName)&&(!t||s["효과 유형"]===t)&&(!q||hit(s,q)));
+    const memoOnly=q&&!$("fmemo").checked?SK.filter(s=>(!fName||s["사도"]===fName)&&(!t||s["효과 유형"]===t)&&!hit(s,q)&&(s["검증 포인트"]||"").includes(q)).length:0;
+    const main=q?rows.filter(s=>isMain(s,q)).length:0; if(q) rows.sort((a,b)=>isMain(b,q)-isMain(a,q));
+    $("cnt").textContent=(q?`효과·상태 일치 ${main} · 언급만 ${rows.length-main} · `:"")+(memoOnly?`검증 포인트에만 나온 ${memoOnly}개 제외 · `:"")+`${rows.length}개 효과 / 전체 ${SK.length} · 사도 ${NAMES.length}명`;
+    const H=v=>hl(esc(v),q);
+    $("skills").innerHTML=rows.map(s=>`<tr><td class="num" style="text-align:left">${esc(s.ID)}</td><td style="white-space:nowrap">${face(s["사도"],24)} ${esc(s["사도"])} <span class="per" data-p="${esc(s["성격"])}">${esc(s["성격"])}</span></td>
+      <td style="white-space:nowrap">${esc(s["스킬 구분"])}${s["스킬명"]?`<br><span class="conf">${H(s["스킬명"])}</span>`:""}</td><td>${H(s["효과 유형"])}${s["상태 이름"]?`<br><span class="conf">${H(s["상태 이름"])}</span>`:""}${q&&!isMain(s,q)?`<br><span class="ment">'${esc(q)}' 언급 · ${whereHit(s,q)}</span>`:""}</td><td style="white-space:nowrap">${H(s["대상"])}</td>
+      <td class="cond">${H(s["발동 조건"])}</td><td class="val">${vals(s["수치"],q)}</td><td style="white-space:nowrap">${H(s["지속"])}</td><td class="conf">${esc(s["확실도"])}${s["근거 유형"]?`<br><span style="white-space:normal">${esc(s["근거 유형"])}</span>`:""}</td><td class="memo">${(EXP_OF[s.ID]||[]).map(e=>`<a class="exl" href="#exp=${e}">${e}</a>`).join("")}${memo(s["검증 포인트"],$("fmemo").checked?q:"")}</td></tr>`).join("");
+  }
+  renderSk();
+  /* 사도 카드 */
+  let cName=NAMES[0];
+  const cc=$("cardChips");
+  function renderCardChips(){cc.innerHTML=NAMES.map(n=>`<button aria-pressed="${n===cName}" data-n="${esc(n)}">${face(n,26)}${esc(n)}</button>`).join("");}
+  cc.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cName=b.dataset.n;renderCardChips();renderCard();});
+  function renderCard(){
+    const rows=SK.filter(s=>s["사도"]===cName),i=SADO_INFO[cName]||{},p=i["성격"]||(rows[0]||{})["성격"];
+    const groups=ORDER.map(g=>[g,rows.filter(r=>r["스킬 구분"]===g)]).filter(([,r])=>r.length);
+    $("card").innerHTML=`<div class="panel" style="display:grid;gap:14px">
+      <div class="card-head">${face(cName,72,p)}<div style="display:grid;gap:4px"><h2>${esc(cName)}</h2><div class="meta"><span class="per" data-p="${esc(p)}">${esc(p)}</span>${["위치","역할","공격 타입"].map(k=>i[k]?`<span class="t">${esc(i[k])}</span>`:"").join("")}<span>효과 ${rows.length}줄</span></div></div></div>
+      <div class="cards-grid">${groups.map(([g,r])=>{const nm=r.find(x=>x["스킬명"])||{},cd=r.find(x=>x["재사용 대기시간"])||{};
+        return `<div class="skillbox"><h3>${esc(g)}${nm["스킬명"]?`<small>${esc(nm["스킬명"])}</small>`:""}${cd["재사용 대기시간"]?`<small>재사용 ${esc(cd["재사용 대기시간"])}</small>`:""}</h3>
+        ${r.map(x=>`<div class="eff"><b>${esc(x["효과 유형"])}</b><span>${esc([x["수치"]&&x["수치"]!=="-"?x["수치"]:"",x["지속"]].filter(Boolean).join(" · "))}</span><span class="d">${esc(x["대상"])}</span><span class="d">${esc(x["발동 조건"])}</span></div>`).join("")}</div>`;}).join("")}</div>
+      <p class="note"><a href="#skills" onclick="document.querySelector('[data-sub=skills]').click();document.querySelector('#chips [data-n=&quot;${esc(cName)}&quot;]').click();return false;">스킬 판정표에서 검증 포인트까지 보기 →</a></p></div>`;
+  }
+  renderCardChips(); renderCard();
+  /* 보스 기믹 */
+  const TAG={};GT.forEach(t=>TAG[t["대응 태그"]]=t);
+  const who=t=>{const r=TAG[t];if(!r||!r["대응 가능 사도"])return "";return r["대응 가능 사도"].split(/,\s*/).filter(Boolean).map(x=>{const m=x.match(/^(.*)\(([\d.]+)\)$/);const n=m?m[1]:x;return `<span>${face(n,22)}${esc(n)}${m?` <small class="conf">${esc(m[2])}</small>`:""}</span>`;}).join("");};
+  let gC="";const contents=[...new Set(GM.map(g=>g["콘텐츠"]))];
+  $("gmChips").innerHTML=[`<button aria-pressed="true" data-c="">전체</button>`,...contents.map(c=>`<button aria-pressed="false" data-c="${esc(c)}">${esc(c)}</button>`)].join("");
+  $("gmChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;gC=b.dataset.c;$("gmChips").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderGm();});
+  function renderGm(){
+    $("gimmicks").innerHTML=GM.filter(g=>!gC||g["콘텐츠"]===gC).map(g=>`<article class="panel gm"><span class="pill${/기준|확인/.test(g["확인 상태"])?"":" off"}" style="justify-self:start">${esc(g["콘텐츠"])} · ${esc(g["확인 상태"])}</span>
+      <h3>${esc(g["보스"])} — ${esc(g["기믹"])}</h3><dl>${g["변형·성격"]?`<dt>변형</dt><dd>${esc(g["변형·성격"])}</dd>`:""}${g["내용"]?`<dt>내용</dt><dd>${esc(g["내용"])}</dd>`:""}${g["대응 방법"]?`<dt>대응</dt><dd>${esc(g["대응 방법"])}</dd>`:""}${g["실전 메모"]?`<dt>실전 메모</dt><dd>${esc(g["실전 메모"])}</dd>`:""}</dl>
+      ${["대응 태그 1","대응 태그 2"].filter(k=>g[k]).map(k=>`<div style="display:grid;gap:4px"><strong style="font-size:.85rem">${esc(g[k])}</strong><div class="who">${who(g[k])||'<span class="note">해당 사도 없음</span>'}</div></div>`).join("")}
+      ${g["출처"]?`<div class="src">출처: ${esc(g["출처"])}</div>`:""}</article>`).join("")||`<p class="note">기믹 데이터가 없습니다.</p>`;
+  }
+  renderGm();
+  $("gtags").innerHTML=GT.map(t=>`<tr><td style="white-space:nowrap"><strong>${esc(t["대응 태그"])}</strong><br><span class="conf">${esc(t["사도 수"])}명</span></td><td class="memo">${esc(t["판정 기준"])}</td><td><div class="who" style="display:flex;flex-wrap:wrap;gap:4px">${who(t["대응 태그"])}</div></td><td class="memo">${esc(t["쓰이는 기믹"])}</td></tr>`).join("");
+  /* 아이콘 사전 */
+  let icG="";const ig=[...new Set(IC.map(i=>i["구분"]).filter(Boolean))];
+  $("icChips").innerHTML=[`<button aria-pressed="true" data-g="">전체 ${IC.length}</button>`,...ig.map(g=>`<button aria-pressed="false" data-g="${esc(g)}">${esc(g)}</button>`)].join("");
+  $("icChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;icG=b.dataset.g;$("icChips").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderIc();});
+  $("icq").addEventListener("input",renderIc);
+  function renderIc(){const q=$("icq").value.trim();
+    $("icons").innerHTML=IC.filter(i=>(!icG||i["구분"]===icG)&&(!q||Object.values(i).join(" ").includes(q))).map(i=>`<tr><td class="num" style="text-align:left">${esc(i["번호"])}</td><td style="white-space:nowrap"><strong>${esc(i["이름"])}</strong>${i["상태사전 연결"]?`<br><span class="conf">사전: ${esc(i["상태사전 연결"])}</span>`:""}</td><td style="white-space:nowrap">${esc(i["구분"])}<br><span class="conf">${esc(i["아이콘 색"])}</span></td><td style="white-space:pre-line">${esc(i["설명"])}</td><td>${esc(i["수치"])}</td><td class="memo">${esc(i["DB 연결·검증 메모"])}</td></tr>`).join("");}
+  renderIc();
+  /* 용어 사전 */
+  let tg=""; const groups=[...new Set(TERMS.map(t=>t["구분"]))]; const tc=$("termChips");
+  tc.innerHTML=[`<button aria-pressed="true" data-g="">전체 ${TERMS.length}</button>`,...groups.map(g=>`<button aria-pressed="false" data-g="${esc(g)}">${esc(g)}</button>`)].join("");
+  tc.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;tg=b.dataset.g;tc.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderT();});
+  function renderT(){$("terms").innerHTML=TERMS.filter(t=>!tg||t["구분"]===tg).map(t=>`<tr><td style="white-space:nowrap"><strong>${esc(t["이름"])}</strong>${t["설명"]?`<div class="memo" style="max-width:44ch">${esc(t["설명"])}</div>`:""}</td><td style="white-space:nowrap">${esc(t["구분"])}</td><td>${esc(t["표준 효과 유형"])}</td><td>${esc(t["처음 확인한 사도"])}</td><td class="conf">${esc(t["확실도"])}</td><td class="memo">${esc(t["검증 포인트"])}</td></tr>`).join("");}
+  renderT();
+  /* 검증 사례: 성장 대조 */
+  $("gCnt").textContent=`${GR.length}개 수치 · 사도 ${new Set(GR.map(g=>g["사도"])).size}명`;
+  const W=240,H=110,P={l:30,r:10,t:10,b:20};
+  $("growth").innerHTML=GR.map(g=>{
+    const a=+g["나무위키 Lv1"],lv=+g["게임 레벨"],gv=+g["게임 값"],n10=+g["나무위키 Lv10"],g10=+g["게임 Lv10"];
+    const lin=a+(n10-a)*(lv-1)/9,dev=(gv-lin)/lin*100;
+    const ys=[a,gv,n10,g10,lin],lo=Math.min(...ys),hi=Math.max(...ys),pad=(hi-lo)*.08||1;
+    const X=l=>P.l+(l-1)/9*(W-P.l-P.r),Y=v=>P.t+(1-(v-lo+pad)/(hi-lo+2*pad))*(H-P.t-P.b);
+    const pts=[[1,a],[lv,gv],[10,g10]];
+    const bad=g["판정"]==="문서 불일치";
+    return `<article class="panel gcard"><div class="top">${face(g["사도"],32)}<div><strong>${esc(g["사도"])}</strong> <span class="conf">${esc(g["스킬 구분"])}</span><br><span style="font-size:.85rem">${esc(g["항목"])}</span></div></div>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(g["사도"])} ${esc(g["항목"])}: 나무위키 직선 대비 게임 Lv${lv} ${dev.toFixed(1)}%">
+      <line x1="${P.l}" y1="${H-P.b}" x2="${W-P.r}" y2="${H-P.b}" stroke="var(--line)"/>
+      ${[1,lv,10].map(l=>`<text x="${X(l)}" y="${H-5}" font-size="10" text-anchor="middle" fill="var(--muted)">Lv${l}</text>`).join("")}
+      <line x1="${X(1)}" y1="${Y(a)}" x2="${X(10)}" y2="${Y(n10)}" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 4"/>
+      <polyline points="${pts.map(([l,v])=>X(l)+","+Y(v)).join(" ")}" fill="none" stroke="var(--leaf)" stroke-width="2"/>
+      ${pts.map(([l,v])=>`<circle cx="${X(l)}" cy="${Y(v)}" r="4" fill="var(--leaf)" stroke="var(--paper)" stroke-width="2"><title>게임 Lv${l}: ${v}</title></circle>`).join("")}
+      <circle cx="${X(lv)}" cy="${Y(lin)}" r="3" fill="var(--paper)" stroke="var(--muted)" stroke-width="2"><title>직선 추정 Lv${lv}: ${lin.toFixed(1)}</title></circle>
+    </svg>
+    <div class="nums">Lv${lv} 게임 ${gv} / 직선 추정 ${lin.toFixed(1)} (${dev>0?"+":""}${dev.toFixed(1)}%)<br>Lv10 게임 ${g10} / 나무위키 ${n10}${bad?` <span class="tag-bad">문서 불일치</span>`:""}</div></article>`;}).join("");
+  $("checks").innerHTML=CK.map(c=>`<tr><td style="white-space:nowrap"><strong>${esc(c["유형"])}</strong></td><td style="white-space:nowrap"><span class="pill cls">${esc(c["분류"])}</span></td><td class="num">${esc(c["건수"])}</td><td>${esc(c["내용"])}<br><span class="conf">${esc(c["관련 ID"])}</span></td><td class="memo">${esc(c["사도"])}</td><td class="conf">${esc(c["상태"])}${c["관련 실험"]?"<br>"+c["관련 실험"].split(/\s*·\s*/).map(e=>`<a class="exl" href="#exp=${esc(e)}">${esc(e)}</a>`).join(""):""}</td></tr>`).join("");
+  /* 실험 (검증 사례) */
+  const ST_DONE=["실행 완료","검증 완료"];
+  const card=(x,rep)=>`<article class="panel exp${rep?" rep":""}"><div class="row"><span class="pill${ST_DONE.includes(x["상태"])?" st-done":" off"}">${esc(x["상태"])} · ${esc(x["실험ID"])}</span>${x["결론 분류"]?`<span class="pill cls">${esc(x["결론 분류"])}</span>`:""}<span class="conf">${esc(x["유형"])}</span></div>
+    <h3>${esc(x["확인할 질문"])}</h3><div class="row" style="font-size:.85rem">${(x["사도"]||"").split(/[·,]/).map(n=>n.trim()).filter(n=>SADO_INFO[n]).map(n=>face(n,22)+" "+esc(n)).join(" ")||`<span class="conf">${esc(x["사도"])}</span>`}</div>
+    <dl><dt>목적</dt><dd>${esc(x["검증 목적"])}</dd><dt>${esc(x["가설 A"])}</dt><dd>${esc(x["A 예상"])}</dd><dt>${esc(x["가설 B"])}</dt><dd>${esc(x["B 예상"])}</dd>${x["결론"]?`<dt>결론</dt><dd>${esc(x["결론"])}</dd>`:""}</dl>
+    <a class="more" href="#exp=${encodeURIComponent(x["실험ID"])}">절차·관찰값·한계 자세히 →</a></article>`;
+  $("reps").innerHTML=EXPS.filter(x=>x["대표"]==="O").map(x=>card(x,true)).join("")||`<p class="note">대표 사례가 아직 없습니다.</p>`;
+  let expSt="";const sts=[...new Set(EXPS.map(x=>x["상태"]))];
+  $("expChips").innerHTML=[`<button aria-pressed="true" data-s="">전체 ${EXPS.length}</button>`,...sts.map(t=>`<button aria-pressed="false" data-s="${esc(t)}">${esc(t)} ${EXPS.filter(x=>x["상태"]===t).length}</button>`)].join("");
+  $("expChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;expSt=b.dataset.s;$("expChips").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderExps();});
+  function renderExps(){$("exps").innerHTML=EXPS.filter(x=>!expSt||x["상태"]===expSt).map(x=>card(x,x["대표"]==="O")).join("");}
+  renderExps();
+  const v=(t)=>t?esc(t):`<span class="empty">실행 후 기록</span>`;
+  window.showExp=id=>{const x=EXPS.find(e=>e["실험ID"]===id);if(!x){$("expDetail").innerHTML="";return;}
+    const rel=(x["관련 ID"]||"").split(/\s*[·,]\s*/).filter(Boolean);
+    $("expDetail").innerHTML=`<article class="panel detail"><div class="row" style="display:flex;gap:6px;flex-wrap:wrap"><span class="pill${ST_DONE.includes(x["상태"])?" st-done":" off"}">${esc(x["상태"])}</span>${x["결론 분류"]?`<span class="pill cls">${esc(x["결론 분류"])}</span>`:""}<span class="conf">${esc(x["실험ID"])} · ${esc(x["유형"])} · ${esc(x["사도"])}</span></div>
+      <h2>${esc(x["확인할 질문"])}</h2>
+      <dl><dt>검증 목적</dt><dd>${esc(x["검증 목적"])}</dd><dt>관련 효과</dt><dd>${esc(x["관련 ID"])}</dd><dt>사전 조건</dt><dd>${esc(x["사전 조건"])}</dd></dl>
+      <div class="hyp"><div><strong>가설 A</strong> — ${esc(x["가설 A"])}<br><span class="conf">예상: ${esc(x["A 예상"])}</span></div><div><strong>가설 B</strong> — ${esc(x["가설 B"])}<br><span class="conf">예상: ${esc(x["B 예상"])}</span></div></div>
+      <dl><dt>절차</dt><dd>${esc(x["절차"])}</dd><dt>반복 횟수</dt><dd>${esc(x["반복 횟수"])}</dd><dt>관찰값</dt><dd>${v(x["관찰값 (실측)"])}</dd><dt>증거</dt><dd>${/^https?:/.test(x["증거 (영상·스크린샷)"]||"")?`<a href="${esc(x["증거 (영상·스크린샷)"])}" rel="noopener">${esc(x["증거 (영상·스크린샷)"])}</a>`:v(x["증거 (영상·스크린샷)"])}</dd>
+      <dt>결론</dt><dd>${v(x["결론"])}</dd><dt>한계</dt><dd>${esc(x["한계"])||"—"}</dd><dt>QA 활용</dt><dd>${esc(x["QA 활용 (회귀 TC 후보)"])}</dd><dt>서버·확인일</dt><dd>${esc([x["서버·버전"],x["확인일"]].filter(Boolean).join(" · "))||"—"}</dd></dl>
+      <p class="note"><a href="#exp" data-go="exp" onclick="document.getElementById('expDetail').innerHTML=''">← 실험 목록</a></p></article>`;
+    $("expDetail").scrollIntoView({block:"start"});};
+  fromHash();
+  /* 정정 */
+  $("fixes").innerHTML=FIXES.map(f=>`<div class="panel"><dl class="fix"><dt>${esc(f["날짜"])}</dt><dd><strong>${esc(f["항목"])}</strong></dd><dt>처음 이해</dt><dd>${esc(f["처음 이해"])}</dd><dt>확인 결과</dt><dd>${esc(f["확인 결과"])}</dd><dt>반영</dt><dd>${esc(f["반영"])}</dd></dl></div>`).join("");
+})();
+</script>
+<script>
+const SEARCH_COLS=["ID","사도","성격","위치","스킬 구분","스킬명","효과 유형","대상","발동 조건","수치","지속","중첩·갱신","상태 이름","피해 분류"];
+function hit(s,q){const cols=document.getElementById("fmemo").checked?SEARCH_COLS.concat(["검증 포인트"]):SEARCH_COLS;return cols.some(c=>(s[c]||"").includes(q));}
+function hl(h,q){if(!q)return h;const e=esc(q);return h.split(e).join(`<mark>${e}</mark>`);}
+function isMain(s,q){const g=s["효과 유형"]||"";return g.includes(q)||((s["상태 이름"]||"").includes(q)&&!["CC 면역","디버프 해제","버프 해제"].includes(g))?1:0;}
+function whereHit(s,q){const lab={"스킬명":"스킬 이름","대상":"대상","발동 조건":"발동 조건","수치":"수치","지속":"지속","중첩·갱신":"중첩·갱신","피해 분류":"피해 분류","사도":"사도 이름","스킬 구분":"스킬 구분","검증 포인트":"검증 포인트"};const cols=Object.keys(lab).filter(c=>(c!=="검증 포인트"||document.getElementById("fmemo").checked)&&(s[c]||"").includes(q));return cols.map(c=>lab[c]).join(", ");}
+function vals(v,q){v=v==null?"":String(v);const p=v.split(" / ").map(x=>x.trim()).filter(Boolean);return p.length>1?p.map(x=>`<span>${hl(esc(x),q)}</span>`).join(""):hl(esc(v),q);}
+function memo(v,q){v=v==null?"":String(v);if(v.length<=110)return hl(esc(v),q);return `<span class="mt long" onclick="this.classList.toggle('open');this.nextElementSibling.textContent=this.classList.contains('open')?'접기':'더 보기'">${hl(esc(v),q)}</span><span class="mt-more" onclick="this.previousElementSibling.click()">더 보기</span>`;}
+</script>
+<script>
+(async()=>{
+  const CD=await opt("cards"); if(!CD.length) return;
+  let kind="",grade=""; const L=$("itLv");
+  L.innerHTML=Array.from({length:12},(_,i)=>`<option value="${i+1}"${i===0?" selected":""}>Lv${i+1}${i===11?" (최대)":""}</option>`).join("");
+  $("itKind").innerHTML=[["","전체"],["아티팩트","아티팩트"],["스펠","스펠 (모든 사도)"]].map(([k,t],i)=>`<button aria-pressed="${i===0}" data-k="${k}">${t}</button>`).join("");
+  const grades=[...new Set(CD.map(c=>c["등급"]))];
+  $("itGrade").innerHTML=[`<button aria-pressed="true" data-g="">모든 등급</button>`,...grades.map(g=>`<button aria-pressed="false" data-g="${esc(g)}">${esc(g)}</button>`)].join("");
+  const pick=(box,attr,set)=>box.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;set(b.dataset[attr]);box.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));render();});
+  pick($("itKind"),"k",v=>kind=v); pick($("itGrade"),"g",v=>grade=v);
+  [L,$("itq"),$("itImp")].forEach(x=>x.addEventListener(x.type==="checkbox"||x.tagName==="SELECT"?"change":"input",render));
+  const ALIAS={"CC":["기절","침묵","도발","넉백","속박","행동불가","CC"],"회피":["눈속임","타겟 불가"],"생존":["무적","생존","보호막","회복"]};
+  const hit=(c,q)=>{if(!q)return true;const t=Object.values(c).join(" ");return (ALIAS[q]||[q]).some(k=>t.includes(k));};
+  const SEC=new Set(["무적","타겟 불가","기절","침묵","도발","넉백","속박","행동불가"]);
+  const val=(c,lv)=>{const a=parseFloat(c["Lv1"]);if(isNaN(a))return "";const st=parseFloat(c["레벨당"]);const known=!isNaN(st);
+    const v=Math.round((a+(lv-1)*(known?st:0))*100)/100;
+    const unit=SEC.has(c["효과 유형"])||/초$/.test(c["효과"])?"초":/고정값|SP 회복량|SP 감소량|학년 +1|아티팩트 2개|성격 +1/.test(c["효과"]+c["발동 조건"])?"":"%";
+    let s=/10배/.test(c["효과"])?`${v}~${Math.round(v*1000)/100}${unit}`:`${v}${unit}`;
+    if(lv>1&&!known) s+=` <span class="d">(성장 미확인 — Lv1 값)</span>`; return s;};
+  const label=c=>c["효과"].replace(/\s*\(Lv1\)$/,"").replace(/\s+[\d.]+$/,"").replace(/\s*[\d.]+%$/,"");
+  window.CARD_MATCH=q=>CD.filter(c=>hit(c,q)).length;
+  function render(){
+    const lv=+L.value,q=$("itq").value.trim(),imp=$("itImp").checked;
+    const rows=CD.filter(c=>(!kind||c["종류"]===kind)&&(!grade||c["등급"]===grade)&&hit(c,q)&&(!imp||c["판정 중요"]));
+    const by=new Map();rows.forEach(c=>{const k=c["종류"]+"|"+c["이름"];by.has(k)||by.set(k,[]);by.get(k).push(c);});
+    const all=new Map();CD.forEach(c=>{const k=c["종류"]+"|"+c["이름"];all.has(k)||all.set(k,[]);all.get(k).push(c);});
+    $("itCnt").textContent=`${by.size}개 카드 · 효과 ${rows.length}줄 / 전체 ${all.size}개`;
+    $("items").innerHTML=[...by.entries()].map(([k,rs])=>{const f=all.get(k)[0],nod=/정보 없음/.test(f["효과"]+f["검증 포인트"])||!f["효과"];
+      const att=all.get(k).find(x=>x["애착 효과"]&&!/^—/.test(x["애착 효과"]));
+      const imps=[...new Set(all.get(k).map(x=>x["판정 중요"]).filter(Boolean))];
+      return `<article class="panel item${nod?" nodata":""}"><h3>${esc(f["이름"])} <span class="gr" data-g="${esc(f["등급"])}">${esc(f["등급"])}</span>${f["코스트"]?`<small>코스트 ${esc(f["코스트"])}</small>`:""}<small>${esc(f["종류"])}</small>${imps.map(i=>`<span class="imp">${esc(i)}</span>`).join("")}</h3>
+      ${nod?`<p class="note">아직 수치 정보가 없습니다(게임 화면 확인 예정).${f["검증 포인트"]?" "+esc(f["검증 포인트"]):""}</p>`:
+        rs.map(c=>`<div class="eff"><b>${esc(c["효과 유형"])}${c["판정 중요"]?` <span class="imp">${esc(c["판정 중요"])}</span>`:""}</b><span><span class="v">${val(c,lv)}</span> ${esc(label(c))}</span>
+        <span class="d">${esc([c["대상"],c["발동 조건"],c["지속"]&&c["지속"]!=="-"?"지속 "+c["지속"]:"",c["중첩"]].filter(Boolean).join(" · "))}</span>
+        ${c["검증 포인트"]?`<span class="d">검증: ${esc(c["검증 포인트"])}</span>`:""}
+        <span class="d">${esc(c["확실도"])} · ${esc(c["출처"])}${c["화면 확인"]?` · 화면 ${esc(c["화면 확인"])}`:""}</span></div>`).join("")}
+      ${att?`<div class="att">애착 효과(참고): ${esc(att["애착 효과"])}</div>`:""}</article>`;}).join("")||`<p class="note">해당하는 카드가 없습니다.</p>`;
+  }
+  render();
+  /* 스킬 판정표 검색 → 아티팩트·스펠 결과 연결 */
+  const hint=$("cardHint");
+  const upd=()=>{const q=$("fq").value.trim(),n=q?CARD_MATCH(q):0;hint.hidden=!n;if(n)hint.textContent=`아티팩트·스펠에서 '${q}' ${n}줄 보기 →`;};
+  $("fq").addEventListener("input",upd);
+  hint.addEventListener("click",e=>{e.preventDefault();$("itq").value=$("fq").value.trim();document.querySelector('.subtabs [data-sub="items"]').click();render();scrollTo(0,0);});
+})();
+</script>
+</body>
+</html>

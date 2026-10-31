@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>글로벌 PvE 분석 — 트릭컬 PvE 메타</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="assets/report.css">
+<style>
+.site-sum{margin-top:14px;background:var(--paper,#fff);border:1px solid var(--line,#D8E5CB);border-left:5px solid var(--leaf,#4E9A3A);border-radius:16px;padding:14px 18px;display:grid;gap:6px;font-size:.9rem}
+.site-sum p{margin:0}.site-sum .sum-h{font-weight:700;font-size:.85rem;color:var(--muted,#667560)}
+.site-sum .sum-stat b{font-family:ui-monospace,Consolas,monospace;font-size:1.05rem}
+.site-sum .sum-list{margin:0;padding-left:18px;display:grid;gap:2px}.site-sum .conf{font-size:.76rem;color:var(--muted,#667560)}
+.sitebar a.tab.log{margin-left:auto;font-size:.85rem}
+</style>
+<style>
+.sk-sum{min-width:0;table-layout:fixed}
+.sk-sum th,.sk-sum td{text-align:left;vertical-align:top}
+.sk-sum th.c-who,.sk-sum td.who{width:150px}.sk-sum th.c-rate,.sk-sum td.n{width:76px;text-align:right;white-space:nowrap}.sk-sum th.c-mix,.sk-sum td.mix{width:270px}
+.sk-sum td.d{font-size:.88rem;word-break:keep-all;overflow-wrap:anywhere}
+.sk-sum .who small{display:block;color:var(--muted)}
+.sk-sum .tag{display:inline-block;margin-top:4px;font-size:.76rem;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:0 8px}
+.sk-sum .mix-in{display:flex;flex-wrap:wrap;gap:5px}
+.sk-sum .mix-in .badge b{font-variant-numeric:tabular-nums;margin-left:4px}
+@media (max-width:760px){
+  .sk-sum,.sk-sum tbody,.sk-sum tr,.sk-sum td{display:block;width:auto!important}
+  .sk-sum thead{display:none}
+  .sk-sum tr{display:grid;grid-template-columns:1fr auto;gap:6px 12px;padding:14px 16px;border-bottom:1px solid var(--line)}
+  .sk-sum tbody tr:last-child{border-bottom:0}
+  .sk-sum td{padding:0;border:0}
+  .sk-sum td.n{text-align:right}
+  .sk-sum td.d,.sk-sum td.mix{grid-column:1 / -1}
+}
+.sk-h{margin:28px 0 10px;font-size:1.05rem}
+.sk-pat{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.sk-pat article{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 16px;font-size:.9rem}
+.sk-pat h4{margin:0 0 6px;font-size:.98rem}.sk-pat p{margin:4px 0}.sk-pat .who{color:var(--muted);font-size:.84rem}
+.sk-pat .mean{border-top:1px dashed var(--line);padding-top:6px;margin-top:8px}
+.sk-det details{background:var(--paper);border:1px solid var(--line);border-radius:16px;margin:8px 0;overflow:hidden}
+.sk-det summary{cursor:pointer;padding:12px 16px;font-weight:600;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.sk-det summary small{font-weight:400;color:var(--muted)}
+.sk-det table{font-size:.86rem;min-width:720px;table-layout:fixed}.sk-det td{word-break:keep-all;overflow-wrap:anywhere}.sk-det td,.sk-det th{text-align:left;vertical-align:top}
+.sk-det td.nm small{display:block;color:var(--muted)}
+.badge{display:inline-block;border-radius:999px;padding:2px 9px;font-size:.78rem;white-space:nowrap;background:color-mix(in srgb,var(--b) 16%,transparent);color:var(--b);font-weight:600}
+.sk-src{margin-top:14px;font-size:.84rem;color:var(--muted)}
+</style>
+</head>
+<body>
+<nav class="sitebar" aria-label="사이트 메뉴"><div class="sitebar-in"><a class="site" href="./">트릭컬 PvE 메타</a><a class="tab" href="./">PvE 기록 분석</a><a class="tab" href="global.html" aria-current="page">글로벌 PvE 분석</a><a class="tab" href="mechanics.html">전투 메커니즘</a><a class="tab" href="calculator.html">덱 계산기</a><a class="tab log" href="changelog.html">업데이트 기록</a></div></nav>
+<main>
+  <nav class="gnb" id="gnb" aria-label="콘텐츠 메뉴" hidden><div class="gnb-in" id="gnbIn"></div></nav>
+  <header class="hero">
+        <div class="tags" id="tags"></div>
+    <h1>트릭컬 리바이브 글로벌<br>PvE 상위권 덱 리포트</h1>
+    <p class="summary" id="summary">데이터를 불러오는 중입니다.</p>
+    <div class="board" id="board" hidden></div>
+    <div class="error" id="error" hidden></div>
+  </header>
+  
+  <section id="s-compare" hidden>
+    <h2>한국 서버와 비교</h2>
+    <p class="lead" id="cmpLead"></p>
+    <div class="scroll"><table class="cmp" id="cmp"></table></div>
+    <p class="cmp-note" id="cmpNote" hidden></p>
+  </section>
+
+  <section id="s-comment" hidden>
+    <h2>이번 시즌 메타 코멘트</h2>
+    <div class="meta-comment" id="metaComment" style="margin-top:16px"></div>
+  </section>
+
+  <section>
+    <h2>사도 티어</h2>
+    <p class="lead" id="tierLead"></p>
+    <div class="tiers" id="tiers"></div>
+  </section>
+
+  <section>
+    <h2>사도별 채용률</h2>
+    <p class="lead">조사한 덱 중 해당 사도가 들어간 덱의 비율입니다. 막대 색은 사도 성격입니다.</p>
+    <div class="bars" id="bars"></div>
+  </section>
+
+  <section>
+    <h2>표준 덱에서 바뀐 자리</h2>
+    <p class="lead">가장 많이 쓰인 덱을 기준으로, 다른 덱들이 어떤 사도를 빼고 누구를 넣었는지 모았습니다.</p>
+    <div class="swaps" id="swaps"></div>
+  </section>
+
+  <section>
+    <h2>성격 분포</h2>
+    <p class="lead" id="stackLead">전체 편성 칸 중 각 성격이 차지한 비율입니다.</p>
+    <p class="lead matchup" id="matchLead" hidden></p>
+    <div class="stack" id="stack"></div>
+    <div class="legend" id="stackLegend"></div>
+  </section>
+
+  <section id="s-reso" hidden>
+    <h2>공명 사도 성격 선택</h2>
+    <p class="lead">공명 사도는 대충돌 계열에서 성격을 골라 편성합니다. 위 채용률·티어는 성격과 상관없이 한 사도로 합쳐 셌고, 성격 분포는 고른 성격대로 셌습니다.</p>
+    <div class="scroll"><table id="reso"></table></div>
+  </section>
+
+  <section>
+    <h2>순위 구간별 채용률</h2>
+    <p class="lead">순위가 높을수록 채용률이 오르는 사도가 최상위 메타의 핵심입니다.</p>
+    <div class="scroll"><table id="bands"></table></div>
+  </section>
+
+  <section id="s-notes" hidden>
+    <h2 id="notesH">사도 노트</h2>
+    <p class="lead" id="notesLead">숫자만으로는 보이지 않는, 직접 써보며 느낀 점입니다.</p>
+    <div class="notes" id="notes"></div>
+  </section>
+
+
+  <section id="s-skill" hidden>
+    <h2>국내·글로벌 스킬 차이</h2>
+    <p class="lead" id="skLead"></p>
+    <div class="scroll"><table class="sk-sum" id="skSum"></table></div>
+    <h3 class="sk-h">공통 패턴</h3>
+    <div class="sk-pat" id="skPat"></div>
+    <h3 class="sk-h">사도별 상세</h3>
+    <p class="lead">사도를 누르면 스킬별 국내·글로벌 수치가 펼쳐집니다. '확인 필요'는 위키에 수치가 없고, 영준 계정에 없는 미보유 사도라 게임 화면으로 검증하지 못한 항목입니다 (보유 시 확인).</p>
+    <div class="sk-det" id="skDet"></div>
+    <p class="note sk-src" id="skSrc"></p>
+  </section>
+
+  <section>
+    <h2>조사 방법</h2>
+    <div class="method" style="margin-top:16px">
+      <div class="card"><dl id="info"></dl></div>
+      <div class="card"><ul class="checks" id="checks"></ul></div>
+    </div>
+  </section>
+
+  <footer>개인이 게임 내 공개 순위 화면을 직접 보고 기록한 비공식 자료입니다. 다른 유저의 닉네임은 기록하지 않았습니다. 사도 이름은 한국 서버 표기로 통일했습니다. 트릭컬 리바이브의 게임 IP(캐릭터·이미지·명칭 등) 권리는 에피드게임즈에 있으며, 이 사이트는 에피드게임즈와 관계없는 비공식 팬 사이트입니다.</footer>
+</main>
+
+<script>
+window.REPORT_CFG={root:"data/global/",compare:"kr",attrFallback:true,bands:[[1,50],[51,100]],
+  brand:"글로벌 덱 리포트",brandHref:"global.html",titleSuffix:"트릭컬 리바이브 글로벌 PvE 상위권 덱 리포트"};
+</script>
+<script src="assets/report.js"></script>
+<script>
+(async()=>{
+  const B={"같음":"#7A8475","수치 상향":"#2F8A3A","수치 하향":"#C8454B","효과 변경":"#3A78C8","글로벌 전용":"#8A5BC8","확인 필요":"#C98A12"};
+  const badge=t=>`<span class="badge" style="--b:${B[t]||"#7A8475"}">${esc(t||"—")}</span>`;
+  let S,D,P; try{ [S,D,P]=await Promise.all([load("data/global/skill_diff_summary.csv"),load("data/global/skill_diff.csv"),load("data/global/skill_patterns.csv")]); }catch(_){ return; }
+  if(!S.length) return; $("s-skill").hidden=false;
+  try{ (await load("data/battle/sado_info.csv")).forEach(r=>{ if(r["사도"]&&r["성격"]&&!ATTR[r["사도"]]) ATTR[r["사도"]]=r["성격"]; }); }catch(_){}
+  const tot={}; D.forEach(r=>tot[r["차이 유형"]]=(tot[r["차이 유형"]]||0)+1);
+  $("skLead").textContent=`글로벌 채용 상위 ${S.length}명의 스킬을 국내 전투 메커니즘 DB(Lv10)와 줄 단위로 비교했습니다 (${D.length}줄: `+Object.entries(tot).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${k} ${v}`).join(" · ")+"). 어사이드1과 PvP 수치는 제외했습니다.";
+  const K=["효과 변경","글로벌 전용","수치 상향","수치 하향","확인 필요"];
+  $("skSum").innerHTML=`<thead><tr><th class="c-who">사도</th><th class="c-rate">채용률</th><th>핵심 차이</th><th class="c-mix">차이 구성</th></tr></thead><tbody>`+
+    S.map(r=>`<tr><td class="who">${chip(r["사도"])}<small>${esc(r["영문명"])}</small>${r["성향"]?`<span class="tag">${esc(r["성향"])}</span>`:""}</td><td class="n">${pct(+r["글로벌 채용률"])}</td><td class="d">${esc(r["핵심 차이"])}${r["국내 성격·열·역할"]!==r["글로벌 성격·열·역할"]?`<br><small style="color:var(--muted)">국내 ${esc(r["국내 성격·열·역할"])} → 글로벌 ${esc(r["글로벌 성격·열·역할"])}</small>`:""}</td><td class="mix"><div class="mix-in">${K.filter(k=>+(r[k]||0)>0).map(k=>`<span class="badge" style="--b:${B[k]}">${esc(k)}<b>${esc(r[k])}</b></span>`).join("")||`<span class="badge" style="--b:${B["같음"]}">차이 없음</span>`}</div></td></tr>`).join("")+`</tbody>`;
+  $("skPat").innerHTML=P.map(r=>`<article><h4>${esc(r["패턴"])}</h4><p>${numB(r["내용"])}</p><p class="who">${esc(r["해당 사도"])}</p>${r["의미"]?`<p class="mean">${esc(r["의미"])}</p>`:""}</article>`).join("");
+  const by={}; D.forEach(r=>(by[r["사도"]]=by[r["사도"]]||[]).push(r));
+  $("skDet").innerHTML=S.map(s=>{ const L=by[s["사도"]]||[]; const c={}; L.forEach(r=>c[r["차이 유형"]]=(c[r["차이 유형"]]||0)+1);
+    return `<details><summary>${chip(s["사도"])} <small>${esc(s["영문명"])} · ${L.length}줄</small> ${Object.entries(c).map(([k,v])=>`${badge(k)}<small>${v}</small>`).join(" ")}</summary>
+    <div class="scroll" style="border:0;border-radius:0;border-top:1px solid var(--line)"><table><thead><tr><th>구분</th><th>스킬명 (국내 / 글로벌)</th><th>국내 (Lv10)</th><th>글로벌 (Lv10)</th><th>재사용</th><th>차이</th><th>비고</th></tr></thead><tbody>`+
+    L.map(r=>`<tr><td>${esc(r["구분"])}</td><td class="nm">${esc(r["국내 스킬명"]||"—")}<small>${esc(r["글로벌 스킬명"])}</small></td><td>${esc(r["국내 (Lv10)"])}</td><td>${esc(r["글로벌 (Lv10)"])}</td><td>${r["국내 재사용"]||r["글로벌 재사용"]?`${esc(r["국내 재사용"]||"—")} → ${esc(r["글로벌 재사용"]||"—")}`:""}</td><td>${badge(r["차이 유형"])}</td><td>${esc(r["비고"])}</td></tr>`).join("")+`</tbody></table></div></details>`; }).join("");
+  const src=[...new Set(S.map(r=>r["출처"]).filter(u=>/^https?:/.test(u)))];
+  $("skSrc").innerHTML=`국내 값: 전투 메커니즘 DB(skills.csv) Lv10 계산용 값, Lv10 값이 없는 칸은 DB 기록값. 글로벌 값: 글로벌 위키(<a href="https://lootandwaifus.com/" rel="noopener">lootandwaifus.com</a>) Lv10을 요약한 값(2026.10.29 확인) — 게임 화면으로 대조한 사도는 네르, 셰럼·요미(어사이드). 글로벌 미보유 사도는 게임에서 어사이드 화면을 볼 수 없어, 어사이드 '확인 필요' 칸은 보유 전까지 위키 기준입니다.`;
+})();
+</script>
+</body>
+</html>
