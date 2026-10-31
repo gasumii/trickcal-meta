@@ -95,7 +95,7 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
 <main>
   <header><h1>전투 메커니즘</h1>
   <p class="lead">스킬 설명을 효과 단위로 나눠 대상·조건·수치를 정리하고, 설명만으로 알 수 없는 부분은 실험으로 확인합니다. <a href="calculator.html">덱 계산기</a>의 규칙은 모두 여기서 나옵니다.</p></header>
-  <!--SUMMARY--><div class="site-sum"><p class="sum-h">전투 메커니즘 DB · 검증 현황</p><p class="sum-stat">사도 <b>136</b>명 · 효과 <b>1,883</b>줄 · 상태·용어 <b>130</b>개 · 아티팩트 <b>89</b>종 · 스펠 <b>44</b>종 · 검증 사례 <b>27</b>건 (실행·검증 완료 <b>14</b>건) · 성장 대조 <b>16</b>개 수치</p><p class=sum-h>대표 검증 사례</p><ul class=sum-list><li><a href="mechanics.html#exp=EXP-04">EXP-04</a> 셀리네 — 고학년 스킬 시전 중 무적 상태에서 공격받으면 어사이드2 SP 회복(10)이 발동하는가? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-18">EXP-18</a> 벨라 · 비비(신성) — 벨라가 영속을 가진 채 쓰러지면 영속과 비비(신성) 어사이드3 중 무엇이 먼저 소모되나? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-19">EXP-19</a> 다야 — 쓰라림이 남은 적에게 쓰라림을 다시 걸면 갱신·덮어쓰기·별도 중첩 중 무엇인가? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-20">EXP-20</a> 공통 (스펠) — 깜짝 상자는 기절 면역 보스에게 최대 HP 비례 피해를 주는가? <span class="conf">[검증 완료]</span></li></ul><p class="sum-link"><a href="mechanics.html">전투 메커니즘 전체 보기 →</a></p></div><!--/SUMMARY-->
+  <!--SUMMARY--><div class="site-sum"><p class="sum-h">전투 메커니즘 DB · 검증 현황</p><p class="sum-stat">사도 <b>136</b>명 · 효과 <b>1,883</b>줄 · 상태·용어 <b>130</b>개 · 아티팩트 <b>89</b>종 · 스펠 <b>44</b>종 · 검증 사례 <b>14</b>건 (실행·검증 완료 <b>14</b>건) · 성장 대조 <b>16</b>개 수치</p><p class=sum-h>대표 검증 사례</p><ul class=sum-list><li><a href="mechanics.html#exp=EXP-04">EXP-04</a> 셀리네 — 고학년 스킬 시전 중 무적 상태에서 공격받으면 어사이드2 SP 회복(10)이 발동하는가? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-18">EXP-18</a> 벨라 · 비비(신성) — 벨라가 영속을 가진 채 쓰러지면 영속과 비비(신성) 어사이드3 중 무엇이 먼저 소모되나? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-19">EXP-19</a> 다야 — 쓰라림이 남은 적에게 쓰라림을 다시 걸면 갱신·덮어쓰기·별도 중첩 중 무엇인가? <span class="conf">[검증 완료]</span></li><li><a href="mechanics.html#exp=EXP-20">EXP-20</a> 공통 (스펠) — 깜짝 상자는 기절 면역 보스에게 최대 HP 비례 피해를 주는가? <span class="conf">[검증 완료]</span></li></ul><p class="sum-link"><a href="mechanics.html">전투 메커니즘 전체 보기 →</a></p></div><!--/SUMMARY-->
   <div class="error" id="error" hidden></div>
   <div class="subtabs" role="tablist">
     <button role="tab" aria-selected="true" data-sub="cases">검증 사례</button>
@@ -174,7 +174,7 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
   <section id="sub-cases" class="sub">
     <div style="display:grid;gap:10px">
       <h2 style="font-size:1.3rem">대표 검증 사례</h2>
-      <p class="note">스킬 설명만으로 판정할 수 없는 부분을 가설 → 절차 → 관찰 → 결론으로 검증합니다. 결과는 <b>정상 동작 확인 · 판정 미확정 · 표기 개선 제안 · 결함 의심(재현 근거가 있을 때만) · 문서 차이 확인</b>으로 나누고, 의도된 동작인지 알 수 없으면 결함으로 단정하지 않습니다. 설계만 한 실험은 '설계 완료'로 표시합니다.</p>
+      <p class="note">스킬 설명만으로 판정할 수 없는 부분을 가설 → 절차 → 관찰 → 결론으로 검증합니다. 결과는 <b>정상 동작 확인 · 판정 미확정 · 표기 개선 제안 · 결함 의심(재현 근거가 있을 때만) · 문서 차이 확인</b>으로 나누고, 의도된 동작인지 알 수 없으면 결함으로 단정하지 않습니다. 직접 실측·검증을 마친 실험만 올리고, 연습장이 없어 모든 실측은 보스전에서 진행했습니다.</p>
       <div class="exps" id="reps"></div>
       <p class="note"><a href="#exp" data-go="exp">실험 기록 전체 보기 →</a></p>
     </div>
