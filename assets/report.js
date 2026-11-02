@@ -12,7 +12,7 @@ const TIERS = [                      // 채용률 이상이면 해당 티어
   { name:"1티어", min:0.60, color:"#4E9A3A" },
   { name:"2티어", min:0.30, color:"#78AE63" },
   { name:"3티어", min:0.10, color:"#9DBF8E" },
-  { name:"비주류", min:0,   color:"#9AA39A" },
+  { name:"채용 10% 미만", min:0,   color:"#9AA39A" },
 ];
 const BANDS = CFG.bands;
 const ATTRS = ["광기","순수","냉정","활발","우울","공명"];
@@ -171,7 +171,7 @@ async function main(){
   if(INFO["메타 코멘트"]){ $("s-comment").hidden=false; $("metaComment").innerHTML=INFO["메타 코멘트"].split(/\n+/).filter(s=>s.trim()).map(s=>`<p>${numB(s.trim())}</p>`).join(""); }
 
   /* 티어 */
-  $("tierLead").textContent="채용률 기준: "+TIERS.slice(0,-1).map(t=>`${t.name} ${pct(t.min)} 이상`).join(", ")+", 그 외 비주류.";
+  $("tierLead").textContent="채용률 기준: "+TIERS.slice(0,-1).map(t=>`${t.name} ${pct(t.min)} 이상`).join(", ")+", 그 외 채용 10% 미만.";
   $("tiers").innerHTML=TIERS.map(t=>{
     const list=stats.filter(s=>tierOf(s.r)===t);
     return `<div class="tier" style="--t:${t.color}"><div class="lab"><b>${t.name}</b><small>${list.length}명</small></div>
