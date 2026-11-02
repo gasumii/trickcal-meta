@@ -38,7 +38,7 @@ const CATS=["공격력 증가","주는 피해 증가","받는 피해 증가","�
 const BASIC=["순수","냉정","광기","활발","우울"];
 const SYN_ON=["대충돌","대충돌 2.0 beta"];
 function matchup(p,en){if(!en||en==="무속성"||en==="성격 없음")return"중립";const A={"광기":"순수","순수":"냉정","냉정":"광기","활발":"우울","우울":"활발"};if(A[p]===en)return"유리";if(A[en]===p&&!(p==="활발"||p==="우울"))return"불리";return"중립";}
-function synBonus(n){const t=[[10,230],[9,200],[7,140],[6,100],[4,55],[2,20]];for(const[k,v]of t)if(n>=k)return v;return 0;}
+function synBonus(n){const t=[[11,260],[10,230],[9,200],[7,140],[6,100],[4,55],[2,20]];for(const[k,v]of t)if(n>=k)return v;return 0;}
 /* 받는 사도 조건: 성격(냉정·활발·광기·같은 성격) / 열(전열·중열·후열 — 편성 칸 기준) / 역할 / 공격 타입 */
 function condOK(d,s,uroP){
   if(d.pc){if(d.pc==="같은 성격"){if(!(uroP&&s.per===uroP))return false;}else if(s.per!==d.pc)return false;}
