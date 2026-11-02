@@ -16,7 +16,7 @@
 - `data/battle/sado_info.csv` — 사도별 성격·열·역할·공격 타입·얼굴 이미지 파일명
 - `data/battle/gimmicks.csv`, `gimmick_tags.csv` — 보스 기믹과 대응 태그별 사도 (엑셀에서 자동 계산된 값)
 - `data/battle/icons.csv` — 버프·디버프 아이콘 사전 (아카라이브 「버프/디버프 총 정리」 + DB 연결 메모)
-- `data/battle/growth.csv` — 스킬 성장 대조 (게임 중간 레벨·Lv10 vs 나무위키)
+- `data/battle/growth.csv` — 실험 EXP-13(문서 대조)의 근거 수치
 - `data/battle/checks.csv` — 스킬 설명 점검 묶음 (손으로 관리)
 - `data/changelog.csv` — 업데이트 기록 (손으로 관리)
 - `assets/sado/<사도명>.png` — 사도 얼굴 아이콘 96×96 (없으면 성격 색 이니셜로 표시)

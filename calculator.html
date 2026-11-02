@@ -58,7 +58,7 @@ dialog.pick::backdrop{background:rgba(20,30,15,.45)}
 .pick-list button:disabled{opacity:.45;cursor:not-allowed}
 .pick-list .meta{display:flex;gap:6px;align-items:center;font-size:.72rem;color:var(--muted)}
 .chips button[data-p][aria-pressed="true"]{background:var(--pc);border-color:var(--pc);color:#fff}
-@media (max-width:560px){.board{gap:6px}.cell{min-height:60px;padding:6px 7px}.cell .nm{font-size:.8rem}.lane-h{font-size:.95rem}}
+@media (max-width:560px){.board{gap:6px;grid-template-columns:1fr}.cell{min-width:0}.cell{min-height:60px;padding:6px 7px}.cell .nm{font-size:.8rem}.lane-h{font-size:.95rem}}
 .cell.on{grid-template-columns:auto 1fr;column-gap:8px;align-items:center}
 .cell.on .face{grid-row:span 2}
 .syn-mini{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.8rem}

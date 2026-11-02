@@ -139,7 +139,7 @@ async function main(){
   const rc2={}; decks.filter(d=>key(d)===stdKey).forEach(d=>{ const k=d.raw.join(","); rc2[k]=(rc2[k]||0)+1; });
   const stdRaw=(Object.entries(rc2).sort((a,b)=>b[1]-a[1])[0]||[std.join(",")])[0];
   const calcHref=`calculator.html?deck=${encodeURIComponent(stdRaw)}${cur?`&s=${encodeURIComponent(cur["시즌ID"])}`:""}`;
-  board.innerHTML=`<div class="board-head"><b>표준 덱</b><span>${N}덱 중 ${stdCount}덱이 이 ${slotKeys.length}명 그대로 편성, 칸의 숫자는 채용률 · <a href="${calcHref}">덱 계산기로 열기 →</a></span></div>
+  board.innerHTML=`<div class="board-head"><b>표준 덱</b><span>${N}덱 중 ${stdCount}덱이 이 ${slotKeys.length}명 그대로 편성, 칸의 숫자는 채용률${/global/.test(location.pathname)?"":` · <a href="${calcHref}">덱 계산기로 열기 →</a>`}</span></div>
   <div class="slots">${std.map(n=>`<div class="slot" style="--c:${col(n)}"><i class="hex" aria-hidden="true"></i>
     <div class="pct">${pct(rateOf[n])}</div><div class="nm">${esc(n)}</div>
     <div class="meter"><i style="width:${rateOf[n]*100}%"></i></div></div>`).join("")}</div>`;
