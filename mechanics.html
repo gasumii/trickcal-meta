@@ -330,7 +330,7 @@ const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일
       <h2>${esc(x["확인할 질문"])}</h2>
       <dl><dt>검증 목적</dt><dd>${esc(x["검증 목적"])}</dd><dt>관련 효과</dt><dd>${esc(x["관련 ID"])}</dd><dt>사전 조건</dt><dd>${esc(x["사전 조건"])}</dd></dl>
       <div class="hyp"><div><strong>가설 A</strong> — ${esc(x["가설 A"])}<br><span class="conf">예상: ${esc(x["A 예상"])}</span></div><div><strong>가설 B</strong> — ${esc(x["가설 B"])}<br><span class="conf">예상: ${esc(x["B 예상"])}</span></div></div>
-      <dl><dt>절차</dt><dd>${esc(x["절차"])}</dd><dt>반복 횟수</dt><dd>${esc(x["반복 횟수"])}</dd><dt>관찰값</dt><dd>${v(x["관찰값 (실측)"])}</dd><dt>증거</dt><dd>${/^https?:/.test(x["증거 (영상·스크린샷)"]||"")?`<a href="${esc(x["증거 (영상·스크린샷)"])}" rel="noopener">${esc(x["증거 (영상·스크린샷)"])}</a>`:v(x["증거 (영상·스크린샷)"])}</dd>
+      <dl><dt>절차</dt><dd>${esc(x["절차"])}</dd><dt>반복 횟수</dt><dd>${esc(x["반복 횟수"])}</dd><dt>관찰값</dt><dd>${v(x["관찰값 (실측)"])}</dd><dt>증거</dt><dd>${/^https?:/.test(x["증거 (영상·스크린샷)"]||"")?`<a href="${esc(x["증거 (영상·스크린샷)"])}" rel="noopener">${esc(x["증거 (영상·스크린샷)"])}</a>`:(/https?:\/\//.test(x["증거 (영상·스크린샷)"]||"")?esc(x["증거 (영상·스크린샷)"]).replace(/(https?:\/\/\S+)/g,'<a href="$1" rel="noopener">영상 보기</a>'):v(x["증거 (영상·스크린샷)"]))}</dd>
       <dt>결론</dt><dd>${v(x["결론"])}</dd><dt>한계</dt><dd>${esc(x["한계"])||"—"}</dd><dt>QA 활용</dt><dd>${esc(x["QA 활용 (회귀 TC 후보)"])}</dd><dt>서버·확인일</dt><dd>${esc([x["서버·버전"],x["확인일"]].filter(Boolean).join(" · "))||"—"}</dd></dl>
       <p class="note"><a href="#exp" data-go="exp" onclick="document.getElementById('expDetail').innerHTML=''">← 실험 목록</a></p></article>`;
     $("expDetail").scrollIntoView({block:"start"});};
