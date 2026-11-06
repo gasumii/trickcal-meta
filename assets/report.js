@@ -8,11 +8,11 @@ const CFG=Object.assign({
   brand:"PvE 덱 리포트", brandHref:"./"
 },window.REPORT_CFG||{});
 const TIERS = [                      // 채용률 이상이면 해당 티어
-  { name:"필수",  min:0.90, color:"#2F6B22" },
-  { name:"1티어", min:0.60, color:"#4E9A3A" },
-  { name:"2티어", min:0.30, color:"#78AE63" },
-  { name:"3티어", min:0.10, color:"#9DBF8E" },
-  { name:"채용 10% 미만", min:0,   color:"#9AA39A" },
+  { name:"필수",  min:0.90, color:"#1F2A44" },
+  { name:"1티어", min:0.60, color:"#3B4F7A" },
+  { name:"2티어", min:0.30, color:"#5F7299" },
+  { name:"3티어", min:0.10, color:"#717E98" },
+  { name:"채용 10% 미만", min:0,   color:"#7A818D" },
 ];
 const BANDS = CFG.bands;
 const ATTRS = ["광기","순수","냉정","활발","우울","공명"];
@@ -48,6 +48,9 @@ let ATTR={};
 const col=n=>`var(--${ATTRS.includes(ATTR[n])?ATTR[n]:"미분류"})`;
 const chip=(n,extra="",cls="")=>`<span class="chip ${cls}" style="--c:${col(n)}">${esc(n)}${extra}</span>`;
 const tierOf=r=>TIERS.find(t=>r>=t.min);
+/* 도넛: [[값, 색], …] → conic-gradient 배경 */
+const conic=parts=>{ const tot=parts.reduce((s,p)=>s+p[0],0)||1; let acc=0;
+  return "conic-gradient("+parts.map(([v,c])=>{ const a=acc/tot*100; acc+=v; return `${c} ${a.toFixed(2)}% ${(acc/tot*100).toFixed(2)}%`; }).join(",")+")"; };
 
 async function main(){
   let decksRaw, sado, info, seasons=[], cur=null, prev=null, prevRaw=null, seasonNotes=[];
@@ -139,10 +142,28 @@ async function main(){
   const rc2={}; decks.filter(d=>key(d)===stdKey).forEach(d=>{ const k=d.raw.join(","); rc2[k]=(rc2[k]||0)+1; });
   const stdRaw=(Object.entries(rc2).sort((a,b)=>b[1]-a[1])[0]||[std.join(",")])[0];
   const calcHref=`calculator.html?deck=${encodeURIComponent(stdRaw)}${cur?`&s=${encodeURIComponent(cur["시즌ID"])}`:""}`;
+  /* 칸 하나: 성격 색 칩 + 이름 + 채용률 (캐릭터 이미지 없음) */
+  const slotHTML=m=>{ const n=baseName(m), rp=(m.match(RESO)||[])[1];
+    return `<div class="slot" style="--c:${col(n)}"><i class="hex" aria-hidden="true"></i>
+    <div class="pct">${pct(rateOf[n])}</div><div class="nm">${esc(n)}${rp?`<small class="rp">공명 ${esc(rp)}</small>`:""}</div>
+    <div class="meter"><i style="width:${rateOf[n]*100}%"></i></div></div>`; };
+  /* 게임 편성 화면과 같은 배치: 왼쪽 후열 · 가운데 중열 · 오른쪽 전열 (기록 순서는 사도1~3 전열, 4~6 중열, 7~9 후열) */
+  const stdSlots=stdRaw.split(",");
+  let slotsHTML;
+  if(slotKeys.length===9&&stdSlots.length===9){
+    const cells=[]; for(let i=0;i<3;i++) cells.push(stdSlots[6+i],stdSlots[3+i],stdSlots[i]);
+    slotsHTML=`<div class="formation"><div class="fh">후열</div><div class="fh">중열</div><div class="fh">전열 <span aria-hidden="true">→</span><span class="sr">적 방향</span></div>${cells.map(slotHTML).join("")}</div>`;
+  }else slotsHTML=`<div class="slots">${std.map(slotHTML).join("")}</div>`;
+  /* 덱 수렴도: 같은 9명 구성 상위 3개가 전체에서 차지하는 비율 */
+  const topDecks=Object.values(dc).sort((a,b)=>b-a);
+  const shareParts=[["최다 덱",topDecks[0]||0],["2위 구성",topDecks[1]||0],["3위 구성",topDecks[2]||0]].filter(p=>p[1]);
+  const others=N-shareParts.reduce((s,p)=>s+p[1],0); if(others>0) shareParts.push(["그 외",others]);
+  const SHADES=["var(--s1)","var(--s2)","var(--s3)","var(--s4)"];
+  const top3=shareParts.filter(p=>p[0]!=="그 외").reduce((s,p)=>s+p[1],0);
   board.innerHTML=`<div class="board-head"><b>표준 덱</b><span>${N}덱 중 ${stdCount}덱이 이 ${slotKeys.length}명 그대로 편성, 칸의 숫자는 채용률${/global/.test(location.pathname)?"":` · <a href="${calcHref}">덱 계산기로 열기 →</a>`}</span></div>
-  <div class="slots">${std.map(n=>`<div class="slot" style="--c:${col(n)}"><i class="hex" aria-hidden="true"></i>
-    <div class="pct">${pct(rateOf[n])}</div><div class="nm">${esc(n)}</div>
-    <div class="meter"><i style="width:${rateOf[n]*100}%"></i></div></div>`).join("")}</div>`;
+  <div class="board-body">${slotsHTML}
+  <figure class="donut-card"><div class="donut lg" style="background:${conic(shareParts.map((p,i)=>[p[1],SHADES[i]]))}" role="img" aria-label="상위 3개 덱 구성이 ${pct(top3/N)} 차지"><div class="hole"><b>${pct(top3/N)}</b><small>상위 3구성</small></div></div>
+    <figcaption><b>덱 수렴도</b>${shareParts.map((p,i)=>`<span class="lg-row"><i style="background:${SHADES[i]}"></i>${p[0]} <b>${p[1]}덱</b> <small>${pct(p[1]/N)}</small></span>`).join("")}</figcaption></figure></div>`;
 
   /* 이전 시즌 비교 */
   if(prevRaw&&prevRaw.length){
@@ -212,6 +233,20 @@ async function main(){
   const bad=ATTRS.filter(a=>BEATS[ENEMY]===a&&!["활발","우울"].includes(a));
   const mark=a=>good.includes(a)?' <b>유리</b>':bad.includes(a)?' <b class="bad">불리</b>':'';
   $("stackLegend").innerHTML=aList.map(a=>`<span style="--c:var(--${a})">${a} ${pct(ac[a]/tot,1)}${mark(a)}</span>`).join("");
+  /* 열별 성격 구성 도넛 — 게임 화면 순서(후열·중열·전열) */
+  const cd=$("colDonuts");
+  if(cd&&slotKeys.length===9){
+    const COLS=[["후열",[6,7,8]],["중열",[3,4,5]],["전열",[0,1,2]]];
+    cd.hidden=false;
+    cd.innerHTML=COLS.map(([nm,idx])=>{
+      const c={}; let t=0;
+      decksRaw.forEach(r=>idx.forEach(i=>{ const m=(r[slotKeys[i]]||"").trim(); if(!m) return;
+        const a=ATTRS.includes(ATTR[m])?ATTR[m]:"미분류"; c[a]=(c[a]||0)+1; t++; }));
+      const list=[...ATTRS,"미분류"].filter(a=>c[a]).sort((x,y)=>c[y]-c[x]);
+      return `<figure class="donut-card"><div class="donut" style="background:${conic(list.map(a=>[c[a],`var(--${a})`]))}" role="img" aria-label="${nm} 성격 구성: ${list.map(a=>`${a} ${pct(c[a]/t)}`).join(", ")}"><div class="hole"><b>${nm}</b><small>${t}칸</small></div></div>
+        <figcaption>${list.map(a=>`<span class="lg-row"><i style="background:var(--${a})"></i>${a} <b>${c[a]/t<0.005?"1% 미만":pct(c[a]/t)}</b></span>`).join("")}</figcaption></figure>`;
+    }).join("");
+  }
   if(ENEMY){
     const ml=$("matchLead"); ml.hidden=false;
     ml.textContent=ENEMY==="성격 없음"

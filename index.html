@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
 <link rel="stylesheet" href="assets/report.css">
 <style>
-.site-sum{margin-top:14px;background:var(--paper,#fff);border:1px solid var(--line,#D8E5CB);border-left:5px solid var(--leaf,#4E9A3A);border-radius:16px;padding:14px 18px;display:grid;gap:6px;font-size:.9rem}
+.site-sum{margin-top:14px;background:var(--paper,#fff);border:1px solid var(--line,#D8E5CB);border-radius:16px;padding:14px 18px;display:grid;gap:6px;font-size:.9rem}
 .site-sum p{margin:0}.site-sum .sum-h{font-weight:700;font-size:.85rem;color:var(--muted,#667560)}
 .site-sum .sum-stat b{font-family:ui-monospace,Consolas,monospace;font-size:1.05rem}
 .site-sum .sum-list{margin:0;padding-left:18px;display:grid;gap:2px}.site-sum .conf{font-size:.76rem;color:var(--muted,#667560)}
@@ -63,6 +63,8 @@
     <h2>성격 분포</h2>
     <p class="lead" id="stackLead">전체 편성 칸 중 각 성격이 차지한 비율입니다.</p>
     <p class="lead matchup" id="matchLead" hidden></p>
+    <div class="col-donuts" id="colDonuts" hidden></div>
+    <p class="lead stack-cap">전체 칸 합계</p>
     <div class="stack" id="stack"></div>
     <div class="legend" id="stackLegend"></div>
   </section>

@@ -1,14 +1,14 @@
 /* 공통 스타일 — index.html(PvE 리포트)과 같은 색·글꼴 */
 :root{
-  --bg:#F4F8EE; --paper:#FFFFFF; --ink:#24321E; --muted:#667560; --line:#D8E5CB;
-  --leaf:#4E9A3A; --leaf-soft:#E4F1D9; --warn:#B5651D; --bad-soft:#FBE3E3; --bad:#B23B3F;
+  --bg:#F4F5F7; --paper:#FFFFFF; --ink:#16181D; --muted:#5B6270; --line:#E2E4E9;
+  --leaf:#2F5FB3; --leaf-soft:#E8EEF8; --warn:#B5651D; --bad-soft:#FBE3E3; --bad:#B23B3F;
   --광기:#E0555A; --순수:#4FAF50; --냉정:#4A8FE0; --활발:#E9A91E; --우울:#9A6AD6; --공명:#1FA3A3; --미분류:#9AA39A;
-  --display:"Jua","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --display:"Pretendard Variable","Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --body:"Pretendard Variable","Pretendard",-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
   --mono:ui-monospace,"SFMono-Regular",Consolas,monospace;
 }
 @media (prefers-color-scheme:dark){
-  :root{ --bg:#161C13; --paper:#1F271B; --ink:#E8F0E0; --muted:#9FB095; --line:#334030; --leaf:#7CC766; --leaf-soft:#27351F; --warn:#E3A35E; --bad-soft:#3A2223; --bad:#F08A8D; color-scheme:dark }
+  :root{ --bg:#121417; --paper:#1B1E23; --ink:#E7E9EE; --muted:#9AA1AD; --line:#2C3138; --leaf:#8FB2F0; --leaf-soft:#1F2A3D; --warn:#E3A35E; --bad-soft:#3A2223; --bad:#F08A8D; color-scheme:dark }
 }
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -60,9 +60,13 @@ footer{color:var(--muted);font-size:.85rem}
 .sitebar a.tab.log{margin-left:auto;font-size:.85rem}
 
 /* 검증 현황 요약 (내보내기 스크립트가 숫자를 채움 — 자바스크립트 없이도 보임) */
-.site-sum{background:var(--paper);border:1px solid var(--line);border-left:5px solid var(--leaf);border-radius:16px;padding:14px 18px;display:grid;gap:6px;font-size:.9rem}
+.site-sum{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 18px;display:grid;gap:6px;font-size:.9rem}
 .site-sum p{margin:0}
 .site-sum .sum-h{font-weight:700;font-size:.85rem;color:var(--muted)}
 .site-sum .sum-stat b{font-family:var(--mono);font-size:1.05rem}
 .site-sum .sum-list{margin:0;padding-left:18px;display:grid;gap:2px}
 .site-sum .sum-link{font-size:.85rem}
+
+/* 11/07 리디자인: 제목 굵기 (Jua → Pretendard) */
+h1,h2,h3,.sitebar .site,.face b{font-weight:700}
+h1{letter-spacing:-.02em}
