@@ -168,7 +168,7 @@ async function main(){
   /* 이전 시즌 비교 */
   if(prevRaw&&prevRaw.length){
     const pk=Object.keys(prevRaw[0]).filter(k=>/^사도\s*\d+$/.test(k));
-    const pd=prevRaw.map(r=>pk.map(k=>r[k]).filter(Boolean)).filter(m=>m.length);
+    const pd=prevRaw.map(r=>pk.map(k=>r[k]).filter(Boolean).map(baseName)).filter(m=>m.length);
     const pc={}; pd.forEach(m=>new Set(m).forEach(x=>pc[x]=(pc[x]||0)+1));
     /* 글로벌 비교: 글로벌에 아직 출시되지 않은 사도는 채용률 0%가 아니라 '고를 수 없음'이라 표에서 제외 (CFG.root/unreleased.csv) */
     let unreleased=[];
