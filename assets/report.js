@@ -135,7 +135,7 @@ async function main(){
   /* 요약 */
   const sum=$("summary");
   if(INFO["한줄요약"]) sum.textContent=INFO["한줄요약"];
-  else { sum.classList.add("auto"); sum.textContent=`필수 ${must}명이 고정되고, 상위 ${N}덱 중 ${stdCount}덱(${pct(stdCount/N)})이 같은 ${slotKeys.length}명으로 편성됐습니다.`; }
+  else { sum.classList.add("auto"); sum.textContent=must?`필수 ${must}명이 고정되고, 상위 ${N}덱 중 ${stdCount}덱(${pct(stdCount/N)})이 같은 ${slotKeys.length}명으로 편성됐습니다.`:`채용률 90% 이상인 필수 사도가 없고, 상위 ${N}덱 중 같은 ${slotKeys.length}명 덱은 가장 많아도 ${stdCount}덱(${pct(stdCount/N)})입니다.`; }
 
   /* 보드 */
   const board=$("board"); board.hidden=false;
