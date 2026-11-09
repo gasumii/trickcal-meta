@@ -128,7 +128,7 @@ async function main(){
   /* 태그 */
   const uniq=a=>[...new Set(a.filter(Boolean))];
   const ranks=decks.map(d=>d.rank).filter(Number.isFinite);
-  const tags=[INFO["조사일"]&&("조사일 "+INFO["조사일"]), INFO["시즌/콘텐츠명"], ...uniq(decks.map(d=>d.stage)).filter(Boolean).map(s=>/단계$/.test(s)?s:s+"단계"), ...uniq(decks.map(d=>d.boss)), ranks.length&&(`${Math.min(...ranks)}~${Math.max(...ranks)}위 ${N}덱`)].filter(Boolean);
+  const tags=[INFO["조사일"]&&("조사일 "+INFO["조사일"]), INFO["시즌/콘텐츠명"], INFO["시즌"],...uniq(decks.map(d=>d.stage)).filter(Boolean).map(s=>/단계$/.test(s)?s:s+"단계"), ...uniq(decks.map(d=>d.boss)), ranks.length&&(`${Math.min(...ranks)}~${Math.max(...ranks)}위 ${N}덱`)].filter(Boolean);
   $("tags").innerHTML=tags.map(t=>`<span class="tag">${esc(t)}</span>`).join("");
 
   /* 요약 */
@@ -303,8 +303,8 @@ async function main(){
   if(cur) document.title=`${cur["표시이름"]||cur["시즌ID"]} — ${CFG.titleSuffix||"트릭컬 리바이브 PvE 상위권 덱 리포트"}`;
 
   /* 조사 방법 & 데이터 점검 */
-  const infoRows=[["조사일",INFO["조사일"]],["시즌/콘텐츠",INFO["시즌/콘텐츠명"]],["보스 성격",((cur&&cur["적 성격"])||INFO["적 성격"]||"")],["게임 버전",INFO["게임 버전"]],["조사 범위",ranks.length?`${Math.min(...ranks)}~${Math.max(...ranks)}위 (${N}덱 · ${INFO["순위 구간"]||"상위 1% 미만"})`:""],["기록 기준","유저별 최고 단계 덱 1개"],["조사자",INFO["조사자"]]];
-  $("info").innerHTML=infoRows.map(([k,v])=>`<dt>${k}</dt><dd>${esc(v||"—")}</dd>`).join("");
+  const infoRows=[["조사일",INFO["조사일"]],["시즌/콘텐츠",INFO["시즌/콘텐츠명"]],["시즌",INFO["시즌"],1],["보스 성격",((cur&&cur["적 성격"])||INFO["적 성격"]||"")],["게임 버전",INFO["게임 버전"],1],["조사 범위",ranks.length?`${Math.min(...ranks)}~${Math.max(...ranks)}위 (${N}덱 · ${INFO["순위 구간"]||"상위 1% 미만"})`:""],["기록 기준","유저별 최고 단계 덱 1개"],["조사자",INFO["조사자"]]];
+  $("info").innerHTML=infoRows.filter(([k,v,opt])=>!opt||v).map(([k,v])=>`<dt>${k}</dt><dd>${esc(v||"—")}</dd>`).join("");
 
   const checks=[];
   const short=decks.filter(d=>d.members.length<slotKeys.length);
