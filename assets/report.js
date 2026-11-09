@@ -179,8 +179,8 @@ async function main(){
       .filter(o=>Math.abs(o.d)>=0.05).sort((x,y)=>Math.abs(y.d)-Math.abs(x.d)).slice(0,15);
     $("s-compare").hidden=false;
     $("cmpLead").textContent=CFG.compare==="kr"
-      ?`한국 서버 ${prev["표시이름"]||prev["시즌ID"]} (${pd.length}덱) → 글로벌 서버 ${cur["표시이름"]||cur["시즌ID"]} (${N}덱). 같은 콘텐츠에서 두 서버에 모두 출시된 사도 중 채용률이 5%p 이상 다른 사도를 차이 폭 순으로 보여줍니다.`
-      :`${prev["표시이름"]||prev["시즌ID"]} (${pd.length}덱) → ${cur["표시이름"]||cur["시즌ID"]} (${N}덱). 채용률이 5%p 이상 바뀐 사도를 변화 폭 순으로 보여줍니다. 패치 노트에 없는 변화라면 확인이 필요한 지점입니다.`;
+      ?`한국 서버 ${prev["표시이름"]||prev["시즌ID"]} (${pd.length}덱) → 글로벌 서버 ${cur["표시이름"]||cur["시즌ID"]} (${N}덱). 같은 콘텐츠에서 두 서버에 모두 출시된 사도 중 채용률이 5%p 이상 다른 사도를 차이가 큰 순서로 정리했습니다.`
+      :`${prev["표시이름"]||prev["시즌ID"]} (${pd.length}덱) → ${cur["표시이름"]||cur["시즌ID"]} (${N}덱). 채용률이 5%p 이상 바뀐 사도를 변화가 큰 순서로 정리했습니다. 패치 노트로 설명되지 않는 변화는 따로 확인이 필요합니다.`;
     $("cmp").innerHTML=`<thead><tr><th>사도</th><th>${CFG.compare==="kr"?"한국":"이전"}</th><th>${CFG.compare==="kr"?"글로벌":"이번"}</th><th>${CFG.compare==="kr"?"차이":"변화"}</th></tr></thead><tbody>`+
       (rows.length?rows.map(o=>`<tr><td>${chip(o.n)}</td><td>${pct(o.a)}</td><td>${pct(o.b)}</td><td class="${o.d>0?'up':'down'}">${o.d>0?'▲':'▼'} ${(Math.abs(o.d)*100).toFixed(0)}%p</td></tr>`).join("")
        :`<tr><td colspan="4">5%p 이상 바뀐 사도가 없습니다.</td></tr>`)+`</tbody>`;
@@ -262,7 +262,7 @@ async function main(){
   if(ENEMY){
     const ml=$("matchLead"); ml.hidden=false;
     ml.textContent=ENEMY==="성격 없음"
-      ?"이번 보스는 성격이 없어 상성 영향이 없습니다. 이 시즌의 성격 분포는 상성과 무관한 선택입니다."
+      ?"이번 보스는 성격이 없어 성격 상성이 적용되지 않습니다."
       :`이번 보스 성격은 ${ENEMY}입니다. ${good.join("·")} 성격이 유리(주는 피해 1.5배)${bad.length?`, ${bad.join("·")} 성격이 불리(0.75배)`:""}합니다.`;
   }
 
@@ -298,7 +298,7 @@ async function main(){
   if(seasonNotes.length){
     $("s-notes").hidden=false;
     $("notesH").textContent="사도별 평가";
-    $("notesLead").textContent="이번 시즌 채용 데이터와 전투 메커니즘 DB(스킬 판정표)의 효과를 맞춰 본 평가입니다. 해석이 들어간 부분은 '~로 보인다'로 구분했습니다.";
+    $("notesLead").textContent="이번 시즌 채용 데이터와 전투 메커니즘 DB(스킬 판정표)의 효과와 대조한 평가입니다. 추정이 들어간 문장은 '~로 보인다'로 적었습니다.";
     const list=seasonNotes.map(r=>({n:r["사도명"],t:r["평가"],r:rateOf[r["사도명"]]||0})).sort((a,b)=>b.r-a.r);
     $("notes").innerHTML=list.map(s=>`<article class="note" style="--c:${col(s.n)}"><h3>${esc(s.n)}</h3>
       <div class="meta">${esc(ATTR[s.n]||"미분류")} / ${tierOf(s.r).name} / 채용률 ${pct(s.r,1)}</div><p>${numB(s.t)}</p></article>`).join("");
