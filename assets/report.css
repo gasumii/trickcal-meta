@@ -108,6 +108,15 @@ td.na{color:var(--muted)}
 .meta-comment{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:24px 28px;max-width:72ch;font-size:1.08rem;line-height:1.9;font-weight:500}
 .meta-comment p{margin:0 0 .9em}
 .meta-comment p:last-child{margin-bottom:0}
+.analysis{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:8px 28px;max-width:72ch;font-size:1.02rem;line-height:1.85;font-weight:500;margin-top:16px}
+.analysis article{padding:18px 0;border-bottom:1px solid var(--line)}
+.analysis article:last-child{border-bottom:0}
+.analysis h3{font-size:1.1rem;margin:0 0 8px}
+.analysis p{margin:0 0 .7em}
+.analysis p:last-child{margin-bottom:0}
+.analysis ul{margin:0 0 .7em;padding-left:1.2em}
+.analysis li{margin:.2em 0}
+.analysis b{font-weight:650}
 
 /* 조사 방법 */
 .method{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}

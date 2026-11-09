@@ -53,7 +53,7 @@ const conic=parts=>{ const tot=parts.reduce((s,p)=>s+p[0],0)||1; let acc=0;
   return "conic-gradient("+parts.map(([v,c])=>{ const a=acc/tot*100; acc+=v; return `${c} ${a.toFixed(2)}% ${(acc/tot*100).toFixed(2)}%`; }).join(",")+")"; };
 
 async function main(){
-  let decksRaw, sado, info, seasons=[], cur=null, prev=null, prevRaw=null, seasonNotes=[];
+  let decksRaw, sado, info, seasons=[], cur=null, prev=null, prevRaw=null, seasonNotes=[], seasonAnalysis=[];
   try{
     try{ seasons=(await load(CFG.root+"seasons.csv")).filter(r=>r["시즌ID"]); }catch(_){ seasons=[]; }
     if(seasons.length){
@@ -70,6 +70,7 @@ async function main(){
       [decksRaw, sado, info] = await Promise.all([load(base+"decks.csv"),load("data/sado.csv"),load(base+"info.csv")]);
       if(prev){ try{ prevRaw=await load(prevRoot+"seasons/"+prev["시즌ID"]+"/decks.csv"); }catch(_){ prevRaw=null; } }
       try{ seasonNotes=(await load(base+"notes.csv")).filter(r=>r["사도명"]&&r["평가"]); }catch(_){ seasonNotes=[]; }
+      try{ seasonAnalysis=(await load(base+"analysis.csv")).filter(r=>r["제목"]&&r["내용"]); }catch(_){ seasonAnalysis=[]; }
       let contents=[];
       try{ contents=(await load("data/contents.csv")).map(r=>r["콘텐츠"]).filter(Boolean); }catch(_){}
       seasons.forEach(r=>{ if(r["콘텐츠"]&&!contents.includes(r["콘텐츠"])) contents.push(r["콘텐츠"]); });
@@ -190,6 +191,17 @@ async function main(){
 
   /* 메타 코멘트 */
   if(INFO["메타 코멘트"]){ $("s-comment").hidden=false; $("metaComment").innerHTML=INFO["메타 코멘트"].split(/\n+/).filter(s=>s.trim()).map(s=>`<p>${numB(s.trim())}</p>`).join(""); }
+
+  /* 분석 보고서: 시즌 폴더의 analysis.csv (제목,내용). 내용의 줄바꿈 = 문단, "- "로 시작하는 줄 = 목록 */
+  if(seasonAnalysis.length&&$("s-analysis")){
+    $("s-analysis").hidden=false;
+    $("analysis").innerHTML=seasonAnalysis.map(r=>{
+      const lines=r["내용"].split(/\n+/).map(x=>x.trim()).filter(Boolean); let h="",ul=[];
+      const flush=()=>{ if(ul.length){ h+=`<ul>${ul.map(x=>`<li>${numB(x)}</li>`).join("")}</ul>`; ul=[]; } };
+      lines.forEach(x=>{ if(x.startsWith("- ")) ul.push(x.slice(2)); else { flush(); h+=`<p>${numB(x)}</p>`; } }); flush();
+      return `<article><h3>${esc(r["제목"])}</h3>${h}</article>`;
+    }).join("");
+  }
 
   /* 티어 */
   $("tierLead").textContent="채용률 기준: "+TIERS.slice(0,-1).map(t=>`${t.name} ${pct(t.min)} 이상`).join(", ")+", 그 외 채용 10% 미만.";
