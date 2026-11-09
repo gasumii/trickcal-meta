@@ -53,7 +53,7 @@ const conic=parts=>{ const tot=parts.reduce((s,p)=>s+p[0],0)||1; let acc=0;
   return "conic-gradient("+parts.map(([v,c])=>{ const a=acc/tot*100; acc+=v; return `${c} ${a.toFixed(2)}% ${(acc/tot*100).toFixed(2)}%`; }).join(",")+")"; };
 
 async function main(){
-  let decksRaw, sado, info, seasons=[], cur=null, prev=null, prevRaw=null, seasonNotes=[], seasonAnalysis=[];
+  let decksRaw, sado, info, seasons=[], cur=null, prev=null, prevRaw=null, seasonNotes=[], seasonAnalysis=[], seasonLevels=[];
   try{
     try{ seasons=(await load(CFG.root+"seasons.csv")).filter(r=>r["시즌ID"]); }catch(_){ seasons=[]; }
     if(seasons.length){
@@ -71,6 +71,7 @@ async function main(){
       if(prev){ try{ prevRaw=await load(prevRoot+"seasons/"+prev["시즌ID"]+"/decks.csv"); }catch(_){ prevRaw=null; } }
       try{ seasonNotes=(await load(base+"notes.csv")).filter(r=>r["사도명"]&&r["평가"]); }catch(_){ seasonNotes=[]; }
       try{ seasonAnalysis=(await load(base+"analysis.csv")).filter(r=>r["제목"]&&r["내용"]); }catch(_){ seasonAnalysis=[]; }
+      try{ seasonLevels=(await load(base+"levels.csv")).filter(r=>r["순위"]); }catch(_){ seasonLevels=[]; }
       let contents=[];
       try{ contents=(await load("data/contents.csv")).map(r=>r["콘텐츠"]).filter(Boolean); }catch(_){}
       seasons.forEach(r=>{ if(r["콘텐츠"]&&!contents.includes(r["콘텐츠"])) contents.push(r["콘텐츠"]); });
@@ -193,12 +194,89 @@ async function main(){
   if(INFO["메타 코멘트"]){ $("s-comment").hidden=false; $("metaComment").innerHTML=INFO["메타 코멘트"].split(/\n+/).filter(s=>s.trim()).map(s=>`<p>${numB(s.trim())}</p>`).join(""); }
 
   /* 분석 보고서: 시즌 폴더의 analysis.csv (제목,내용). 내용의 줄바꿈 = 문단, "- "로 시작하는 줄 = 목록 */
+  /* 보고서 차트: 내용 한 줄에 [차트:구간 1-100,101-200,201-300] (구간 생략 가능) 또는 [차트:레벨] (시즌 폴더 levels.csv 필요) */
+  const fig=(h,body)=>`<figure class="an-chart"><svg viewBox="0 0 760 ${h}" role="img" font-size="16">${body}</svg></figure>`;
+  const chartBands=arg=>{
+    let bs=(arg||"").split(",").map(x=>x.trim().split("-").map(Number)).filter(b=>b.length===2&&b.every(Number.isFinite));
+    if(!bs.length){ const mx=Math.max(...ranks); bs=mx>150?[[1,100],[101,200],[201,mx]]:[[1,Math.round(mx/2)],[Math.round(mx/2)+1,mx]]; }
+    const bd=bs.map(([lo,hi])=>decks.filter(d=>d.rank>=lo&&d.rank<=hi));
+    const share=(n,i)=>bd[i].length?bd[i].filter(d=>d.members.includes(n)).length/bd[i].length*100:0;
+    let rows=Object.keys(cnt).filter(n=>cnt[n]/N>=0.04).map(n=>{ const v=bs.map((_,i)=>share(n,i)); return {n,v,d:v[v.length-1]-v[0]}; })
+      .filter(r=>Math.min(...r.v)<97).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d)).slice(0,10).sort((a,b)=>b.d-a.d);
+    if(!rows.length) return "";
+    const x0=190,x1=660,y0=78,rh=30,yEnd=y0+rows.length*rh,sx=v=>x0+v/100*(x1-x0),op=i=>bs.length>1?0.3+0.7*i/(bs.length-1):1;
+    let s=`<text x="20" y="22" fill="var(--muted)">순위 구간별 채용률(%) · 변화 = 마지막 구간 − 첫 구간</text>`;
+    s+=bs.map(([lo,hi],i)=>`<circle cx="${196+i*130}" cy="46" r="6" fill="var(--leaf)" fill-opacity="${op(i)}"/><text x="208" dx="${i*130}" y="50" fill="var(--muted)">${lo}~${hi}위</text>`).join("");
+    s+=`<text x="740" y="${y0-8}" text-anchor="end" fill="var(--muted)">변화</text>`;
+    s+=[0,25,50,75,100].map(t=>`<line x1="${sx(t)}" x2="${sx(t)}" y1="${y0}" y2="${yEnd}" stroke="var(--line)"/><text x="${sx(t)}" y="${yEnd+18}" text-anchor="middle" fill="var(--muted)">${t}</text>`).join("");
+    s+=rows.map((r,i)=>{ const y=y0+i*rh+rh/2, lo=Math.min(...r.v), hi=Math.max(...r.v);
+      return `<text x="178" y="${y+4}" text-anchor="end" fill="var(--ink)">${esc(r.n)}</text><line x1="${sx(lo)}" x2="${sx(hi)}" y1="${y}" y2="${y}" stroke="var(--muted)" stroke-opacity=".45" stroke-width="2"/>`
+        +r.v.map((v,j)=>`<circle cx="${sx(v)}" cy="${y}" r="6" fill="var(--leaf)" fill-opacity="${op(j)}"><title>${esc(r.n)} ${bs[j][0]}~${bs[j][1]}위: ${v.toFixed(1)}%</title></circle>`).join("")
+        +`<text x="740" y="${y+4}" text-anchor="end" fill="var(--ink)">${r.d>0?"+":""}${Math.round(r.d)}%p</text>`; }).join("");
+    return fig(yEnd+30,s);
+  };
+  const chartLevels=()=>{
+    const L=seasonLevels.map(r=>({rank:+r["순위"],t:+r["클리어 시간(초)"],n:+r["편성 인원"],lo:+r["최저 Lv"],hi:+r["최고 Lv"],f:r["이상"]||""})).filter(r=>Number.isFinite(r.t));
+    if(!L.length) return "";
+    const tm=Math.ceil(Math.max(...L.map(r=>r.t))/10)*10, x0=70,x1=720,yT=60,yB=330, sx=t=>x0+t/tm*(x1-x0), sy=v=>yB-v/150*(yB-yT);
+    let s=`<text x="20" y="22" fill="var(--muted)">클리어 시간과 덱 최고 레벨 · 진한 점 = 특히 이상, 연한 점 = 이상</text>`;
+    s+=[0,50,100,150].map(v=>`<line x1="${x0}" x2="${x1}" y1="${sy(v)}" y2="${sy(v)}" stroke="var(--line)"/><text x="${x0-8}" y="${sy(v)+4}" text-anchor="end" fill="var(--muted)">${v}</text>`).join("");
+    for(let t=0;t<=tm;t+=10) s+=`<text x="${sx(t)}" y="${yB+18}" text-anchor="middle" fill="var(--muted)">${t}</text>`;
+    s+=`<text x="${x0-8}" y="${yT-12}" text-anchor="end" fill="var(--muted)">최고 Lv</text><text x="${x1}" y="${yB+38}" text-anchor="end" fill="var(--muted)">클리어 시간(초)</text>`;
+    const tip=r=>`<title>${r.rank}위: ${r.t}초, ${r.n}명, Lv.${r.lo}~${r.hi}</title>`;
+    s+=L.filter(r=>!r.f).map(r=>`<circle cx="${sx(r.t)}" cy="${sy(r.hi)}" r="4.5" fill="var(--미분류)" fill-opacity=".7">${tip(r)}</circle>`).join("");
+    const odd=L.filter(r=>r.f).sort((a,b)=>b.hi-a.hi), ly0=Math.max(yT+20,sy(odd.length?odd[0].hi:0));
+    s+=odd.map((r,i)=>{ const ly=ly0+i*26, lx=430;
+      return `<line x1="${sx(r.t)+7}" y1="${sy(r.hi)}" x2="${lx-6}" y2="${ly-4}" stroke="var(--muted)" stroke-opacity=".6"/><circle cx="${sx(r.t)}" cy="${sy(r.hi)}" r="6.5" fill="var(--leaf)" fill-opacity="${r.f==="특히 이상"?1:.4}" stroke="var(--leaf)">${tip(r)}</circle><text x="${lx}" y="${ly}" fill="var(--ink)">${r.rank}위 · ${r.n}명 Lv.${r.lo}~${r.hi} · ${r.t}초</text>`; }).join("");
+    return fig(yB+48,s);
+  };
+  const parseBands=arg=>{ let bs=(arg||"").split(",").map(x=>x.trim().split("-").map(Number)).filter(b=>b.length===2&&b.every(Number.isFinite));
+    if(!bs.length){ const mx=Math.max(...ranks); bs=mx>150?[[1,100],[101,200],[201,mx]]:[[1,Math.round(mx/2)],[Math.round(mx/2)+1,mx]]; } return bs; };
+  const persOf=m=>{ const r=m.match(RESO); return r?r[1]:(ATTR[baseName(m)]||"미분류"); };
+  const PORDER=["냉정","광기","활발","우울","순수","공명","미분류"];
+  /* 100% 가로 막대 한 줄: parts=[[이름,값]] */
+  const stackRow=(y,label,parts,x0=150,x1=740,h=30)=>{ const tot=parts.reduce((s,p)=>s+p[1],0)||1; let acc=x0;
+    return `<text x="${x0-12}" y="${y+h/2+5}" text-anchor="end" fill="var(--ink)">${esc(label)}</text>`+parts.filter(p=>p[1]>0).map(([k,v])=>{ const w=v/tot*(x1-x0), sx=acc; acc+=w; const pc=v/tot*100;
+      return `<rect x="${sx}" y="${y}" width="${Math.max(w-1,0)}" height="${h}" fill="var(--${k})" fill-opacity=".85"><title>${esc(label)} ${k}: ${pc.toFixed(1)}% (${v}칸)</title></rect>`+(pc>=8?`<text x="${sx+w/2}" y="${y+h/2+5}" text-anchor="middle" fill="#fff" font-size="14">${pc.toFixed(0)}%</text>`:""); }).join(""); };
+  const legendP=(keys,y)=>keys.map((k,i)=>`<rect x="${20+i*96}" y="${y-11}" width="14" height="14" rx="3" fill="var(--${k})"/><text x="${40+i*96}" y="${y+1}" fill="var(--muted)">${k}</text>`).join("");
+  const chartPers=arg=>{
+    const bs=parseBands(arg);
+    const rows=bs.map(([lo,hi])=>{ const c={}; decks.filter(d=>d.rank>=lo&&d.rank<=hi).forEach(d=>d.raw.forEach(m=>{ const p=persOf(m); c[p]=(c[p]||0)+1; })); return {label:`${lo}~${hi}위`,c}; });
+    const keys=PORDER.filter(k=>rows.some(r=>r.c[k]));
+    let s=`<text x="20" y="22" fill="var(--muted)">순위 구간별 편성 칸의 성격 비율</text>`+legendP(keys,50);
+    s+=rows.map((r,i)=>stackRow(72+i*44,r.label,keys.map(k=>[k,r.c[k]||0]))).join("");
+    return fig(72+rows.length*44+10,s);
+  };
+  const chartReso=arg=>{
+    const bs=parseBands(arg);
+    const bases=uniq(decks.flatMap(d=>d.raw.filter(m=>RESO.test(m)).map(baseName)));
+    if(!bases.length) return "";
+    const rows=[]; bases.forEach(b=>bs.forEach(([lo,hi])=>{ const c={}; decks.filter(d=>d.rank>=lo&&d.rank<=hi).forEach(d=>d.raw.forEach(m=>{ if(baseName(m)===b&&RESO.test(m)){ const p=m.match(RESO)[1]; c[p]=(c[p]||0)+1; } })); rows.push({label:`${b} ${lo}~${hi}위`,c}); }));
+    const keys=PORDER.filter(k=>rows.some(r=>r.c[k]));
+    let s=`<text x="20" y="22" fill="var(--muted)">공명 사도가 고른 성격 · 순위 구간별 비율</text>`+legendP(keys,50);
+    s+=rows.map((r,i)=>stackRow(72+i*40+Math.floor(i/bs.length)*12,r.label,keys.map(k=>[k,r.c[k]||0]),230,740,28)).join("");
+    return fig(72+rows.length*40+Math.floor((rows.length-1)/bs.length)*12+10,s);
+  };
+  const chartRows=()=>{
+    const ROWN=["전열","중열","후열"], c=ROWN.map(()=>({}));
+    decksRaw.forEach(r=>slotKeys.forEach((k,i)=>{ const m=r[k]; if(!m) return; const b=baseName(m), ri=Math.min(2,Math.floor(i/3)); c[ri][b]=(c[ri][b]||0)+1; }));
+    const x0=200,x1=660, mx=Math.max(...c.flatMap(o=>Object.values(o)));
+    let y=40, s=`<text x="20" y="22" fill="var(--muted)">열마다 많이 놓인 사도 (덱 수, 막대 색 = 성격)</text>`;
+    ROWN.forEach((rn,ri)=>{ const top=Object.entries(c[ri]).sort((a,b)=>b[1]-a[1]).slice(0,6);
+      s+=`<text x="20" y="${y+20}" fill="var(--ink)" font-weight="600">${rn}</text>`; y+=30;
+      top.forEach(([n,v])=>{ s+=`<text x="${x0-12}" y="${y+16}" text-anchor="end" fill="var(--ink)">${esc(n)}</text><rect x="${x0}" y="${y+2}" width="${v/mx*(x1-x0)}" height="20" rx="3" fill="var(--${ATTRS.includes(ATTR[n])?ATTR[n]:"미분류"})" fill-opacity=".85"><title>${esc(n)} ${rn}: ${v}덱</title></rect><text x="${x0+v/mx*(x1-x0)+8}" y="${y+17}" fill="var(--ink)">${v}</text>`; y+=26; });
+      y+=10; });
+    return fig(y+6,s);
+  };
+  const chartFor=x=>{ const m=x.match(/^\[차트:(\S+)\s*(.*)\]$/); if(!m) return "";
+    return m[1]==="구간"?chartBands(m[2]):m[1]==="레벨"?chartLevels():m[1]==="성격"?chartPers(m[2]):m[1]==="공명"?chartReso(m[2]):m[1]==="열"?chartRows():""; };
+
   if(seasonAnalysis.length&&$("s-analysis")){
     $("s-analysis").hidden=false;
     $("analysis").innerHTML=seasonAnalysis.map(r=>{
       const lines=r["내용"].split(/\n+/).map(x=>x.trim()).filter(Boolean); let h="",ul=[];
       const flush=()=>{ if(ul.length){ h+=`<ul>${ul.map(x=>`<li>${numB(x)}</li>`).join("")}</ul>`; ul=[]; } };
-      lines.forEach(x=>{ if(x.startsWith("- ")) ul.push(x.slice(2)); else { flush(); h+=`<p>${numB(x)}</p>`; } }); flush();
+      lines.forEach(x=>{ if(x.startsWith("[차트:")){ flush(); h+=chartFor(x); } else if(x.startsWith("- ")) ul.push(x.slice(2)); else { flush(); h+=`<p>${numB(x)}</p>`; } }); flush();
       return `<article><h3>${esc(r["제목"])}</h3>${h}</article>`;
     }).join("");
   }

@@ -117,6 +117,8 @@ td.na{color:var(--muted)}
 .analysis ul{margin:0 0 .7em;padding-left:1.2em}
 .analysis li{margin:.2em 0}
 .analysis b{font-weight:650}
+.an-chart{margin:10px 0 14px;padding:0;overflow-x:auto}
+.an-chart svg{width:100%;min-width:560px;height:auto;display:block;font-family:var(--body)}
 
 /* 조사 방법 */
 .method{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
