@@ -195,7 +195,7 @@ async function main(){
 
   /* 분석 보고서: 시즌 폴더의 analysis.csv (제목,내용). 내용의 줄바꿈 = 문단, "- "로 시작하는 줄 = 목록 */
   /* 보고서 차트: 내용 한 줄에 [차트:구간 1-100,101-200,201-300] (구간 생략 가능) 또는 [차트:레벨] (시즌 폴더 levels.csv 필요) */
-  const fig=(h,body)=>`<figure class="an-chart"><svg viewBox="0 0 760 ${h}" role="img" font-size="16">${body}</svg></figure>`;
+  const fig=(h,body,cap)=>`<figure class="an-chart"><svg viewBox="0 0 760 ${h}" role="img" font-size="16">${body}</svg>${cap?`<figcaption><b>읽는 법</b> ${esc(cap)}</figcaption>`:""}</figure>`;
   const chartBands=arg=>{
     let bs=(arg||"").split(",").map(x=>x.trim().split("-").map(Number)).filter(b=>b.length===2&&b.every(Number.isFinite));
     if(!bs.length){ const mx=Math.max(...ranks); bs=mx>150?[[1,100],[101,200],[201,mx]]:[[1,Math.round(mx/2)],[Math.round(mx/2)+1,mx]]; }
@@ -204,16 +204,20 @@ async function main(){
     let rows=Object.keys(cnt).filter(n=>cnt[n]/N>=0.04).map(n=>{ const v=bs.map((_,i)=>share(n,i)); return {n,v,d:v[v.length-1]-v[0]}; })
       .filter(r=>Math.min(...r.v)<97).sort((a,b)=>Math.abs(b.d)-Math.abs(a.d)).slice(0,10).sort((a,b)=>b.d-a.d);
     if(!rows.length) return "";
-    const x0=190,x1=660,y0=78,rh=30,yEnd=y0+rows.length*rh,sx=v=>x0+v/100*(x1-x0),op=i=>bs.length>1?0.3+0.7*i/(bs.length-1):1;
-    let s=`<text x="20" y="22" fill="var(--muted)">순위 구간별 채용률(%) · 변화 = 마지막 구간 − 첫 구간</text>`;
-    s+=bs.map(([lo,hi],i)=>`<circle cx="${196+i*130}" cy="46" r="6" fill="var(--leaf)" fill-opacity="${op(i)}"/><text x="208" dx="${i*130}" y="50" fill="var(--muted)">${lo}~${hi}위</text>`).join("");
+    const x0=190,x1=660,y0=84,rh=32,yEnd=y0+rows.length*rh,sx=v=>x0+v/100*(x1-x0);
+    /* 구간 색: 첫 구간 회색 → 중간 연한 파랑 → 마지막 진한 파랑 */
+    const dot=j=>j===0?`fill="var(--미분류)"`:j===bs.length-1?`fill="var(--leaf)"`:`fill="var(--leaf)" fill-opacity=".45"`;
+    let s=`<text x="20" y="22" fill="var(--muted)">순위 구간별 채용률(%) · 화살표 = 첫 구간 → 마지막 구간</text>`;
+    s+=bs.map(([lo,hi],i)=>`<circle cx="${26+i*150}" cy="50" r="7" ${dot(i)}/><text x="${40+i*150}" y="55" fill="var(--muted)">${lo}~${hi}위</text>`).join("");
     s+=`<text x="740" y="${y0-8}" text-anchor="end" fill="var(--muted)">변화</text>`;
     s+=[0,25,50,75,100].map(t=>`<line x1="${sx(t)}" x2="${sx(t)}" y1="${y0}" y2="${yEnd}" stroke="var(--line)"/><text x="${sx(t)}" y="${yEnd+18}" text-anchor="middle" fill="var(--muted)">${t}</text>`).join("");
-    s+=rows.map((r,i)=>{ const y=y0+i*rh+rh/2, lo=Math.min(...r.v), hi=Math.max(...r.v);
-      return `<text x="178" y="${y+4}" text-anchor="end" fill="var(--ink)">${esc(r.n)}</text><line x1="${sx(lo)}" x2="${sx(hi)}" y1="${y}" y2="${y}" stroke="var(--muted)" stroke-opacity=".45" stroke-width="2"/>`
-        +r.v.map((v,j)=>`<circle cx="${sx(v)}" cy="${y}" r="6" fill="var(--leaf)" fill-opacity="${op(j)}"><title>${esc(r.n)} ${bs[j][0]}~${bs[j][1]}위: ${v.toFixed(1)}%</title></circle>`).join("")
-        +`<text x="740" y="${y+4}" text-anchor="end" fill="var(--ink)">${r.d>0?"+":""}${Math.round(r.d)}%p</text>`; }).join("");
-    return fig(yEnd+30,s);
+    s+=rows.map((r,i)=>{ const y=y0+i*rh+rh/2, xs=r.v.map(sx), xl=xs[xs.length-1], xp=xs[xs.length-2]??xs[0], dir=Math.sign(xl-xp);
+      const path=xs.map((x,j)=>`${j?"L":"M"}${x.toFixed(1)} ${y}`).join(" ");
+      const head=dir&&Math.abs(xl-xp)>12?`<path d="M${(xl-dir*8).toFixed(1)} ${y} l${(-dir*9).toFixed(1)} -6 l0 12 z" fill="var(--leaf)"/>`:"";
+      return `<text x="178" y="${y+5}" text-anchor="end" fill="var(--ink)">${esc(r.n)}</text><path d="${path}" fill="none" stroke="var(--leaf)" stroke-opacity=".55" stroke-width="2.5"/>${head}`
+        +r.v.map((v,j)=>`<circle cx="${sx(v)}" cy="${y}" r="6.5" ${dot(j)}><title>${esc(r.n)} ${bs[j][0]}~${bs[j][1]}위: ${v.toFixed(1)}%</title></circle>`).join("")
+        +`<text x="740" y="${y+5}" text-anchor="end" fill="var(--ink)" font-weight="600">${r.d>0?"+":""}${Math.round(r.d)}%p</text>`; }).join("");
+    return fig(yEnd+30,s,`한 줄이 사도 한 명입니다. 점은 순위 구간별로 그 사도를 쓴 덱의 비율(%)이고, 회색 점이 ${bs[0][0]}~${bs[0][1]}위, 진한 파란 점이 ${bs[bs.length-1][0]}~${bs[bs.length-1][1]}위입니다. 선은 위 구간에서 아래 구간 순서로 이은 것이고 화살표가 마지막 구간 쪽을 가리킵니다. 오른쪽 숫자는 마지막 구간에서 첫 구간을 뺀 값으로, +면 순위가 내려갈수록 더 많이 쓴 사도, −면 상위권에서 더 많이 쓴 사도입니다. 중간에 꺾이는 사도는 숫자만 보지 말고 점 위치도 같이 보세요.`);
   };
   const chartLevels=()=>{
     const L=seasonLevels.map(r=>({rank:+r["순위"],t:+r["클리어 시간(초)"],n:+r["편성 인원"],lo:+r["최저 Lv"],hi:+r["최고 Lv"],f:r["이상"]||""})).filter(r=>Number.isFinite(r.t));
@@ -228,7 +232,7 @@ async function main(){
     const odd=L.filter(r=>r.f).sort((a,b)=>b.hi-a.hi), ly0=Math.max(yT+20,sy(odd.length?odd[0].hi:0));
     s+=odd.map((r,i)=>{ const ly=ly0+i*26, lx=430;
       return `<line x1="${sx(r.t)+7}" y1="${sy(r.hi)}" x2="${lx-6}" y2="${ly-4}" stroke="var(--muted)" stroke-opacity=".6"/><circle cx="${sx(r.t)}" cy="${sy(r.hi)}" r="6.5" fill="var(--leaf)" fill-opacity="${r.f==="특히 이상"?1:.4}" stroke="var(--leaf)">${tip(r)}</circle><text x="${lx}" y="${ly}" fill="var(--ink)">${r.rank}위 · ${r.n}명 Lv.${r.lo}~${r.hi} · ${r.t}초</text>`; }).join("");
-    return fig(yB+48,s);
+    return fig(yB+48,s,"점 하나가 덱 하나입니다. 가로는 클리어 시간(왼쪽일수록 빠르고 순위가 높음), 세로는 그 덱에서 가장 높은 사도 레벨입니다. 대부분의 덱은 Lv.100 안팎에 모여 있고, 그 아래로 떨어진 파란 점은 낮은 레벨로 빠르게 클리어한 기록입니다. 진한 파랑은 특히 이상한 기록, 연한 파랑은 이상 기록입니다.");
   };
   const parseBands=arg=>{ let bs=(arg||"").split(",").map(x=>x.trim().split("-").map(Number)).filter(b=>b.length===2&&b.every(Number.isFinite));
     if(!bs.length){ const mx=Math.max(...ranks); bs=mx>150?[[1,100],[101,200],[201,mx]]:[[1,Math.round(mx/2)],[Math.round(mx/2)+1,mx]]; } return bs; };
@@ -245,7 +249,7 @@ async function main(){
     const keys=PORDER.filter(k=>rows.some(r=>r.c[k]));
     let s=`<text x="20" y="22" fill="var(--muted)">순위 구간별 편성 칸의 성격 비율</text>`+legendP(keys,50);
     s+=rows.map((r,i)=>stackRow(72+i*44,r.label,keys.map(k=>[k,r.c[k]||0]))).join("");
-    return fig(72+rows.length*44+10,s);
+    return fig(72+rows.length*44+10,s,"막대 하나가 순위 구간 하나입니다. 그 구간에 편성된 칸 전체를 100%로 놓고 성격별 비율을 색으로 나눴습니다(공명 사도는 고른 성격으로 셈). 위아래 막대에서 같은 색 조각의 길이를 비교하면, 순위가 내려갈수록 어떤 성격이 늘고 줄었는지 보입니다. 8% 미만 조각은 숫자를 생략했고, 막대에 마우스를 올리면 정확한 값이 나옵니다.");
   };
   const chartReso=arg=>{
     const bs=parseBands(arg);
@@ -255,7 +259,7 @@ async function main(){
     const keys=PORDER.filter(k=>rows.some(r=>r.c[k]));
     let s=`<text x="20" y="22" fill="var(--muted)">공명 사도가 고른 성격 · 순위 구간별 비율</text>`+legendP(keys,50);
     s+=rows.map((r,i)=>stackRow(72+i*40+Math.floor(i/bs.length)*12,r.label,keys.map(k=>[k,r.c[k]||0]),230,740,28)).join("");
-    return fig(72+rows.length*40+Math.floor((rows.length-1)/bs.length)*12+10,s);
+    return fig(72+rows.length*40+Math.floor((rows.length-1)/bs.length)*12+10,s,"공명 사도는 편성할 때 성격을 골라 씁니다. 막대 하나가 '사도 × 순위 구간'이고, 그 구간에서 그 사도를 쓴 덱 전체를 100%로 놓고 고른 성격 비율을 나눴습니다. 같은 사도의 막대를 위에서 아래로 보면, 순위가 내려갈수록 성격 선택이 어떻게 바뀌는지 보입니다.");
   };
   const chartRows=()=>{
     const ROWN=["전열","중열","후열"], c=ROWN.map(()=>({}));
@@ -266,7 +270,7 @@ async function main(){
       s+=`<text x="20" y="${y+20}" fill="var(--ink)" font-weight="600">${rn}</text>`; y+=30;
       top.forEach(([n,v])=>{ s+=`<text x="${x0-12}" y="${y+16}" text-anchor="end" fill="var(--ink)">${esc(n)}</text><rect x="${x0}" y="${y+2}" width="${v/mx*(x1-x0)}" height="20" rx="3" fill="var(--${ATTRS.includes(ATTR[n])?ATTR[n]:"미분류"})" fill-opacity=".85"><title>${esc(n)} ${rn}: ${v}덱</title></rect><text x="${x0+v/mx*(x1-x0)+8}" y="${y+17}" fill="var(--ink)">${v}</text>`; y+=26; });
       y+=10; });
-    return fig(y+6,s);
+    return fig(y+6,s,"전·중·후열마다 그 자리에 가장 많이 놓인 사도 6명입니다. 막대 길이와 숫자는 그 열에 놓인 덱 수이고, 막대 색은 사도의 성격입니다. 한 사도가 여러 열에 나오면 덱마다 다른 자리에 놓았다는 뜻입니다.");
   };
   const chartFor=x=>{ const m=x.match(/^\[차트:(\S+)\s*(.*)\]$/); if(!m) return "";
     return m[1]==="구간"?chartBands(m[2]):m[1]==="레벨"?chartLevels():m[1]==="성격"?chartPers(m[2]):m[1]==="공명"?chartReso(m[2]):m[1]==="열"?chartRows():""; };
@@ -279,6 +283,13 @@ async function main(){
       lines.forEach(x=>{ if(x.startsWith("[차트:")){ flush(); h+=chartFor(x); } else if(x.startsWith("- ")) ul.push(x.slice(2)); else { flush(); h+=`<p>${numB(x)}</p>`; } }); flush();
       return `<article><h3>${esc(r["제목"])}</h3>${h}</article>`;
     }).join("");
+    /* 그래프 등장 효과: 화면에 들어오면 막대가 자라고 점이 나타남 */
+    const figs=[...$("analysis").querySelectorAll(".an-chart")];
+    if(figs.length&&"IntersectionObserver" in window&&!matchMedia("(prefers-reduced-motion: reduce)").matches){
+      figs.forEach(f=>f.classList.add("anim"));
+      const io=new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }),{threshold:.2});
+      figs.forEach(f=>io.observe(f));
+    }
   }
 
   /* 티어 */
@@ -290,7 +301,7 @@ async function main(){
   }).join("");
 
   /* 막대 */
-  $("bars").innerHTML=stats.map(s=>`<div class="bar" style="--c:${col(s.n)}"><span class="n">${esc(s.n)}</span>
+  $("bars").innerHTML=stats.map(s=>`<div class="bar" data-n="${esc(s.n)}" style="--c:${col(s.n)}"><span class="n">${esc(s.n)}</span>
     <span class="track" role="img" aria-label="${esc(s.n)} 채용률 ${pct(s.r,1)}"><i style="width:${s.r*100}%"></i></span>
     <span class="v">${pct(s.r,1)} <small>${s.c}덱</small></span></div>`).join("")
     +`<div class="legend">${[...ATTRS,"미분류"].map(a=>`<span style="--c:var(--${a})">${a}</span>`).join("")}</div>`;
@@ -312,31 +323,114 @@ async function main(){
     </div><span class="cnt">${s.c}덱 <small>${pct(s.c/N)}</small></span></div>`).join("")
     :'<p class="empty">모든 덱이 표준 덱과 같습니다.</p>';
 
+  /* ===== 순위 지정: 한 번 고른 범위로 성격 원 그래프·열별 도넛·칸 합계·사도별 채용률이 같이 움직인다 (트릭컬 레코드 '순위 지정' 참고) ===== */
+  const RMX=Math.max(...ranks), STILL=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const PRESETS=[[1,RMX,"전체"]].concat(RMX>150?[[1,100],[101,200],[201,RMX]]:[[1,Math.round(RMX/2)],[Math.round(RMX/2)+1,RMX]]);
+  const pk=p=>PORDER.includes(p)?p:"미분류";
+  const rangeSubs=[]; let ranged=false;
+  const setRange=(lo,hi)=>{ ranged=true; lo=Math.max(1,Math.min(RMX,lo||1)); hi=Math.max(1,Math.min(RMX,hi||RMX)); if(lo>hi) [lo,hi]=[hi,lo];
+    if(!decks.some(d=>d.rank>=lo&&d.rank<=hi)) return; rangeSubs.forEach(f=>f(lo,hi)); };
+  /* 범위 버튼 묶음: 어디서 바꿔도 모든 묶음의 버튼·입력칸이 같은 범위를 가리킨다 */
+  const rangeCtl=box=>{
+    box.insertAdjacentHTML("beforeend",`<div class="pie-ctl">${PRESETS.map((p,i)=>`<button type="button" data-i="${i}"${i?"":' class="on"'}>${p[2]||`${p[0]}~${p[1]}위`}</button>`).join("")}
+      <span class="pie-range"><input type="number" min="1" max="${RMX}" value="1" aria-label="시작 순위"><span>~</span><input type="number" min="1" max="${RMX}" value="${RMX}" aria-label="끝 순위"><button type="button" data-apply>적용</button></span></div>`);
+    const ctl=box.lastElementChild, ins=ctl.querySelectorAll("input");
+    ctl.querySelectorAll("button[data-i]").forEach(b=>b.onclick=()=>{ const p=PRESETS[+b.dataset.i]; setRange(p[0],p[1]); });
+    ctl.querySelector("[data-apply]").onclick=()=>setRange(+ins[0].value,+ins[1].value);
+    ins.forEach(x=>x.onkeydown=e=>{ if(e.key==="Enter") setRange(+ins[0].value,+ins[1].value); });
+    rangeSubs.push((lo,hi)=>{ ins[0].value=lo; ins[1].value=hi; ctl.querySelectorAll("button[data-i]").forEach(b=>{ const p=PRESETS[+b.dataset.i]; b.classList.toggle("on",p[0]===lo&&p[1]===hi); }); });
+  };
+  /* 범위 안 편성 칸의 성격 수 (idx = 칸 번호, 생략하면 9칸 전부). 공명 사도는 고른 성격으로 센다 */
+  const persCount=(lo,hi,idx)=>{ const c={}; let t=0, n=0;
+    decksRaw.forEach(r=>{ const rk=parseInt(r["순위"],10); if(!(rk>=lo&&rk<=hi)) return; n++;
+      (idx||slotKeys.map((_,i)=>i)).forEach(i=>{ const m=(r[slotKeys[i]]||"").trim(); if(!m) return; const p=pk(persOf(m)); c[p]=(c[p]||0)+1; t++; }); });
+    return {c,t,n}; };
+  /* 값 배열을 0.75초 동안 새 값으로 옮기며 매 프레임 그린다 */
+  const tween=(from,to,paint,D=750)=>{ let raf=0; const t0=performance.now(), d=STILL?0:D;
+    const step=now=>{ const k=d?Math.min(1,(now-t0)/d):1, e=1-Math.pow(1-k,3); paint(from.map((f,i)=>Array.isArray(f)?f.map((x,j)=>x+(to[i][j]-x)*e):f+(to[i]-f)*e)); if(k<1) raf=requestAnimationFrame(step); };
+    raf=requestAnimationFrame(step); return ()=>cancelAnimationFrame(raf); };
+
   /* 성격 분포 */
-  const ac={}; let tot=0;
-  decks.forEach(d=>d.raw.forEach(m=>{ const a=ATTRS.includes(ATTR[m])?ATTR[m]:"미분류"; ac[a]=(ac[a]||0)+1; tot++; }));
-  const aList=[...ATTRS,"미분류"].filter(a=>ac[a]);
-  $("stack").innerHTML=aList.map(a=>`<i style="--c:var(--${a});flex:${ac[a]}" title="${a} ${pct(ac[a]/tot,1)}">${ac[a]/tot>=.08?pct(ac[a]/tot):""}</i>`).join("");
   const ENEMY=((cur&&cur["적 성격"])||INFO["적 성격"]||"").trim();
   const BEATS={"광기":"순수","순수":"냉정","냉정":"광기","활발":"우울","우울":"활발"};
   const good=ATTRS.filter(a=>BEATS[a]===ENEMY);
   const bad=ATTRS.filter(a=>BEATS[ENEMY]===a&&!["활발","우울"].includes(a));
   const mark=a=>good.includes(a)?' <b>유리</b>':bad.includes(a)?' <b class="bad">불리</b>':'';
-  $("stackLegend").innerHTML=aList.map(a=>`<span style="--c:var(--${a})">${a} ${pct(ac[a]/tot,1)}${mark(a)}</span>`).join("");
-  /* 열별 성격 구성 도넛 — 게임 화면 순서(후열·중열·전열) */
+
+  /* 전체 칸 합계 막대: 조각 폭(flex-grow)이 CSS로 부드럽게 바뀐다 */
+  const stackEl=$("stack"), stackCap=document.querySelector(".stack-cap");
+  stackEl.innerHTML=PORDER.map(a=>`<i style="--c:var(--${a})" data-a="${a}"></i>`).join("");
+  rangeSubs.push((lo,hi)=>{ const {c,t}=persCount(lo,hi);
+    stackEl.querySelectorAll("i").forEach(e=>{ const a=e.dataset.a, v=c[a]||0; e.style.flexGrow=v; e.title=v?`${a} ${pct(v/t,1)}`:""; e.textContent=v/t>=.08?pct(v/t):""; });
+    $("stackLegend").innerHTML=PORDER.filter(a=>c[a]).map(a=>`<span style="--c:var(--${a})">${a} ${pct(c[a]/t,1)}${mark(a)}</span>`).join("");
+    if(stackCap) stackCap.textContent=lo===1&&hi===RMX?"전체 칸 합계":`${lo}~${hi}위 칸 합계`; });
+
+  /* 열별 성격 구성 도넛 — 게임 화면 순서(후열·중열·전열), 범위를 바꾸면 조각이 움직인다 */
   const cd=$("colDonuts");
   if(cd&&slotKeys.length===9){
     const COLS=[["후열",[6,7,8]],["중열",[3,4,5]],["전열",[0,1,2]]];
     cd.hidden=false;
-    cd.innerHTML=COLS.map(([nm,idx])=>{
-      const c={}; let t=0;
-      decksRaw.forEach(r=>idx.forEach(i=>{ const m=(r[slotKeys[i]]||"").trim(); if(!m) return;
-        const a=ATTRS.includes(ATTR[m])?ATTR[m]:"미분류"; c[a]=(c[a]||0)+1; t++; }));
-      const list=[...ATTRS,"미분류"].filter(a=>c[a]).sort((x,y)=>c[y]-c[x]);
-      return `<figure class="donut-card"><div class="donut" style="background:${conic(list.map(a=>[c[a],`var(--${a})`]))}" role="img" aria-label="${nm} 성격 구성: ${list.map(a=>`${a} ${pct(c[a]/t)}`).join(", ")}"><div class="hole"><b>${nm}</b><small>${t}칸</small></div></div>
-        <figcaption>${list.map(a=>`<span class="lg-row"><i style="background:var(--${a})"></i>${a} <b>${c[a]/t<0.005?"1% 미만":pct(c[a]/t)}</b></span>`).join("")}</figcaption></figure>`;
-    }).join("");
+    cd.innerHTML=COLS.map(([nm])=>`<figure class="donut-card"><div class="donut" role="img"><div class="hole"><b>${nm}</b><small></small></div></div><figcaption></figcaption></figure>`).join("");
+    const figs=[...cd.querySelectorAll(".donut-card")];
+    let vals=COLS.map(()=>PORDER.map(()=>0)), stop=()=>{};
+    const paint=v=>{ vals=v; figs.forEach((f,j)=>{ const s=v[j].reduce((a,b)=>a+b,0); f.querySelector(".donut").style.background=s>0.001?conic(PORDER.map((k,i)=>[v[j][i],`var(--${k})`])):"var(--line)"; }); };
+    paint(vals);
+    rangeSubs.push((lo,hi)=>{
+      const to=COLS.map(([nm,idx],j)=>{ const {c,t}=persCount(lo,hi,idx), list=PORDER.filter(a=>c[a]).sort((x,y)=>c[y]-c[x]);
+        figs[j].querySelector(".hole small").textContent=`${t}칸`;
+        figs[j].querySelector(".donut").setAttribute("aria-label",`${lo}~${hi}위 ${nm} 성격 구성: ${list.map(a=>`${a} ${pct(c[a]/t)}`).join(", ")}`);
+        figs[j].querySelector("figcaption").innerHTML=list.map(a=>`<span class="lg-row"><i style="background:var(--${a})"></i>${a} <b>${c[a]/t<0.005?"1% 미만":pct(c[a]/t)}</b></span>`).join("");
+        return PORDER.map(k=>t?(c[k]||0)/t:0); });
+      stop(); stop=tween(vals,to,paint); });
   }
+
+  /* 움직이는 성격 원 그래프: 순위 범위를 바꾸면 조각이 새 비율로 움직인다 */
+  const pieBox=$("persPie");
+  if(pieBox){
+    pieBox.innerHTML=`<div class="pie-wrap"><svg viewBox="0 0 220 220" class="pie" role="img" aria-label="순위 범위별 성격 비율"></svg><div class="pie-side"></div></div>`;
+    const side=pieBox.querySelector(".pie-side"); rangeCtl(side);
+    side.insertAdjacentHTML("beforeend",`<ul class="pie-legend"></ul><p class="pie-note"></p>`);
+    const svg=pieBox.querySelector("svg"), leg=side.querySelector(".pie-legend"), note=side.querySelector(".pie-note");
+    const arc=(a0,a1)=>{ const R=100,r=60,P=(a,q)=>[(110+q*Math.sin(a)).toFixed(2),(110-q*Math.cos(a)).toFixed(2)]; if(a1-a0>=Math.PI*2-1e-4) a1=a0+Math.PI*2-1e-3;
+      const lg=a1-a0>Math.PI?1:0,[x0,y0]=P(a0,R),[x1,y1]=P(a1,R),[x2,y2]=P(a1,r),[x3,y3]=P(a0,r); return `M${x0} ${y0}A${R} ${R} 0 ${lg} 1 ${x1} ${y1}L${x2} ${y2}A${r} ${r} 0 ${lg} 0 ${x3} ${y3}Z`; };
+    let lab=["",""];
+    const draw=v=>{ let a=0; svg.innerHTML=PORDER.map((k,i)=>{ const w=v[i]*Math.PI*2, mid=a+w/2;
+        const s=w>0.002?`<path d="${arc(a,a+w)}" fill="var(--${k})"><title>${k} ${(v[i]*100).toFixed(1)}%</title></path>`:"";
+        const t=v[i]>=0.06?`<text x="${(110+80*Math.sin(mid)).toFixed(1)}" y="${(114-80*Math.cos(mid)).toFixed(1)}" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">${Math.round(v[i]*100)}%</text>`:"";
+        a+=w; return s+t; }).join("")+`<text x="110" y="106" text-anchor="middle" font-size="13" fill="var(--muted)">${lab[0]}</text><text x="110" y="126" text-anchor="middle" font-size="16" font-weight="700" fill="var(--ink)">${lab[1]}</text>`; };
+    let pv=PORDER.map(()=>0), stop=()=>{};
+    rangeSubs.push((lo,hi)=>{ const {c,t,n}=persCount(lo,hi), v=PORDER.map(k=>t?(c[k]||0)/t:0); lab=[`${lo}~${hi}위`,`${n}덱`];
+      leg.innerHTML=PORDER.map((k,i)=>v[i]>0?`<li><i style="background:var(--${k})"></i>${k}<b>${(v[i]*100).toFixed(1)}%</b></li>`:"").join("");
+      note.textContent=`${lo}~${hi}위 ${n}덱 · 편성 칸 ${t}칸 기준 · 공명 사도는 고른 성격으로 셈 · 아래 열별 도넛과 칸 합계, 위 사도별 채용률도 같이 바뀝니다`;
+      stop(); stop=tween(pv,v,x=>{ pv=x; draw(x); }); });
+    draw(pv);
+  }
+
+  /* 사도별 채용률 막대: 범위를 바꾸면 막대 길이가 바뀌고 순서가 다시 정렬된다 */
+  const barsEl=$("bars");
+  if(barsEl){
+    const top=document.createElement("div"); top.className="bars-ctl"; barsEl.before(top); rangeCtl(top);
+    top.insertAdjacentHTML("beforeend",`<p class="pie-note"></p>`); const bnote=top.lastElementChild;
+    const rowsB=Object.fromEntries([...barsEl.querySelectorAll(".bar")].map(e=>[e.dataset.n,e])), legEl=barsEl.querySelector(".legend");
+    rangeSubs.push((lo,hi)=>{ const ds=decks.filter(d=>d.rank>=lo&&d.rank<=hi), n=ds.length, c={};
+      ds.forEach(d=>new Set(d.members).forEach(m=>c[m]=(c[m]||0)+1));
+      const order=stats.map(s=>({n:s.n,c:c[s.n]||0})).sort((a,b)=>b.c-a.c||rateOf[b.n]-rateOf[a.n]||a.n.localeCompare(b.n,"ko"));
+      const before=STILL?null:Object.fromEntries(order.map(o=>[o.n,rowsB[o.n].getBoundingClientRect().top]));
+      order.forEach(o=>{ const e=rowsB[o.n]; e.querySelector(".track i").style.width=(o.c/n*100)+"%";
+        e.querySelector(".track").setAttribute("aria-label",`${o.n} ${lo}~${hi}위 채용률 ${pct(o.c/n,1)}`);
+        e.querySelector(".v").innerHTML=`${pct(o.c/n,1)} <small>${o.c}덱</small>`; e.classList.toggle("zero",!o.c); barsEl.insertBefore(e,legEl); });
+      if(before){ const moved=order.map(o=>[rowsB[o.n],before[o.n]-rowsB[o.n].getBoundingClientRect().top]).filter(x=>Math.abs(x[1])>1);
+        moved.forEach(([e,dy])=>{ e.style.transition="none"; e.style.transform=`translateY(${dy}px)`; });
+        barsEl.offsetHeight; moved.forEach(([e])=>{ e.style.transition=""; e.style.transform=""; }); }
+      bnote.textContent=`${lo}~${hi}위 ${n}덱 기준 · 0덱인 사도는 흐리게 아래로 내려갑니다`; });
+  }
+
+  /* 처음 그리기: 원 그래프가 화면에 들어오면 전체 범위로 움직이며 채운다 */
+  const firstRange=()=>{ if(!ranged) setRange(1,RMX); };
+  /* 원 그래프·열별 도넛·칸 합계 중 하나라도 화면에 들어오면 시작 (빠르게 스크롤해 원 그래프를 건너뛰어도 비지 않게) */
+  const watch=[pieBox,cd&&!cd.hidden?cd:null,stackEl].filter(Boolean);
+  if(watch.length&&!STILL&&"IntersectionObserver" in window){ const io=new IntersectionObserver(es=>{ if(es.some(e=>e.isIntersecting)){ io.disconnect(); firstRange(); } },{threshold:.1}); watch.forEach(w=>io.observe(w)); }
+  else firstRange();
   if(ENEMY){
     const ml=$("matchLead"); ml.hidden=false;
     ml.textContent=ENEMY==="성격 없음"
@@ -389,7 +483,7 @@ async function main(){
     }
   }
 
-  $("stackLead").textContent=`전체 편성 칸(덱 수 × ${slotKeys.length}) 중 각 성격이 차지한 비율입니다.`;
+  $("stackLead").textContent=`편성 칸(덱 수 × ${slotKeys.length}) 중 각 성격이 차지한 비율입니다. 공명 사도는 고른 성격으로 셌습니다. 순위 범위를 바꾸면 원 그래프·열별 도넛·칸 합계가 같이 움직입니다.`;
   if(cur) document.title=`${cur["표시이름"]||cur["시즌ID"]} — ${CFG.titleSuffix||"트릭컬 리바이브 PvE 상위권 덱 리포트"}`;
 
   /* 조사 방법 & 데이터 점검 */
