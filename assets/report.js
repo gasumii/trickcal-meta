@@ -79,7 +79,7 @@ async function main(){
       $("gnbIn").innerHTML=`<a class="brand" href="${CFG.brandHref}">${esc(CFG.brand)}</a>`+contents.map(c=>{
         const list=seasons.filter(r=>r["콘텐츠"]===c).slice().reverse();
         const items=list.length?list.map(r=>`<li><a href="?s=${encodeURIComponent(r["시즌ID"])}"${r===cur?' aria-current="page"':''}>${esc(r["표시이름"]||r["시즌ID"])}${r["조사일"]?`<small>조사일 ${esc(r["조사일"])}</small>`:""}</a></li>`).join("")
-          :`<li class="empty">아직 기록 없음 — 시즌 종료 후 추가 예정</li>`;
+          :`<li class="empty">아직 기록이 없습니다. 시즌이 끝나면 추가합니다</li>`;
         return `<details${c===cur["콘텐츠"]?' class="cur"':''}><summary>${esc(c)}</summary><ul class="menu">${items}</ul></details>`;
       }).join("");
       const dets=[...nav.querySelectorAll("details")];
@@ -249,7 +249,7 @@ async function main(){
     const keys=PORDER.filter(k=>rows.some(r=>r.c[k]));
     let s=`<text x="20" y="22" fill="var(--muted)">순위 구간별 편성 칸의 성격 비율</text>`+legendP(keys,50);
     s+=rows.map((r,i)=>stackRow(72+i*44,r.label,keys.map(k=>[k,r.c[k]||0]))).join("");
-    return fig(72+rows.length*44+10,s,"막대 하나가 순위 구간 하나입니다. 그 구간에 편성된 칸 전체를 100%로 놓고 성격별 비율을 색으로 나눴습니다(공명 사도는 고른 성격으로 셈). 위아래 막대에서 같은 색 조각의 길이를 비교하면, 순위가 내려갈수록 어떤 성격이 늘고 줄었는지 보입니다. 8% 미만 조각은 숫자를 생략했고, 막대에 마우스를 올리면 정확한 값이 나옵니다.");
+    return fig(72+rows.length*44+10,s,"막대 하나가 순위 구간 하나입니다. 그 구간에 편성된 칸 전체를 100%로 놓고 성격별 비율을 색으로 나눴습니다(공명 사도는 고른 성격으로 셌습니다). 위아래 막대에서 같은 색 조각의 길이를 비교하면, 순위가 내려갈수록 어떤 성격이 늘고 줄었는지 보입니다. 8% 미만 조각은 숫자를 생략했고, 막대에 마우스를 올리면 정확한 값이 나옵니다.");
   };
   const chartReso=arg=>{
     const bs=parseBands(arg);
@@ -293,7 +293,7 @@ async function main(){
   }
 
   /* 티어 */
-  $("tierLead").textContent="채용률 기준: "+TIERS.slice(0,-1).map(t=>`${t.name} ${pct(t.min)} 이상`).join(", ")+", 그 외 채용 10% 미만.";
+  $("tierLead").textContent="채용률 기준은 "+TIERS.slice(0,-1).map(t=>`${t.name} ${pct(t.min)} 이상`).join(", ")+", 그 외는 채용 10% 미만입니다.";
   $("tiers").innerHTML=TIERS.map(t=>{
     const list=stats.filter(s=>tierOf(s.r)===t);
     return `<div class="tier" style="--t:${t.color}"><div class="lab"><b>${t.name}</b><small>${list.length}명</small></div>
@@ -401,7 +401,7 @@ async function main(){
     let pv=PORDER.map(()=>0), stop=()=>{};
     rangeSubs.push((lo,hi)=>{ const {c,t,n}=persCount(lo,hi), v=PORDER.map(k=>t?(c[k]||0)/t:0); lab=[`${lo}~${hi}위`,`${n}덱`];
       leg.innerHTML=PORDER.map((k,i)=>v[i]>0?`<li><i style="background:var(--${k})"></i>${k}<b>${(v[i]*100).toFixed(1)}%</b></li>`:"").join("");
-      note.textContent=`${lo}~${hi}위 ${n}덱 · 편성 칸 ${t}칸 기준 · 공명 사도는 고른 성격으로 셈 · 아래 열별 도넛과 칸 합계, 위 사도별 채용률도 같이 바뀝니다`;
+      note.textContent=`${lo}~${hi}위 ${n}덱 · 편성 칸 ${t}칸 기준입니다. 공명 사도는 고른 성격으로 셌고, 아래 열별 도넛과 칸 합계, 위 사도별 채용률도 같이 바뀝니다.`;
       stop(); stop=tween(pv,v,x=>{ pv=x; draw(x); }); });
     draw(pv);
   }
@@ -422,7 +422,7 @@ async function main(){
       if(before){ const moved=order.map(o=>[rowsB[o.n],before[o.n]-rowsB[o.n].getBoundingClientRect().top]).filter(x=>Math.abs(x[1])>1);
         moved.forEach(([e,dy])=>{ e.style.transition="none"; e.style.transform=`translateY(${dy}px)`; });
         barsEl.offsetHeight; moved.forEach(([e])=>{ e.style.transition=""; e.style.transform=""; }); }
-      bnote.textContent=`${lo}~${hi}위 ${n}덱 기준 · 0덱인 사도는 흐리게 아래로 내려갑니다`; });
+      bnote.textContent=`${lo}~${hi}위 ${n}덱 기준입니다. 0덱인 사도는 흐리게 아래로 내려갑니다.`; });
   }
 
   /* 처음 그리기: 원 그래프가 화면에 들어오면 전체 범위로 움직이며 채운다 */
