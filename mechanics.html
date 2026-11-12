@@ -189,8 +189,6 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
     <button role="tab" aria-selected="false" data-sub="skills">스킬 판정표</button>
     <button role="tab" aria-selected="false" data-sub="exp">실험 기록</button>
     <button role="tab" aria-selected="false" data-sub="items">아티팩트·스펠</button>
-    <button role="tab" aria-selected="false" data-sub="gimmick">보스 기믹</button>
-    <button role="tab" aria-selected="false" data-sub="icons">아이콘 사전</button>
     <button role="tab" aria-selected="false" data-sub="terms">상태·용어 사전</button>
     <button role="tab" aria-selected="false" data-sub="fix">정정 기록</button>
   </div>
@@ -265,20 +263,6 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
     <div class="items" id="items"></div>
   </section>
 
-  <section id="sub-gimmick" class="sub" hidden>
-    <p class="note">보스 기믹과 대응 방법, 그 대응에 맞는 효과를 가진 사도를 스킬 판정표에서 자동으로 찾아 보여 줍니다(괄호 안 숫자 = 해당 효과 줄 수, 우로스 열반은 1회 감소량 초). 교주의 권능·시즌 규칙은 시즌마다 달라 제외했습니다.</p>
-    <div class="chips" id="gmChips"></div>
-    <div class="exps" id="gimmicks"></div>
-    <h2 style="font-size:1.3rem">대응 태그별 사도</h2>
-    <div class="tbl"><table><thead><tr><th>대응 태그</th><th>판정 기준</th><th>사도</th><th>쓰이는 기믹</th></tr></thead><tbody id="gtags"></tbody></table></div>
-  </section>
-
-  <section id="sub-icons" class="sub" hidden>
-    <p class="note">버프·디버프 아이콘 83개의 효과를 정리한 유저 자료를 바탕으로, 이 DB의 스킬 설명과 어긋나거나 근거가 되는 부분을 연결했습니다. 게임 스킬 설명과 다르면 게임 설명을 기준으로 봅니다. 출처: <a href="https://arca.live/b/trickcal/120778351" rel="noopener">아카라이브 트릭컬 채널 「버프/디버프 총 정리」 (2024-11-08)</a></p>
-    <div class="controls"><div class="chips" id="icChips"></div><label class="f" for="icq" style="flex:1 1 200px">검색<input id="icq" type="search" placeholder="예: 기절, 보호막"></label></div>
-    <div class="tbl" style="max-height:640px"><table><thead><tr><th>번호</th><th>이름</th><th>구분</th><th>효과 (자료 기준)</th><th>수치</th><th>DB 연결·검증 메모</th></tr></thead><tbody id="icons"></tbody></table></div>
-  </section>
-
   <section id="sub-terms" class="sub" hidden>
     <p class="note">트릭컬은 같은 효과에도 고유 상태 이름(존속·신성 등)을 씁니다. 상태 이름을 표준 효과 유형으로 묶어두면 사도가 달라도 같은 기준으로 비교할 수 있습니다.</p>
     <div class="chips" id="termChips"></div>
@@ -328,10 +312,10 @@ addEventListener("hashchange",fromHash); fromHash();
 const opt=async n=>{try{return await load("data/battle/"+n+".csv");}catch(_){return [];}};
 const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일반 공격 (강화)","어사이드2","어사이드3"];
 (async()=>{
-  let SK,TERMS,EXPS,FIXES,GM,GT,IC,CK;
+  let SK,TERMS,EXPS,FIXES,CK;
   try{[SK,TERMS,EXPS,FIXES]=await Promise.all(["skills","terms","experiments","fixes"].map(n=>load("data/battle/"+n+".csv")));}
   catch(e){showError(e);return;}
-  [GM,GT,IC,CK]=await Promise.all(["gimmicks","gimmick_tags","icons","checks"].map(opt));
+  [CK]=await Promise.all(["checks"].map(opt));
   await loadSadoInfo();
   const NAMES=[...new Set(SK.map(s=>s["사도"]))];
   /* 효과 ID → 관련 실험 */
@@ -590,28 +574,6 @@ const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일
   }
   $("judge").addEventListener("click",e=>{const b=e.target.closest("button[data-sado]");if(b)showSado(b.dataset.sado);});
   renderJudge();
-  /* 보스 기믹 */
-  const TAG={};GT.forEach(t=>TAG[t["대응 태그"]]=t);
-  const who=t=>{const r=TAG[t];if(!r||!r["대응 가능 사도"])return "";return r["대응 가능 사도"].split(/,\s*/).filter(Boolean).map(x=>{const m=x.match(/^(.*)\(([\d.]+)\)$/);const n=m?m[1]:x;return `<span>${face(n,22)}${esc(n)}${m?` <small class="conf">${esc(m[2])}</small>`:""}</span>`;}).join("");};
-  let gC="";const contents=[...new Set(GM.map(g=>g["콘텐츠"]))];
-  $("gmChips").innerHTML=[`<button aria-pressed="true" data-c="">전체</button>`,...contents.map(c=>`<button aria-pressed="false" data-c="${esc(c)}">${esc(c)}</button>`)].join("");
-  $("gmChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;gC=b.dataset.c;$("gmChips").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderGm();});
-  function renderGm(){
-    $("gimmicks").innerHTML=GM.filter(g=>!gC||g["콘텐츠"]===gC).map(g=>`<article class="panel gm"><span class="pill${/기준|확인/.test(g["확인 상태"])?"":" off"}" style="justify-self:start">${esc(g["콘텐츠"])} · ${esc(g["확인 상태"])}</span>
-      <h3>${esc(g["보스"])} — ${esc(g["기믹"])}</h3><dl>${g["변형·성격"]?`<dt>변형</dt><dd>${esc(g["변형·성격"])}</dd>`:""}${g["내용"]?`<dt>내용</dt><dd>${esc(g["내용"])}</dd>`:""}${g["대응 방법"]?`<dt>대응</dt><dd>${esc(g["대응 방법"])}</dd>`:""}${g["실전 메모"]?`<dt>실전 메모</dt><dd>${esc(g["실전 메모"])}</dd>`:""}</dl>
-      ${["대응 태그 1","대응 태그 2"].filter(k=>g[k]).map(k=>`<div style="display:grid;gap:4px"><strong style="font-size:.85rem">${esc(g[k])}</strong><div class="who">${who(g[k])||'<span class="note">해당 사도 없음</span>'}</div></div>`).join("")}
-      ${g["출처"]?`<div class="src">출처: ${esc(g["출처"])}</div>`:""}</article>`).join("")||`<p class="note">기믹 데이터가 없습니다.</p>`;
-  }
-  renderGm();
-  $("gtags").innerHTML=GT.map(t=>`<tr><td style="white-space:nowrap"><strong>${esc(t["대응 태그"])}</strong><br><span class="conf">${esc(t["사도 수"])}명</span></td><td class="memo">${esc(t["판정 기준"])}</td><td><div class="who" style="display:flex;flex-wrap:wrap;gap:4px">${who(t["대응 태그"])}</div></td><td class="memo">${esc(t["쓰이는 기믹"])}</td></tr>`).join("");
-  /* 아이콘 사전 */
-  let icG="";const ig=[...new Set(IC.map(i=>i["구분"]).filter(Boolean))];
-  $("icChips").innerHTML=[`<button aria-pressed="true" data-g="">전체 ${IC.length}</button>`,...ig.map(g=>`<button aria-pressed="false" data-g="${esc(g)}">${esc(g)}</button>`)].join("");
-  $("icChips").addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;icG=b.dataset.g;$("icChips").querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderIc();});
-  $("icq").addEventListener("input",renderIc);
-  function renderIc(){const q=$("icq").value.trim();
-    $("icons").innerHTML=IC.filter(i=>(!icG||i["구분"]===icG)&&(!q||Object.values(i).join(" ").includes(q))).map(i=>`<tr><td class="num" style="text-align:left">${esc(i["번호"])}</td><td style="white-space:nowrap"><strong>${esc(i["이름"])}</strong>${i["상태사전 연결"]?`<br><span class="conf">사전: ${esc(i["상태사전 연결"])}</span>`:""}</td><td style="white-space:nowrap">${esc(i["구분"])}<br><span class="conf">${esc(i["아이콘 색"])}</span></td><td style="white-space:pre-line">${esc(i["설명"])}</td><td>${esc(i["수치"])}</td><td class="memo">${esc(i["DB 연결·검증 메모"])}</td></tr>`).join("");}
-  renderIc();
   /* 용어 사전 */
   let tg=""; const groups=[...new Set(TERMS.map(t=>t["구분"]))]; const tc=$("termChips");
   tc.innerHTML=[`<button aria-pressed="true" data-g="">전체 ${TERMS.length}</button>`,...groups.map(g=>`<button aria-pressed="false" data-g="${esc(g)}">${esc(g)}</button>`)].join("");

@@ -2,7 +2,7 @@
 
 게임 내 PvE 순위 화면의 상위권 덱을 직접 기록하고, 사도 채용률·티어·메타를 정리한 사이트입니다.
 
-상단 탭: **PvE 기록 분석**(`index.html`) / **글로벌 PvE 분석**(`global.html`) / **전투 메커니즘**(`mechanics.html` — 스킬 판정표·사도 카드·보스 기믹·아이콘 사전·상태·용어 사전·검증 사례·실험 기록·정정 기록) / **덱 계산기**(`calculator.html` — 편성 판·고급 옵션) / 업데이트 기록(`changelog.html`)
+상단 탭: **PvE 기록 분석**(`index.html`) / **글로벌 PvE 분석**(`global.html`) / **전투 메커니즘**(`mechanics.html` — 사도로 보기·판정으로 보기·스킬 판정표·상태·용어 사전·검증 사례·실험 기록·정정 기록) / **덱 계산기**(`calculator.html` — 편성 판·고급 옵션) / 업데이트 기록(`changelog.html`)
 콘텐츠(대충돌, 프론티어 등)가 끝날 때마다 시즌 단위로 데이터를 쌓고, 같은 콘텐츠의 이전 시즌과 채용률 변화를 자동으로 비교합니다.
 
 ## 파일 구성
@@ -14,8 +14,8 @@
 - `data/battle/skills.csv` — 사도 스킬 판정표 (효과 1개 = 1줄, 게임 원문 제외) — 2026-11-07 기준 사도 137명 · 효과 1,907줄
 - `data/battle/terms.csv` — 상태·용어 사전 (130개)
 - `data/battle/sado_info.csv` — 사도별 성격·열·역할·공격 타입·얼굴 이미지 파일명
-- `data/battle/gimmicks.csv`, `gimmick_tags.csv` — 보스 기믹과 대응 태그별 사도 (엑셀에서 자동 계산된 값)
-- `data/battle/icons.csv` — 버프·디버프 아이콘 사전 (아카라이브 「버프/디버프 총 정리」 + DB 연결 메모)
+- `data/battle/gimmicks.csv`, `gimmick_tags.csv` — 보스 기믹과 대응 태그별 사도 (엑셀에서 자동 계산된 값, 11/13부터 화면에는 표시하지 않음)
+- `data/battle/icons.csv` — 버프·디버프 아이콘 사전 (아카라이브 「버프/디버프 총 정리」 + DB 연결 메모, 11/13부터 화면에는 표시하지 않음)
 - `data/battle/growth.csv` — 실험 EXP-13(문서 대조)의 근거 수치
 - `data/battle/checks.csv` — 스킬 설명 점검 묶음 (손으로 관리)
 - `data/changelog.csv` — 업데이트 기록 (손으로 관리)
