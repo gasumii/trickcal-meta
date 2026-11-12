@@ -88,6 +88,35 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
 .gr[data-g="전설"]{border-color:#B07AE0;color:#8A4FC8}.gr[data-g="희귀"]{border-color:#4A8FE0;color:#2F6FC0}
 .item .att{font-size:.78rem;color:var(--muted);border-top:1px dashed var(--line);padding-top:6px}
 .item.nodata{opacity:.75}
+/* 스킬 판정표 세부 필터 */
+.fgrid{display:grid;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.frow{display:grid;grid-template-columns:76px 1fr;gap:4px 12px;align-items:start}
+.fl{font-size:.82rem;color:var(--muted);padding-top:4px;white-space:nowrap}
+.fbody{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chips.sm button{font-size:.8rem;padding:3px 10px}
+.chips.sm button small{font-size:.72rem;opacity:.7;margin-left:3px;font-family:var(--mono)}
+.chips.sm button.zero:not([aria-pressed="true"]){opacity:.45}
+.chips.sm button.grp{border-style:dashed}
+.chips.sm .sep{width:1px;align-self:stretch;background:var(--line);margin:0 2px}
+.fbody select,.fbody input{font:inherit;font-size:.82rem;padding:3px 8px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);min-width:0}
+.fbody input{flex:1 1 180px}
+.freset{font:inherit;font-size:.82rem;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:8px;padding:4px 10px;cursor:pointer}
+#cnt b{color:var(--ink)}
+.tier{display:inline-block;margin-top:4px;font-size:.72rem;font-weight:700;padding:0 7px;border-radius:6px;border:1px solid var(--line);color:var(--muted);cursor:help}
+.tier[data-t="S"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.tier[data-t="A"]{background:var(--leaf);border-color:var(--leaf);color:var(--paper)}
+.tier[data-t="B"]{border-color:var(--leaf);color:var(--leaf)}
+@media (max-width:600px){.frow{grid-template-columns:1fr}.fl{padding-top:0}}
+/* 고른 조건 강조: 칸 배경 + 왼쪽 띠, 머리글 표시, 행 태그, 발동 조건 단어 */
+#skills td.fh{background:color-mix(in srgb,var(--leaf) 16%,var(--paper));box-shadow:inset 4px 0 0 var(--leaf);font-weight:700}
+/* 필터를 쓰는 동안 발동 조건·수치는 핵심 정보로 진하게 */
+#skills td.key{background:color-mix(in srgb,var(--warn) 12%,var(--paper));color:var(--ink);font-weight:600}
+#skills td.key.fh{background:color-mix(in srgb,var(--leaf) 16%,var(--paper))}
+#sub-skills thead th.key{color:var(--warn)}
+#sub-skills thead th.fh{color:var(--leaf);box-shadow:inset 0 -3px 0 var(--leaf)}
+#sub-skills thead th.fh::after{content:" ●";font-size:.7em}
+#skills mark.fc{background:var(--leaf);color:var(--paper);font-weight:700;padding:0 3px}
+.ftag{display:block;margin-top:5px;min-width:11ch;max-width:16ch;font-family:var(--body);font-size:.7rem;line-height:1.35;font-weight:700;color:var(--leaf);border:1px solid var(--leaf);border-radius:6px;padding:1px 5px;white-space:normal;word-break:keep-all}
 </style>
 </head>
 <body>
@@ -112,10 +141,21 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
   <section id="sub-skills" class="sub" hidden>
     <div class="panel" style="display:grid;gap:12px">
       <div class="chips" id="chips"></div>
+      <div class="fgrid" id="fgrid">
+        <div class="frow"><span class="fl">효과 유형</span><div class="fbody"><div class="chips sm" id="fType"></div><select id="ftype" aria-label="다른 효과 유형 추가"><option value="">+ 다른 효과 유형</option></select></div></div>
+        <div class="frow"><span class="fl">대상</span><div class="fbody"><div class="chips sm" id="fTgt"></div></div></div>
+        <div class="frow"><span class="fl">스킬 구분</span><div class="fbody"><div class="chips sm" id="fKind"></div></div></div>
+        <div class="frow"><span class="fl">발동 조건</span><div class="fbody"><div class="chips sm" id="fCond"></div><input id="fcond" type="search" placeholder="조건에 들어간 말, 예: 피격, HP"></div></div>
+        <div class="frow"><span class="fl">지속</span><div class="fbody"><div class="chips sm" id="fDur"></div></div></div>
+        <div class="frow"><span class="fl">픽 티어</span><div class="fbody"><div class="chips sm" id="fTier"></div></div></div>
+      </div>
+      <p class="note" id="tierNote"></p>
+      <p class="note">같은 줄 안에서는 하나라도 맞으면(또는), 줄끼리는 모두 맞아야(그리고) 나옵니다. 칩의 숫자는 다른 조건을 그대로 두고 그 칩을 더했을 때의 효과 줄 수입니다. 아래 표에서는 고른 조건이 걸린 칸을 파란 바탕으로, 발동 조건·수치 칸을 주황 바탕으로 표시하고, 발동 조건에서 걸린 단어를 진하게 칠하며, ID 아래 태그에 그 줄이 걸린 조건을 모아 적습니다.</p>
       <div class="controls">
-        <label class="f" for="ftype">효과 유형<select id="ftype"><option value="">전체</option></select></label>
         <label class="f" for="fq" style="flex:1 1 220px">검색<input id="fq" type="search" placeholder="예: 무적, 방어력, 존속"></label>
         <label class="note" style="display:flex;gap:6px;align-items:center;white-space:nowrap"><input id="fmemo" type="checkbox">검증 포인트까지 검색</label>
+        <label class="f" for="fsort">정렬<select id="fsort"><option value="pick">많이 쓰인 사도 순</option><option value="id">ID 순</option></select></label>
+        <button type="button" class="freset" id="freset">조건 초기화</button>
         <span class="note" id="cnt"></span>
         <a class="note" id="cardHint" href="#items" hidden></a>
       </div>
@@ -226,18 +266,129 @@ const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일
   const chips=$("chips");
   chips.innerHTML=[`<button aria-pressed="true" data-n="">전체</button>`,...NAMES.map(n=>`<button aria-pressed="false" data-n="${esc(n)}">${esc(n)}</button>`)].join("");
   chips.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;fName=b.dataset.n;chips.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));renderSk();});
-  $("ftype").innerHTML+=[...new Set(SK.map(s=>s["효과 유형"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ko")).map(t=>`<option>${esc(t)}</option>`).join("");
-  $("ftype").addEventListener("change",renderSk); $("fq").addEventListener("input",renderSk); $("fmemo").addEventListener("change",renderSk);
+  /* 세부 필터: 줄(그룹) 안은 OR, 줄끼리는 AND */
+  const ALL_TYPES=[...new Set(SK.map(s=>s["효과 유형"]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ko"));
+  const QUICK_TYPES=["회복","지속 회복","보호막","무적","부활","받는 피해 감소","회복량 증가","받는 회복량 증가","타겟 불가","CC 면역","디버프 해제"].filter(t=>ALL_TYPES.includes(t));
+  const ALLY=["아군 전체","아군 일부(조건)","아군 단일"],FOE=["적 단일","적 일부(조건)","적 전체"];
+  const TGT_ORDER=["자신",...ALLY,...FOE];
+  const tgtVals=[...TGT_ORDER.filter(v=>SK.some(s=>s["대상"]===v)),...[...new Set(SK.map(s=>s["대상"]).filter(v=>v&&!TGT_ORDER.includes(v)))]];
+  const kindVals=ORDER.filter(k=>SK.some(s=>s["스킬 구분"]===k)).concat([...new Set(SK.map(s=>s["스킬 구분"]).filter(k=>k&&!ORDER.includes(k)))]);
+  const COND_RE={"상시":/상시/,"HP 조건":/HP/,"피격 시":/피격/,"처치 시":/처치/,"저학년 스킬":/저학년/,"고학년 스킬":/고학년/,"일반·강화 공격":/일반 공격|기본 공격|강화 공격/,"주기(…초마다)":/[\d.]*\s*초마다/,"자신 제외":/자신 제외/};
+  const COND=Object.fromEntries(Object.entries(COND_RE).map(([k,re])=>[k,c=>re.test(c)]));
+  const reEsc=t=>t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  /* 발동 조건 칸: 고른 조건 단어(fc)와 검색어를 한 번에 표시 */
+  function condMarks(raw,q){
+    raw=raw==null?"":String(raw);
+    const parts=[...F.cond].map(k=>COND_RE[k].source);const ct=condText();if(ct)parts.push(reEsc(ct));
+    const all=parts.slice();if(q)all.push(reEsc(q));
+    if(!all.length)return esc(raw);
+    const re=new RegExp(all.map(x=>"(?:"+x+")").join("|"),"g"),fre=parts.length?new RegExp("^(?:"+parts.join("|")+")$"):null;
+    let out="",i=0;raw.replace(re,(m,...a)=>{const at=a[a.length-2];if(!m)return m;out+=esc(raw.slice(i,at))+(fre&&fre.test(m)?`<mark class="fc">${esc(m)}</mark>`:`<mark>${esc(m)}</mark>`);i=at+m.length;return m;});
+    return out+esc(raw.slice(i));
+  }
+  /* 행에서 걸린 조건 이름 */
+  const durLabel=d=>Object.keys(DUR).find(k=>F.dur.has(k)&&DUR[k](d));
+  const durSec=d=>{const m=String(d||"").match(/^([\d.]+)\s*초/);return m?+m[1]:null;};
+  const DUR={"즉시·표기 없음":d=>!d||d==="-","5초 이하":d=>{const n=durSec(d);return n!=null&&n<=5;},"6~10초":d=>{const n=durSec(d);return n!=null&&n>5&&n<=10;},"10초 초과":d=>{const n=durSec(d);return n!=null&&n>10;},"그 밖의 표기":d=>d&&d!=="-"&&durSec(d)==null};
+  /* 국내 시즌 덱 기록 → 사도별 픽률 점수와 티어 (시즌마다 같은 비중) */
+  const PICK={};let PSEAS=[];
+  try{
+    PSEAS=(await load("data/seasons.csv")).filter(x=>x["시즌ID"]);
+    const decks=await Promise.all(PSEAS.map(x=>load(`data/seasons/${x["시즌ID"]}/decks.csv`).catch(()=>[])));
+    PSEAS=PSEAS.map((x,i)=>({...x,decks:decks[i]})).filter(x=>x.decks.length);
+    PSEAS.forEach(x=>{const c={};x.decks.forEach(d=>{new Set(Array.from({length:9},(_,i)=>(d["사도"+(i+1)]||"").replace(/\[.*?\]/g,"").trim()).filter(Boolean)).forEach(n=>c[n]=(c[n]||0)+1);});
+      Object.entries(c).forEach(([n,v])=>{(PICK[n]=PICK[n]||{per:{}}).per[x["표시이름"]]=v/x.decks.length;});});
+    Object.values(PICK).forEach(p=>{const r=Object.values(p.per);p.avg=r.reduce((a,b)=>a+b,0)/PSEAS.length;p.max=Math.max(...r);
+      p.tier=p.avg>=.7?"S":(p.avg>=.25||p.max>=.9)?"A":(p.avg>=.05||p.max>=.3)?"B":"C";});
+  }catch(_){}
+  const TIERS=["S","A","B","C","기록 없음"];
+  const tierOf=n=>PICK[n]?PICK[n].tier:"기록 없음";
+  const pickScore=n=>PICK[n]?PICK[n].avg+PICK[n].max/1000:-1;
+  const pct=v=>(v*100>=10||v===0?Math.round(v*100):(v*100).toFixed(1))+"%";
+  const pickTitle=n=>PICK[n]?`평균 픽률 ${pct(PICK[n].avg)} · 최고 시즌 ${pct(PICK[n].max)}\n`+PSEAS.map(x=>`${x["표시이름"]}: ${pct(PICK[n].per[x["표시이름"]]||0)}`).join("\n"):"국내 시즌 덱 기록에 없음";
+  $("tierNote").textContent=PSEAS.length?`픽 티어 — 국내 ${PSEAS.length}시즌(${PSEAS.map(x=>x["콘텐츠"]+" "+x.decks.length+"덱").join(" · ")}) 기록에서 사도별 시즌 픽률을 구해, 시즌마다 같은 비중으로 평균했습니다. S: 평균 70% 이상 · A: 평균 25% 이상 또는 한 시즌 90% 이상 · B: 평균 5% 이상 또는 한 시즌 30% 이상 · C: 한 번이라도 기록됨. '많이 쓰인 사도 순'은 평균 픽률이 높은 사도부터 보여 줍니다. 사도 이름 옆 배지에 마우스를 올리면 시즌별 픽률이 나옵니다.`:"";
+  const F={type:new Set(),tgt:new Set(),kind:new Set(),cond:new Set(),dur:new Set(),tier:new Set()};
+  let extraTypes=[];
+  const TEST={
+    type:(s,set)=>set.has(s["효과 유형"]),
+    tgt:(s,set)=>set.has(s["대상"]),
+    kind:(s,set)=>set.has(s["스킬 구분"]),
+    cond:(s,set)=>[...set].some(k=>COND[k](s["발동 조건"]||"")),
+    dur:(s,set)=>[...set].some(k=>DUR[k]((s["지속"]||"").trim())),
+    tier:(s,set)=>set.has(tierOf(s["사도"]))
+  };
+  const condText=()=>$("fcond").value.trim();
+  /* except: 이 그룹은 빼고 나머지 조건만 적용 (칩 숫자 계산용) */
+  function pass(s,except){
+    if(fName&&s["사도"]!==fName) return false;
+    for(const g in F){ if(g===except||!F[g].size) continue; if(!TEST[g](s,F[g])) return false; }
+    const ct=condText(); if(ct&&!(s["발동 조건"]||"").includes(ct)) return false;
+    return true;
+  }
+  const chipBtn=(g,v,label,cls="")=>`<button type="button" class="${cls}" data-g="${g}" data-v="${esc(v)}" aria-pressed="false">${esc(label)}<small></small></button>`;
+  function buildChips(){
+    const types=[...QUICK_TYPES,...extraTypes.filter(t=>!QUICK_TYPES.includes(t))];
+    $("fType").innerHTML=types.map(t=>chipBtn("type",t,t)).join("");
+    $("fTgt").innerHTML=chipBtn("tgt","자신","자신만")+`<span class="sep"></span>`+chipBtn("tgtAlly","","다른 아군 모두","grp")
+      +tgtVals.filter(v=>v!=="자신").map(v=>(v===FOE[0]?`<span class="sep"></span>`:"")+chipBtn("tgt",v,v)).join("");
+    $("fKind").innerHTML=kindVals.map(k=>chipBtn("kind",k,k)).join("");
+    $("fCond").innerHTML=Object.keys(COND).map(k=>chipBtn("cond",k,k)).join("");
+    $("fDur").innerHTML=Object.keys(DUR).map(k=>chipBtn("dur",k,k)).join("");
+    $("fTier").innerHTML=TIERS.map(t=>chipBtn("tier",t,t==="기록 없음"?t:t+" 티어")).join("");
+  }
+  function syncChips(){
+    $("fgrid").querySelectorAll("button[data-g]").forEach(b=>{
+      const g=b.dataset.g,v=b.dataset.v;
+      if(g==="tgtAlly"){
+        const on=ALLY.every(a=>!tgtVals.includes(a)||F.tgt.has(a));
+        b.setAttribute("aria-pressed",on);
+        const n=SK.filter(s=>pass(s,"tgt")&&ALLY.includes(s["대상"])).length;
+        b.querySelector("small").textContent=n; b.classList.toggle("zero",!n); return;
+      }
+      b.setAttribute("aria-pressed",F[g].has(v));
+      const one=new Set([v]);
+      const n=SK.filter(s=>pass(s,g)&&TEST[g](s,one)).length;
+      b.querySelector("small").textContent=n; b.classList.toggle("zero",!n);
+    });
+  }
+  $("fgrid").addEventListener("click",e=>{const b=e.target.closest("button[data-g]");if(!b)return;
+    const g=b.dataset.g,v=b.dataset.v;
+    if(g==="tgtAlly"){const on=b.getAttribute("aria-pressed")==="true";ALLY.forEach(a=>on?F.tgt.delete(a):F.tgt.add(a));}
+    else F[g].has(v)?F[g].delete(v):F[g].add(v);
+    renderSk();});
+  $("ftype").innerHTML+=ALL_TYPES.filter(t=>!QUICK_TYPES.includes(t)).map(t=>`<option>${esc(t)}</option>`).join("");
+  $("ftype").addEventListener("change",()=>{const t=$("ftype").value;if(!t)return;if(!extraTypes.includes(t)){extraTypes.push(t);buildChips();}F.type.add(t);$("ftype").value="";renderSk();});
+  $("fcond").addEventListener("input",renderSk);
+  $("freset").addEventListener("click",()=>{Object.values(F).forEach(s=>s.clear());$("fcond").value="";$("fq").value="";renderSk();});
+  $("fsort").addEventListener("change",renderSk);
+  buildChips();
+  $("fq").addEventListener("input",renderSk); $("fmemo").addEventListener("change",renderSk);
   function renderSk(){
-    const t=$("ftype").value,q=$("fq").value.trim();
-    const rows=SK.filter(s=>(!fName||s["사도"]===fName)&&(!t||s["효과 유형"]===t)&&(!q||hit(s,q)));
-    const memoOnly=q&&!$("fmemo").checked?SK.filter(s=>(!fName||s["사도"]===fName)&&(!t||s["효과 유형"]===t)&&!hit(s,q)&&(s["검증 포인트"]||"").includes(q)).length:0;
-    const main=q?rows.filter(s=>isMain(s,q)).length:0; if(q) rows.sort((a,b)=>isMain(b,q)-isMain(a,q));
-    $("cnt").textContent=(q?`효과·상태 일치 ${main} · 언급만 ${rows.length-main} · `:"")+(memoOnly?`검증 포인트에만 나온 ${memoOnly}개 제외 · `:"")+`${rows.length}개 효과 / 전체 ${SK.length} · 사도 ${NAMES.length}명`;
+    const q=$("fq").value.trim();
+    syncChips();
+    const base=SK.filter(s=>pass(s));
+    const rows=base.filter(s=>!q||hit(s,q));
+    const memoOnly=q&&!$("fmemo").checked?base.filter(s=>!hit(s,q)&&(s["검증 포인트"]||"").includes(q)).length:0;
+    const main=q?rows.filter(s=>isMain(s,q)).length:0;
+    const byPick=$("fsort").value==="pick";
+    rows.sort((a,b)=>(q?isMain(b,q)-isMain(a,q):0)||(byPick?pickScore(b["사도"])-pickScore(a["사도"])||a["사도"].localeCompare(b["사도"],"ko"):0)||(parseInt(a.ID.slice(3))-parseInt(b.ID.slice(3))));
+    const nSado=new Set(rows.map(s=>s["사도"])).size;
+    const picked=[...F.type,...F.tgt,...F.kind,...F.cond,...F.dur,...F.tier].length+(condText()?1:0);
+    $("cnt").innerHTML=(q?`효과·상태 일치 ${main} · 언급만 ${rows.length-main} · `:"")+(memoOnly?`검증 포인트에만 나온 ${memoOnly}개 제외 · `:"")+`<b>${rows.length}</b>개 효과 · 사도 <b>${nSado}</b>명 / 전체 ${SK.length}줄 · ${NAMES.length}명`+(picked?` · 조건 ${picked}개`:"");
     const H=v=>hl(esc(v),q);
-    $("skills").innerHTML=rows.map(s=>`<tr><td class="num" style="text-align:left">${esc(s.ID)}</td><td style="white-space:nowrap">${face(s["사도"],24)} ${esc(s["사도"])} <span class="per" data-p="${esc(s["성격"])}">${esc(s["성격"])}</span></td>
-      <td style="white-space:nowrap">${esc(s["스킬 구분"])}${s["스킬명"]?`<br><span class="conf">${H(s["스킬명"])}</span>`:""}</td><td>${H(s["효과 유형"])}${s["상태 이름"]?`<br><span class="conf">${H(s["상태 이름"])}</span>`:""}${q&&!isMain(s,q)?`<br><span class="ment">'${esc(q)}' 언급 · ${whereHit(s,q)}</span>`:""}</td><td style="white-space:nowrap">${H(s["대상"])}</td>
-      <td class="cond">${H(s["발동 조건"])}</td><td class="val">${vals(s["수치"],q)}</td><td style="white-space:nowrap">${H(s["지속"])}</td><td class="conf">${esc(s["확실도"])}${s["근거 유형"]?`<br><span style="white-space:normal">${esc(s["근거 유형"])}</span>`:""}</td><td class="memo">${(EXP_OF[s.ID]||[]).map(e=>`<a class="exl" href="#exp=${e}">${e}</a>`).join("")}${memo(s["검증 포인트"],$("fmemo").checked?q:"")}</td></tr>`).join("");
+    const on={type:F.type.size>0,tgt:F.tgt.size>0,kind:F.kind.size>0,cond:F.cond.size>0||!!condText(),dur:F.dur.size>0,tier:F.tier.size>0};
+    const COLS={2:"kind",3:"type",4:"tgt",5:"cond",7:"dur"};
+    const anyOn=Object.values(on).some(Boolean);
+    document.querySelectorAll("#sub-skills thead th").forEach((th,i)=>{th.classList.toggle("fh",!!(COLS[i]&&on[COLS[i]]));th.classList.toggle("key",anyOn&&(i===5||i===6));});
+    const fh=g=>on[g]?" fh":"",key=anyOn?" key":"";
+    const tags=s=>{const t=[];if(on.type)t.push(s["효과 유형"]);if(on.tgt)t.push(s["대상"]==="자신"?"자신만":s["대상"]);if(on.kind)t.push(s["스킬 구분"]);
+      if(on.cond){[...F.cond].filter(k=>COND[k](s["발동 조건"]||"")).forEach(k=>t.push(k));if(condText())t.push(`'${condText()}'`);}
+      if(on.dur)t.push("지속 "+durLabel((s["지속"]||"").trim()));
+      if(on.tier)t.push(tierOf(s["사도"])==="기록 없음"?"픽 기록 없음":tierOf(s["사도"])+" 티어");
+      return t.length?`<span class="ftag" title="걸린 조건">${t.map(esc).join(" · ")}</span>`:"";};
+    $("skills").innerHTML=rows.map(s=>`<tr><td class="num" style="text-align:left">${esc(s.ID)}${tags(s)}</td><td style="white-space:nowrap">${face(s["사도"],24)} ${esc(s["사도"])} <span class="per" data-p="${esc(s["성격"])}">${esc(s["성격"])}</span><br><span class="tier" data-t="${esc(tierOf(s["사도"]))}" title="${esc(pickTitle(s["사도"]))}">${PICK[s["사도"]]?esc(tierOf(s["사도"]))+" · 픽 "+pct(PICK[s["사도"]].avg):"픽 기록 없음"}</span></td>
+      <td class="${fh("kind").trim()}" style="white-space:nowrap">${esc(s["스킬 구분"])}${s["스킬명"]?`<br><span class="conf">${H(s["스킬명"])}</span>`:""}</td><td class="${fh("type").trim()}">${H(s["효과 유형"])}${s["상태 이름"]?`<br><span class="conf">${H(s["상태 이름"])}</span>`:""}${q&&!isMain(s,q)?`<br><span class="ment">'${esc(q)}' 언급 · ${whereHit(s,q)}</span>`:""}</td><td class="${fh("tgt").trim()}" style="white-space:nowrap">${H(s["대상"])}</td>
+      <td class="cond${fh("cond")}${key}">${condMarks(s["발동 조건"],q)}</td><td class="val${key}">${vals(s["수치"],q)}</td><td class="${fh("dur").trim()}" style="white-space:nowrap">${H(s["지속"])}</td><td class="conf">${esc(s["확실도"])}${s["근거 유형"]?`<br><span style="white-space:normal">${esc(s["근거 유형"])}</span>`:""}</td><td class="memo">${(EXP_OF[s.ID]||[]).map(e=>`<a class="exl" href="#exp=${e}">${e}</a>`).join("")}${memo(s["검증 포인트"],$("fmemo").checked?q:"")}</td></tr>`).join("");
   }
   renderSk();
   /* 사도 카드 */
