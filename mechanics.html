@@ -117,6 +117,62 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
 #sub-skills thead th.fh::after{content:" ●";font-size:.7em}
 #skills mark.fc{background:var(--leaf);color:var(--paper);font-weight:700;padding:0 3px}
 .ftag{display:block;margin-top:5px;min-width:11ch;max-width:16ch;font-family:var(--body);font-size:.7rem;line-height:1.35;font-weight:700;color:var(--leaf);border:1px solid var(--leaf);border-radius:6px;padding:1px 5px;white-space:normal;word-break:keep-all}
+/* 11/13 사도로 보기 · 판정으로 보기 — 스킬 구분 4열 공통 */
+:root{--c-dmg:#3A4150;--c-buff:#2F5FB3;--c-def:#1F7A6B;--c-heal:#4E9A5B;--c-cc:#C46A1C;--c-rev:#7A5BC4;--c-deb:#B23B3F;--c-etc:#9AA1AD;
+  --k-base:#9AA1AD;--k-enh:#3A4150;--k-low:#2F5FB3;--k-high:#C46A1C;--k-a2:#1F7A6B;--k-a3:#7A5BC4;--track:#EEF0F3}
+@media (prefers-color-scheme:dark){:root{--c-dmg:#B9C0CC;--c-buff:#8FB2F0;--c-def:#5FC2AF;--c-heal:#7BC98A;--c-cc:#E3A35E;--c-rev:#B39BEB;--c-deb:#F08A8D;--c-etc:#6C7380;
+  --k-base:#6C7380;--k-enh:#B9C0CC;--k-low:#8FB2F0;--k-high:#E3A35E;--k-a2:#5FC2AF;--k-a3:#B39BEB;--track:#262A31}}
+.pick{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+.pick input[type=search]{flex:0 1 240px}
+.pick .lbl{font-size:.82rem;color:var(--muted)}
+.pick .more{margin-left:auto}
+.col4{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px;align-items:start}
+.col4>section{display:grid;gap:0;align-content:start;min-width:0}
+.col4 .ch{display:grid;gap:1px;padding-bottom:8px}
+.col4 .ch .k{font-size:.75rem;font-weight:700;color:var(--leaf);letter-spacing:.02em}
+.col4 .ch h3{font-size:1.02rem}
+.col4 .ch .m{font-size:.76rem;color:var(--muted)}
+.col4 .sg{font-size:.78rem;font-weight:700;color:var(--muted);padding:10px 0 2px}
+.col4 .none{font-size:.84rem;color:var(--muted);padding:10px 0;border-top:1px solid var(--line)}
+.ef{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:2px 8px;padding:9px 0;border-top:1px solid var(--line);font-size:.86rem;line-height:1.45}
+.ef .dot{width:10px;height:10px;border-radius:50%;margin-top:6px;background:var(--c-etc)}
+.ef .t b{font-weight:700}
+.ef .s{font-size:.78rem;color:var(--muted)}
+.ef .cd{font-size:.78rem;color:var(--warn)}
+.ef .r{display:grid;gap:3px;justify-items:end;align-content:start}
+.ef .r a{font-family:var(--mono);font-size:.7rem;color:var(--muted);text-decoration:none}
+.ef .r a:hover{color:var(--leaf);text-decoration:underline}
+.mk{font-size:.68rem;font-weight:700;padding:0 6px;border-radius:5px;white-space:nowrap}
+.mk.ok{background:var(--leaf-soft);color:var(--leaf)}.mk.est{background:color-mix(in srgb,var(--warn) 16%,var(--paper));color:var(--warn)}.mk.etc{border:1px solid var(--line);color:var(--muted)}
+.dot.dmg{background:var(--c-dmg)}.dot.buff{background:var(--c-buff)}.dot.def{background:var(--c-def)}.dot.heal{background:var(--c-heal)}.dot.cc{background:var(--c-cc)}.dot.rev{background:var(--c-rev)}.dot.deb{background:var(--c-deb)}
+.lgd{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);align-items:center}
+.lgd .dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.lgd .sw{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.bars{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,330px),1fr));gap:8px 32px}
+.bar{display:grid;grid-template-columns:minmax(90px,120px) minmax(0,1fr) 58px;gap:10px;align-items:center;font-size:.84rem}
+.bar .tk{height:16px;background:var(--track);border-radius:4px;display:flex;overflow:hidden}
+.bar .tk i{display:block;height:100%}
+.bar .v{font-family:var(--mono);font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.k-base{background:var(--k-base)}.k-enh{background:var(--k-enh)}.k-low{background:var(--k-low)}.k-high{background:var(--k-high)}.k-a2{background:var(--k-a2)}.k-a3{background:var(--k-a3)}
+.tk i.c{background-image:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--paper) 60%,transparent) 5px 9px)}
+.tk i.e{background:transparent!important;box-shadow:inset 0 0 0 2px var(--k-a3)}
+.sw.c{background-image:repeating-linear-gradient(135deg,var(--muted) 0 4px,transparent 4px 7px)}
+.sw.e{box-shadow:inset 0 0 0 2px var(--muted)}
+.scale{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+.jq{font-size:1rem}
+.jq b{color:var(--leaf)}
+.sc{display:grid;gap:2px;padding:10px 0;border-top:1px solid var(--line);font-size:.86rem;line-height:1.45}
+.sc .nm{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.sc .nm button{font:inherit;font-weight:700;background:none;border:0;padding:0;color:var(--ink);cursor:pointer;display:inline-flex;gap:6px;align-items:center;text-align:left}
+.sc .nm button:hover{color:var(--leaf)}
+.sc .s{font-size:.78rem;color:var(--muted)}
+.sc .cd{font-size:.78rem;color:var(--warn)}
+.sc .id{font-family:var(--mono);font-size:.7rem;color:var(--muted)}
+.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:18px 32px}
+.cmp h3{font-size:.92rem}
+.cmp .bar .tk i{background:var(--c-heal)}
+.cmp .bar .tk i.lv1{background-image:repeating-linear-gradient(135deg,transparent 0 5px,color-mix(in srgb,var(--paper) 60%,transparent) 5px 9px)}
+.allwall[hidden]{display:none}
 </style>
 </head>
 <body>
@@ -128,9 +184,10 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
   <div class="error" id="error" hidden></div>
   <div class="subtabs" role="tablist">
     <button role="tab" aria-selected="true" data-sub="cases">검증 사례</button>
-    <button role="tab" aria-selected="false" data-sub="exp">실험 기록</button>
+    <button role="tab" aria-selected="false" data-sub="cards">사도로 보기</button>
+    <button role="tab" aria-selected="false" data-sub="judge">판정으로 보기</button>
     <button role="tab" aria-selected="false" data-sub="skills">스킬 판정표</button>
-    <button role="tab" aria-selected="false" data-sub="cards">사도 카드</button>
+    <button role="tab" aria-selected="false" data-sub="exp">실험 기록</button>
     <button role="tab" aria-selected="false" data-sub="items">아티팩트·스펠</button>
     <button role="tab" aria-selected="false" data-sub="gimmick">보스 기믹</button>
     <button role="tab" aria-selected="false" data-sub="icons">아이콘 사전</button>
@@ -168,9 +225,29 @@ td.val span+span{margin-top:4px;padding-top:4px;border-top:1px dashed var(--line
   </section>
 
   <section id="sub-cards" class="sub" hidden>
-    <p class="note">사도 한 명의 효과를 스킬별로 모아 봅니다. 수치는 스킬 Lv10 기준(게임 미리보기·나무위키 대조)입니다.</p>
-    <div class="panel"><div class="chips faces" id="cardChips"></div></div>
+    <p class="note">사도 한 명의 효과를 일반 공격 · 저학년 · 고학년 · 어사이드 네 칸으로 나눠 한 화면에 봅니다. 위 막대는 아군 전체에 주는 % 수치를 스킬별 색으로 쌓은 요약입니다. 행 오른쪽의 ID를 누르면 스킬 판정표에서 검증 포인트까지 볼 수 있습니다.</p>
+    <div class="panel" style="display:grid;gap:12px">
+      <div class="pick">
+        <label class="lbl" for="cardQ">사도</label>
+        <input id="cardQ" type="search" list="cardList" placeholder="이름 검색 (예: 벨라, 비비)" autocomplete="off">
+        <datalist id="cardList"></datalist>
+        <span class="lbl" id="cardRecentL">최근 본 사도</span>
+        <div class="chips faces" id="cardRecent"></div>
+        <button type="button" class="freset more" id="cardAll" aria-expanded="false">전체 사도 펼치기</button>
+      </div>
+      <div class="chips faces allwall" id="cardChips" hidden></div>
+    </div>
     <div id="card"></div>
+  </section>
+
+  <section id="sub-judge" class="sub" hidden>
+    <p class="note">효과와 대상을 고르면, 그 판정을 가진 사도를 같은 네 칸(일반 공격 · 저학년 · 고학년 · 어사이드)에 모아 보여 줍니다. 수치는 단위(공격력의 % · 최대 HP의 % · 입힌 피해의 % 등)가 다르면 비교할 수 없어, 아래 막대는 기준이 같은 것끼리만 묶습니다.</p>
+    <div class="panel" style="display:grid;gap:10px">
+      <div class="frow"><span class="fl">효과</span><div class="fbody"><div class="chips sm" id="jType"></div><select id="jtype" aria-label="다른 효과 추가"><option value="">+ 다른 효과</option></select></div></div>
+      <div class="frow"><span class="fl">대상</span><div class="fbody"><div class="chips sm" id="jTgt"></div></div></div>
+      <p class="jq" id="jSum" style="margin:4px 0 0"></p>
+    </div>
+    <div id="judge"></div>
   </section>
 
   <section id="sub-items" class="sub" hidden>
@@ -391,22 +468,128 @@ const ORDER=["저학년 스킬","고학년 스킬","일반 공격 (기본)","일
       <td class="cond${fh("cond")}${key}">${condMarks(s["발동 조건"],q)}</td><td class="val${key}">${vals(s["수치"],q)}</td><td class="${fh("dur").trim()}" style="white-space:nowrap">${H(s["지속"])}</td><td class="conf">${esc(s["확실도"])}${s["근거 유형"]?`<br><span style="white-space:normal">${esc(s["근거 유형"])}</span>`:""}</td><td class="memo">${(EXP_OF[s.ID]||[]).map(e=>`<a class="exl" href="#exp=${e}">${e}</a>`).join("")}${memo(s["검증 포인트"],$("fmemo").checked?q:"")}</td></tr>`).join("");
   }
   renderSk();
-  /* 사도 카드 */
-  let cName=NAMES[0];
+  /* ── 공통: 스킬 구분 4열 · 효과 분류 · 표시 ── */
+  const COLS4=[
+    {k:"일반 공격",subs:[["일반 공격 (기본)","기본"],["일반 공격 (강화)","강화"]]},
+    {k:"저학년 스킬",subs:[["저학년 스킬",""]]},
+    {k:"고학년 스킬",subs:[["고학년 스킬",""]]},
+    {k:"어사이드",subs:[["어사이드2","2단계"],["어사이드3","3단계"]]}];
+  const KCLS={"일반 공격 (기본)":"k-base","일반 공격 (강화)":"k-enh","저학년 스킬":"k-low","고학년 스킬":"k-high","어사이드2":"k-a2","어사이드3":"k-a3"};
+  const KSHORT={"일반 공격 (기본)":"기본 공격","일반 공격 (강화)":"강화 공격","저학년 스킬":"저학년","고학년 스킬":"고학년","어사이드2":"어사이드 2","어사이드3":"어사이드 3"};
+  const CAT_OF=g=>{g=g||"";
+    if(/^부활$/.test(g))return "rev";
+    if(/공격 피해|지속 피해/.test(g))return "dmg";
+    if(/회복|^SP 회복/.test(g)&&!/^SP/.test(g))return "heal";
+    if(/기절|도발|행동불가|침묵|넉백|둔화|속박|변이/.test(g))return "cc";
+    if(/받는 피해 감소|보호막$|무적|CC 면역|타겟 불가|방어력 증가|저항 증가|디버프 해제/.test(g))return "def";
+    if(/대기시간 감소/.test(g))return "buff";
+    if(/받는 .*증가|감소$|보호막 파괴|대기시간 증가/.test(g))return "deb";
+    if(/증가|SP 회복/.test(g))return "buff";
+    return "";};
+  const LEGEND=`<div class="lgd"><span><i class="dot dmg"></i>공격 피해</span><span><i class="dot buff"></i>강화</span><span><i class="dot deb"></i>약화</span><span><i class="dot def"></i>방어</span><span><i class="dot heal"></i>회복</span><span><i class="dot cc"></i>도발·기절 등</span><span><i class="dot rev"></i>부활</span></div>`;
+  const MK=s=>{const c=s["확실도"]||"";if(c==="실측 확인")return `<span class="mk ok" title="실험으로 동작 확인">실측 확인</span>`;if(c==="추정"||c==="미확정")return `<span class="mk est">${esc(c)}</span>`;if(c==="화면 확인")return `<span class="mk etc">화면 확인</span>`;return "";};
+  const isCond=s=>/\(조건\)/.test(s["상태 이름"]||"")||(!/상시/.test(s["발동 조건"]||"")&&/보유|발동 시|상태일 때|상태 시|유지 중|상태에서/.test(s["발동 조건"]||""));
+  const valTxt=s=>[s["수치"]&&s["수치"]!=="-"?s["수치"]:"",s["지속"]&&s["지속"]!=="-"?s["지속"]:""].filter(Boolean).join(" · ");
+  function goSkill(id,name){
+    document.querySelector('.subtabs [data-sub="skills"]').click();
+    const b=document.querySelector(`#chips [data-n="${CSS.escape(name)}"]`);if(b)b.click();
+    $("fq").value=id;$("fq").dispatchEvent(new Event("input"));scrollTo(0,0);}
+  document.addEventListener("click",e=>{const a=e.target.closest("a[data-sk]");if(!a)return;e.preventDefault();goSkill(a.dataset.sk,a.dataset.n);});
+  /* ── 사도로 보기 ── */
+  const RKEY="tm-recent-sado";
+  let recent=[];try{recent=JSON.parse(localStorage.getItem(RKEY)||"[]").filter(n=>NAMES.includes(n));}catch(_){recent=[];}
+  let cName=recent[0]||(NAMES.includes("벨라")?"벨라":NAMES[0]);
   const cc=$("cardChips");
-  function renderCardChips(){cc.innerHTML=NAMES.map(n=>`<button aria-pressed="${n===cName}" data-n="${esc(n)}">${face(n,26)}${esc(n)}</button>`).join("");}
-  cc.addEventListener("click",e=>{const b=e.target.closest("button");if(!b)return;cName=b.dataset.n;renderCardChips();renderCard();});
+  $("cardList").innerHTML=NAMES.map(n=>`<option value="${esc(n)}">`).join("");
+  function pickSado(n){if(!NAMES.includes(n))return;cName=n;recent=[n,...recent.filter(x=>x!==n)].slice(0,6);try{localStorage.setItem(RKEY,JSON.stringify(recent));}catch(_){}renderCardChips();renderCard();}
+  window.showSado=n=>{document.querySelector('.subtabs [data-sub="cards"]').click();pickSado(n);scrollTo(0,0);};
+  function renderCardChips(){
+    const rc=[cName,...recent.filter(n=>n!==cName)].slice(0,6);
+    $("cardRecent").innerHTML=rc.map(n=>`<button aria-pressed="${n===cName}" data-n="${esc(n)}">${face(n,24)}${esc(n)}</button>`).join("");
+    if(!cc.hidden)cc.innerHTML=NAMES.map(n=>`<button aria-pressed="${n===cName}" data-n="${esc(n)}">${face(n,26)}${esc(n)}</button>`).join("");}
+  [cc,$("cardRecent")].forEach(box=>box.addEventListener("click",e=>{const b=e.target.closest("button");if(b)pickSado(b.dataset.n);}));
+  $("cardQ").addEventListener("change",()=>{const v=$("cardQ").value.trim();const n=NAMES.find(x=>x===v)||NAMES.find(x=>x.includes(v));if(v&&n){pickSado(n);$("cardQ").value="";}});
+  $("cardQ").addEventListener("keydown",e=>{if(e.key==="Enter")$("cardQ").dispatchEvent(new Event("change"));});
+  $("cardAll").addEventListener("click",()=>{cc.hidden=!cc.hidden;$("cardAll").setAttribute("aria-expanded",!cc.hidden);$("cardAll").textContent=cc.hidden?`전체 사도 펼치기 (${NAMES.length}명)`:"전체 사도 접기";renderCardChips();});
+  $("cardAll").textContent=`전체 사도 펼치기 (${NAMES.length}명)`;
+  function allyBars(rows){
+    const by={};
+    rows.filter(s=>s["대상"]==="아군 전체"&&["buff","def"].includes(CAT_OF(s["효과 유형"]))).forEach(s=>{
+      const v=String(s["수치"]||"");const m=v.match(/[\d.]+%/g);
+      if(!m||m.length!==1||/의\s*[\d.]+%|→|~/.test(v))return;
+      const n=parseFloat(m[0]);if(!(n>0))return;
+      (by[s["효과 유형"]]=by[s["효과 유형"]]||[]).push({n,k:s["스킬 구분"],c:isCond(s),e:s["확실도"]==="추정",id:s.ID,t:`${KSHORT[s["스킬 구분"]]||s["스킬 구분"]} · ${s["수치"]}${s["지속"]&&s["지속"]!=="-"?" · "+s["지속"]:""}${isCond(s)?" · 조건: "+(s["발동 조건"]||""):""}${s["확실도"]==="추정"?" · 추정":""}`});});
+    const list=Object.entries(by).map(([g,seg])=>({g,seg:seg.sort((a,b)=>ORDER.indexOf(a.k)-ORDER.indexOf(b.k)),tot:seg.reduce((a,x)=>a+x.n,0)})).sort((a,b)=>b.tot-a.tot);
+    if(!list.length)return `<p class="note">아군 전체에 주는 % 수치 효과가 없습니다.</p>`;
+    const top=Math.max(80,Math.ceil(Math.max(...list.map(x=>x.tot))/20)*20);
+    const kinds=[...new Set(list.flatMap(x=>x.seg.map(s=>s.k)))].sort((a,b)=>ORDER.indexOf(a)-ORDER.indexOf(b));
+    const fmt=n=>Math.round(n*10)/10+"%";
+    return `<div class="lgd">${kinds.map(k=>`<span><i class="sw ${KCLS[k]||""}"></i>${esc(KSHORT[k]||k)}</span>`).join("")}<span><i class="sw c"></i>빗금 = 조건부</span><span><i class="sw e"></i>테두리 = 추정</span></div>
+      <div class="bars">${list.map(x=>`<div class="bar"><span>${esc(x.g)}</span><span class="tk" role="img" aria-label="${esc(x.g)} ${fmt(x.tot)}">${x.seg.map(s=>`<i class="${KCLS[s.k]||""}${s.c?" c":""}${s.e?" e":""}" style="width:${(s.n/top*100).toFixed(2)}%" title="${esc(s.t)}"></i>`).join("")}</span><span class="v">${fmt(x.tot)}</span></div>`).join("")}</div>
+      <div class="bars"><div class="bar"><span></span><span class="scale"><span>0</span><span>${top/2}%</span><span>${top}%</span></span><span></span></div></div>`;
+  }
+  const efRow=s=>`<div class="ef"><i class="dot ${CAT_OF(s["효과 유형"])}"></i><div style="display:grid;gap:1px;min-width:0"><div class="t">${esc(s["효과 유형"])} <b>${esc(valTxt(s))}</b></div><div class="s">${esc(s["대상"])}${s["상태 이름"]?" · "+esc(s["상태 이름"]):""}</div>${s["발동 조건"]&&!/^상시/.test(s["발동 조건"])?`<div class="cd">조건 · ${esc(s["발동 조건"])}</div>`:`<div class="s">${esc(s["발동 조건"]||"상시")}</div>`}</div><div class="r">${MK(s)}<a href="#skills" data-sk="${esc(s.ID)}" data-n="${esc(s["사도"])}" title="스킬 판정표에서 보기">${esc(s.ID)}</a></div></div>`;
   function renderCard(){
     const rows=SK.filter(s=>s["사도"]===cName),i=SADO_INFO[cName]||{},p=i["성격"]||(rows[0]||{})["성격"];
-    const groups=ORDER.map(g=>[g,rows.filter(r=>r["스킬 구분"]===g)]).filter(([,r])=>r.length);
-    $("card").innerHTML=`<div class="panel" style="display:grid;gap:14px">
-      <div class="card-head">${face(cName,72,p)}<div style="display:grid;gap:4px"><h2>${esc(cName)}</h2><div class="meta"><span class="per" data-p="${esc(p)}">${esc(p)}</span>${["위치","역할","공격 타입"].map(k=>i[k]?`<span class="t">${esc(i[k])}</span>`:"").join("")}<span>효과 ${rows.length}줄</span></div></div></div>
-      <div class="cards-grid">${groups.map(([g,r])=>{const nm=r.find(x=>x["스킬명"])||{},cd=r.find(x=>x["재사용 대기시간"])||{};
-        return `<div class="skillbox"><h3>${esc(g)}${nm["스킬명"]?`<small>${esc(nm["스킬명"])}</small>`:""}${cd["재사용 대기시간"]?`<small>재사용 ${esc(cd["재사용 대기시간"])}</small>`:""}</h3>
-        ${r.map(x=>`<div class="eff"><b>${esc(x["효과 유형"])}</b><span>${esc([x["수치"]&&x["수치"]!=="-"?x["수치"]:"",x["지속"]].filter(Boolean).join(" · "))}</span><span class="d">${esc(x["대상"])}</span><span class="d">${esc(x["발동 조건"])}</span></div>`).join("")}</div>`;}).join("")}</div>
-      <p class="note"><a href="#skills" onclick="document.querySelector('[data-sub=skills]').click();document.querySelector('#chips [data-n=&quot;${esc(cName)}&quot;]').click();return false;">스킬 판정표에서 검증 포인트까지 보기 →</a></p></div>`;
+    const nOk=rows.filter(s=>s["확실도"]==="실측 확인").length,nEst=rows.filter(s=>s["확실도"]==="추정"||s["확실도"]==="미확정").length;
+    $("card").innerHTML=`<div style="display:grid;gap:14px">
+      <div class="panel" style="display:grid;gap:12px">
+        <div class="card-head">${face(cName,64,p)}<div style="display:grid;gap:4px"><h2>${esc(cName)}</h2><div class="meta"><span class="per" data-p="${esc(p)}">${esc(p)}</span>${["위치","역할","공격 타입"].map(k=>i[k]?`<span class="t">${esc(i[k])}</span>`:"").join("")}<span>효과 ${rows.length}줄${nOk?` · 실측 확인 ${nOk}`:""}${nEst?` · 추정·미확정 ${nEst}`:""}</span>${PICK[cName]?`<span class="tier" data-t="${esc(tierOf(cName))}" title="${esc(pickTitle(cName))}">${esc(tierOf(cName))} · 픽 ${pct(PICK[cName].avg)}</span>`:""}</div></div></div>
+        <h3 style="font-size:1rem">아군 전체에 주는 수치</h3>${allyBars(rows)}
+      </div>
+      ${LEGEND}
+      <div class="col4">${COLS4.map(c=>{const rs=rows.filter(r=>c.subs.some(([k])=>r["스킬 구분"]===k));
+        const one=c.subs.length===1,nm=one?[...new Set(rs.map(x=>x["스킬명"]).filter(Boolean))].join(" · "):"",cdr=one?(rs.find(x=>x["재사용 대기시간"])||{})["재사용 대기시간"]:"";
+        return `<section class="panel"><div class="ch"><span class="k">${esc(c.k)}</span>${nm?`<h3>${esc(nm)}</h3>`:""}${cdr?`<span class="m">재사용 ${esc(cdr)}</span>`:""}</div>
+        ${rs.length?c.subs.map(([k,lab])=>{const r=rs.filter(x=>x["스킬 구분"]===k);if(!r.length)return "";const nm=c.subs.length>1?[...new Set(r.map(x=>x["스킬명"]).filter(Boolean))].join(" · "):"";
+          return (lab&&c.subs.length>1?`<div class="sg">${esc(lab)}${nm?" · "+esc(nm):""}</div>`:"")+r.map(efRow).join("");}).join(""):`<div class="none">효과 없음</div>`}</section>`;}).join("")}</div></div>`;
   }
   renderCardChips(); renderCard();
+  /* ── 판정으로 보기 ── */
+  const JQ=["회복","지속 회복","보호막","무적","부활","받는 피해 감소","주는 피해 증가","공격력 증가","공격 속도 증가","도발","기절","디버프 해제"].filter(t=>ALL_TYPES.includes(t));
+  const J={type:new Set(["회복","지속 회복"].filter(t=>ALL_TYPES.includes(t))),tgt:new Set(["아군 전체"])};
+  let jExtra=[];
+  function jChips(){
+    const types=[...JQ,...jExtra.filter(t=>!JQ.includes(t))];
+    const cnt=(g,v)=>SK.filter(s=>(g==="type"?s["효과 유형"]===v:J.type.size?J.type.has(s["효과 유형"]):true)&&(g==="tgt"?s["대상"]===v:J.tgt.size?J.tgt.has(s["대상"]):true)).length;
+    $("jType").innerHTML=types.map(t=>`<button type="button" data-g="type" data-v="${esc(t)}" aria-pressed="${J.type.has(t)}">${esc(t)}<small>${cnt("type",t)}</small></button>`).join("");
+    $("jTgt").innerHTML=tgtVals.map(t=>`<button type="button" data-g="tgt" data-v="${esc(t)}" aria-pressed="${J.tgt.has(t)}" class="${cnt("tgt",t)?"":"zero"}">${esc(t==="자신"?"자신만":t)}<small>${cnt("tgt",t)}</small></button>`).join("");
+  }
+  [$("jType"),$("jTgt")].forEach(box=>box.addEventListener("click",e=>{const b=e.target.closest("button[data-g]");if(!b)return;const S=J[b.dataset.g],v=b.dataset.v;S.has(v)?S.delete(v):S.add(v);renderJudge();}));
+  $("jtype").innerHTML+=ALL_TYPES.filter(t=>!JQ.includes(t)).map(t=>`<option>${esc(t)}</option>`).join("");
+  $("jtype").addEventListener("change",()=>{const t=$("jtype").value;if(!t)return;if(!jExtra.includes(t))jExtra.push(t);J.type.add(t);$("jtype").value="";renderJudge();});
+  const BASIS=[["공격력 기준",/공격력/],["최대 HP 기준",/최대\s*HP|HP의/],["입힌 피해 기준",/입힌 피해|피해량의/]];
+  function basisOf(s){const v=String(s["수치"]||"");const b=BASIS.find(([,re])=>re.test(v));const m=v.match(/([\d,.]+)\s*%/);if(!m)return null;
+    return {b:b?b[0]:"% 수치",n:parseFloat(m[1].replace(/,/g,"")),lv1:/Lv\s*1\b/.test(v),ps:/매초|초당|\/초/.test(v+(s["발동 조건"]||""))};}
+  function renderJudge(){
+    jChips();
+    const rows=SK.filter(s=>(!J.type.size||J.type.has(s["효과 유형"]))&&(!J.tgt.size||J.tgt.has(s["대상"])));
+    const sados=new Set(rows.map(s=>s["사도"]));
+    const tl=[...J.tgt].map(t=>t==="자신"?"자신":t).join(" · ")||"모든 대상",el=[...J.type].join(" · ")||"모든 효과";
+    $("jSum").innerHTML=`<b>${esc(tl)}</b>에게 <b>${esc(el)}</b> 효과 · <b>${rows.length}</b>줄, 사도 <b>${sados.size}</b>명`;
+    if(!rows.length){$("judge").innerHTML=`<p class="note">고른 조합에 해당하는 효과가 없습니다. 효과나 대상을 하나 더 골라 보세요.</p>`;return;}
+    const cols=COLS4.map(c=>({c,rs:rows.filter(r=>c.subs.some(([k])=>r["스킬 구분"]===k))}));
+    const mx=Math.max(1,...cols.map(x=>x.rs.length));
+    const byPick=(a,b)=>pickScore(b["사도"])-pickScore(a["사도"])||a["사도"].localeCompare(b["사도"],"ko");
+    const card=s=>{const i=SADO_INFO[s["사도"]]||{};return `<div class="sc"><div class="nm"><button type="button" data-sado="${esc(s["사도"])}" title="사도로 보기">${face(s["사도"],22)}${esc(s["사도"])}</button><span class="id">${MK(s)} <a href="#skills" data-sk="${esc(s.ID)}" data-n="${esc(s["사도"])}" style="color:inherit">${esc(s.ID)}</a></span></div>
+      <div class="s"><span class="per" data-p="${esc(s["성격"])}">${esc(s["성격"])}</span> ${esc([i["위치"],i["역할"],KSHORT[s["스킬 구분"]],s["스킬명"]].filter(Boolean).join(" · "))}</div>
+      <div>${esc(s["효과 유형"])} <b>${esc(valTxt(s))}</b></div>${s["발동 조건"]&&!/^상시/.test(s["발동 조건"])?`<div class="cd">조건 · ${esc(s["발동 조건"])}</div>`:`<div class="s">${esc(s["발동 조건"]||"상시")}</div>`}</div>`;};
+    const groups={};rows.forEach(s=>{const b=basisOf(s);if(b)(groups[b.b]=groups[b.b]||[]).push({s,...b});});
+    const gOrder=[...BASIS.map(x=>x[0]),"% 수치"].filter(g=>groups[g]);
+    $("judge").innerHTML=`<div style="display:grid;gap:14px">
+      <div class="panel" style="display:grid;gap:8px"><h3 style="font-size:1rem">어느 스킬에 몰려 있나</h3>
+        <div class="bars">${cols.map(x=>`<div class="bar"><span>${esc(x.c.k)}</span><span class="tk"><i class="k-low" style="width:${(x.rs.length/mx*100).toFixed(1)}%"></i></span><span class="v">${x.rs.length}</span></div>`).join("")}</div></div>
+      <div class="col4">${cols.map(x=>`<section class="panel"><div class="ch" style="grid-template-columns:1fr auto;display:grid"><h3>${esc(x.c.k)}</h3><span class="m">${new Set(x.rs.map(s=>s["사도"])).size}명</span></div>
+        ${x.rs.length?x.c.subs.map(([k,lab])=>{const r=x.rs.filter(s=>s["스킬 구분"]===k).sort(byPick);if(!r.length)return "";return (x.c.subs.length>1?`<div class="sg">${esc(lab)}</div>`:"")+r.map(card).join("");}).join(""):`<div class="none">이 조합은 ${esc(x.c.k)}에 없음</div>`}</section>`).join("")}</div>
+      ${gOrder.length?`<div class="panel" style="display:grid;gap:12px"><h3 style="font-size:1rem">수치 비교 · 기준이 같은 것끼리만</h3>
+        <div class="lgd"><span><i class="sw" style="background:var(--c-heal)"></i>게임 설명 수치</span><span><i class="sw c" style="background-color:var(--c-heal)"></i>빗금 = Lv1 표기값</span><span>초당 = 매초 들어오는 값(합계 아님)</span></div>
+        <div class="cmp">${gOrder.map(g=>{const L=groups[g].sort((a,b)=>b.n-a.n).slice(0,12),top=Math.max(...L.map(x=>x.n));
+          return `<div style="display:grid;gap:6px;align-content:start;min-width:0"><h3>${esc(g)} <span class="conf">· 막대 끝 ${top}%${groups[g].length>12?` · 상위 12/${groups[g].length}`:""}</span></h3>
+          ${L.map(x=>`<div class="bar"><span title="${esc(x.s.ID)}">${esc(x.s["사도"])}</span><span class="tk"><i class="${x.lv1?"lv1":""}" style="width:${(x.n/top*100).toFixed(1)}%" title="${esc(x.s["수치"])}"></i></span><span class="v">${x.n}%${x.ps?"<small style='font-weight:400'>/초</small>":""}</span></div>`).join("")}</div>`;}).join("")}</div></div>`:""}
+    </div>`;
+  }
+  $("judge").addEventListener("click",e=>{const b=e.target.closest("button[data-sado]");if(b)showSado(b.dataset.sado);});
+  renderJudge();
   /* 보스 기믹 */
   const TAG={};GT.forEach(t=>TAG[t["대응 태그"]]=t);
   const who=t=>{const r=TAG[t];if(!r||!r["대응 가능 사도"])return "";return r["대응 가능 사도"].split(/,\s*/).filter(Boolean).map(x=>{const m=x.match(/^(.*)\(([\d.]+)\)$/);const n=m?m[1]:x;return `<span>${face(n,22)}${esc(n)}${m?` <small class="conf">${esc(m[2])}</small>`:""}</span>`;}).join("");};
