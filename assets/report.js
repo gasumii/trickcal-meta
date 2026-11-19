@@ -484,7 +484,7 @@ async function main(){
   }
 
   $("stackLead").textContent=`편성 칸(덱 수 × ${slotKeys.length}) 중 각 성격이 차지한 비율입니다. 공명 사도는 고른 성격으로 셌습니다. 순위 범위를 바꾸면 원 그래프·열별 도넛·칸 합계가 같이 움직입니다.`;
-  if(cur) document.title=`${cur["표시이름"]||cur["시즌ID"]} — ${CFG.titleSuffix||"트릭컬 리바이브 PvE 상위권 덱 리포트"}`;
+  if(cur) document.title=`${cur["표시이름"]||cur["시즌ID"]} — ${CFG.titleSuffix||"트릭컬 리바이브 PvE 300위 덱 리포트"}`;
 
   /* 조사 방법 & 데이터 점검 */
   const infoRows=[["조사일",INFO["조사일"]],["시즌/콘텐츠",INFO["시즌/콘텐츠명"]],["시즌",INFO["시즌"],1],["보스 성격",((cur&&cur["적 성격"])||INFO["적 성격"]||"")],["게임 버전",INFO["게임 버전"],1],["조사 범위",ranks.length?`${Math.min(...ranks)}~${Math.max(...ranks)}위 (${N}덱 · ${INFO["순위 구간"]||"상위 1% 미만"})`:""],["기록 기준","유저별 최고 단계 덱 1개"],["조사자",INFO["조사자"]]];
