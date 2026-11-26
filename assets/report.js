@@ -45,8 +45,13 @@ const pct=(v,d=0)=>(v*100).toFixed(d)+"%";
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const numB=s=>esc(s).replace(/(\d+(?:[.,]\d+)?(?:~\d+(?:[.,]\d+)?)?(?:%p|%|초|덱|위|명|배)?)/g,(m,x)=>/[%초덱위명배p]$/.test(x)||x.includes("~")?`<b>${x}</b>`:x); // 수치만 굵게
 let ATTR={};
+/* 사도 얼굴 아이콘(식별용, 게임 기본 초상을 작게 잘라 낸 것 · © EPIDGames). 목록에 없는 사도는 성격 색 표시 */
+const SADO_ICONS=new Set(["가비아", "그윈", "나이아", "네르", "네르(빡침)", "네티", "니콜", "다야", "다야(퓨어샤인)", "델리아", "두두", "디아나", "디아나(왕년)", "라이카", "란", "레비", "레비(졸업)", "레이지", "레테", "로네", "로네(시장)", "로니", "롤렛", "루드", "루포", "리뉴아", "리스티", "리온", "리츠", "리코타", "림", "림(혼돈)", "마고", "마리", "마에스트로 2호", "마요", "마요(멋짐)", "마카샤", "메죵", "멜루나", "모모", "뮤트", "미로", "밍스", "바나", "바롱", "바리에", "버터", "베니", "베니(베니)", "베루", "벨라", "벨리타", "벨벳", "블랑셰", "비비", "비비(신성)", "빅우드", "사리", "샤샤", "셀리네", "셰럼", "셰이디", "셰이디(역전)", "슈로", "슈팡", "스노키", "스키아", "스패럿", "스피키", "스피키(메이드)", "시스트", "시온 더 다크불릿", "시저", "실라", "실비아", "실피르", "아네트", "아라그니아", "아르코", "아멜리아", "아멜리아(R41)", "아사나", "아야", "아이리스", "아이시아", "아일라", "알레트", "앨리스", "에르핀", "에르핀(왕도)", "에슈르", "에슈르(마도)", "에스피", "에피카", "엘레나", "오로라", "오르", "오팔", "요미", "우로스", "우이", "우이(기억)", "유미미", "이드", "이드(재활)", "이프리트", "잉클", "제이드", "죠안", "쥬비", "쵸피", "카렌", "칸나", "칸타", "캐시", "캬롯", "코미", "코미(수영복)", "코페", "큐이", "클로에", "키디언", "키샤", "타이다", "티그", "티그(영웅)", "파트라", "페스타", "포셔", "폴랑", "프리클", "피라", "피코라", "하이디", "헤일리", "헤일리(멀쩡)", "힐데"]);
+const icoSrc=n=>"assets/sado/"+encodeURIComponent(n)+".webp";
+const ico=(n,cls="sico")=>SADO_ICONS.has(n)?`<img class="${cls}" src="${icoSrc(n)}" alt="" loading="lazy" decoding="async">`:"";
+const svgIco=(n,x,y,sz=22)=>SADO_ICONS.has(n)?`<image href="${icoSrc(n)}" x="${x}" y="${y}" width="${sz}" height="${sz}"/>`:"";
 const col=n=>`var(--${ATTRS.includes(ATTR[n])?ATTR[n]:"미분류"})`;
-const chip=(n,extra="",cls="")=>`<span class="chip ${cls}" style="--c:${col(n)}">${esc(n)}${extra}</span>`;
+const chip=(n,extra="",cls="")=>`<span class="chip ${cls}${SADO_ICONS.has(n)?" has-ico":""}" style="--c:${col(n)}">${ico(n)}${esc(n)}${extra}</span>`;
 const tierOf=r=>TIERS.find(t=>r>=t.min);
 /* 도넛: [[값, 색], …] → conic-gradient 배경 */
 const conic=parts=>{ const tot=parts.reduce((s,p)=>s+p[0],0)||1; let acc=0;
@@ -144,9 +149,9 @@ async function main(){
   const rc2={}; decks.filter(d=>key(d)===stdKey).forEach(d=>{ const k=d.raw.join(","); rc2[k]=(rc2[k]||0)+1; });
   const stdRaw=(Object.entries(rc2).sort((a,b)=>b[1]-a[1])[0]||[std.join(",")])[0];
   const calcHref=`calculator.html?deck=${encodeURIComponent(stdRaw)}${cur?`&s=${encodeURIComponent(cur["시즌ID"])}`:""}`;
-  /* 칸 하나: 성격 색 칩 + 이름 + 채용률 (캐릭터 이미지 없음) */
+  /* 칸 하나: 사도 얼굴(없으면 성격 색 육각형) + 이름 + 채용률 */
   const slotHTML=m=>{ const n=baseName(m), rp=(m.match(RESO)||[])[1];
-    return `<div class="slot" style="--c:${col(n)}"><i class="hex" aria-hidden="true"></i>
+    return `<div class="slot" style="--c:${col(n)}">${ico(n,"face")||`<i class="hex" aria-hidden="true"></i>`}
     <div class="pct">${pct(rateOf[n])}</div><div class="nm">${esc(n)}${rp?`<small class="rp">공명 ${esc(rp)}</small>`:""}</div>
     <div class="meter"><i style="width:${rateOf[n]*100}%"></i></div></div>`; };
   /* 게임 편성 화면과 같은 배치: 왼쪽 후열 · 가운데 중열 · 오른쪽 전열 (기록 순서는 사도1~3 전열, 4~6 중열, 7~9 후열) */
@@ -214,7 +219,7 @@ async function main(){
     s+=rows.map((r,i)=>{ const y=y0+i*rh+rh/2, xs=r.v.map(sx), xl=xs[xs.length-1], xp=xs[xs.length-2]??xs[0], dir=Math.sign(xl-xp);
       const path=xs.map((x,j)=>`${j?"L":"M"}${x.toFixed(1)} ${y}`).join(" ");
       const head=dir&&Math.abs(xl-xp)>12?`<path d="M${(xl-dir*8).toFixed(1)} ${y} l${(-dir*9).toFixed(1)} -6 l0 12 z" fill="var(--leaf)"/>`:"";
-      return `<text x="178" y="${y+5}" text-anchor="end" fill="var(--ink)">${esc(r.n)}</text><path d="${path}" fill="none" stroke="var(--leaf)" stroke-opacity=".55" stroke-width="2.5"/>${head}`
+      return `<text x="${SADO_ICONS.has(r.n)?152:178}" y="${y+5}" text-anchor="end" fill="var(--ink)">${esc(r.n)}</text>${svgIco(r.n,158,y-11)}<path d="${path}" fill="none" stroke="var(--leaf)" stroke-opacity=".55" stroke-width="2.5"/>${head}`
         +r.v.map((v,j)=>`<circle cx="${sx(v)}" cy="${y}" r="6.5" ${dot(j)}><title>${esc(r.n)} ${bs[j][0]}~${bs[j][1]}위: ${v.toFixed(1)}%</title></circle>`).join("")
         +`<text x="740" y="${y+5}" text-anchor="end" fill="var(--ink)" font-weight="600">${r.d>0?"+":""}${Math.round(r.d)}%p</text>`; }).join("");
     return fig(yEnd+30,s,`한 줄이 사도 한 명입니다. 점은 순위 구간별로 그 사도를 쓴 덱의 비율(%)이고, 회색 점이 ${bs[0][0]}~${bs[0][1]}위, 진한 파란 점이 ${bs[bs.length-1][0]}~${bs[bs.length-1][1]}위입니다. 선은 위 구간에서 아래 구간 순서로 이은 것이고 화살표가 마지막 구간 쪽을 가리킵니다. 오른쪽 숫자는 마지막 구간에서 첫 구간을 뺀 값으로, +면 순위가 내려갈수록 더 많이 쓴 사도, −면 상위권에서 더 많이 쓴 사도입니다. 중간에 꺾이는 사도는 숫자만 보지 말고 점 위치도 같이 보세요.`);
@@ -268,7 +273,7 @@ async function main(){
     let y=40, s=`<text x="20" y="22" fill="var(--muted)">열마다 많이 놓인 사도 (덱 수, 막대 색 = 성격)</text>`;
     ROWN.forEach((rn,ri)=>{ const top=Object.entries(c[ri]).sort((a,b)=>b[1]-a[1]).slice(0,6);
       s+=`<text x="20" y="${y+20}" fill="var(--ink)" font-weight="600">${rn}</text>`; y+=30;
-      top.forEach(([n,v])=>{ s+=`<text x="${x0-12}" y="${y+16}" text-anchor="end" fill="var(--ink)">${esc(n)}</text><rect x="${x0}" y="${y+2}" width="${v/mx*(x1-x0)}" height="20" rx="3" fill="var(--${ATTRS.includes(ATTR[n])?ATTR[n]:"미분류"})" fill-opacity=".85"><title>${esc(n)} ${rn}: ${v}덱</title></rect><text x="${x0+v/mx*(x1-x0)+8}" y="${y+17}" fill="var(--ink)">${v}</text>`; y+=26; });
+      top.forEach(([n,v])=>{ s+=`<text x="${SADO_ICONS.has(n)?x0-38:x0-12}" y="${y+16}" text-anchor="end" fill="var(--ink)">${esc(n)}</text>${svgIco(n,x0-32,y+1)}<rect x="${x0}" y="${y+2}" width="${v/mx*(x1-x0)}" height="20" rx="3" fill="var(--${ATTRS.includes(ATTR[n])?ATTR[n]:"미분류"})" fill-opacity=".85"><title>${esc(n)} ${rn}: ${v}덱</title></rect><text x="${x0+v/mx*(x1-x0)+8}" y="${y+17}" fill="var(--ink)">${v}</text>`; y+=26; });
       y+=10; });
     return fig(y+6,s,"전·중·후열마다 그 자리에 가장 많이 놓인 사도 6명입니다. 막대 길이와 숫자는 그 열에 놓인 덱 수이고, 막대 색은 사도의 성격입니다. 한 사도가 여러 열에 나오면 덱마다 다른 자리에 놓았다는 뜻입니다.");
   };
@@ -301,7 +306,7 @@ async function main(){
   }).join("");
 
   /* 막대 */
-  $("bars").innerHTML=stats.map(s=>`<div class="bar" data-n="${esc(s.n)}" style="--c:${col(s.n)}"><span class="n">${esc(s.n)}</span>
+  $("bars").innerHTML=stats.map(s=>`<div class="bar" data-n="${esc(s.n)}" style="--c:${col(s.n)}"><span class="n">${ico(s.n)}${esc(s.n)}</span>
     <span class="track" role="img" aria-label="${esc(s.n)} 채용률 ${pct(s.r,1)}"><i style="width:${s.r*100}%"></i></span>
     <span class="v">${pct(s.r,1)} <small>${s.c}덱</small></span></div>`).join("")
     +`<div class="legend">${[...ATTRS,"미분류"].map(a=>`<span style="--c:var(--${a})">${a}</span>`).join("")}</div>`;

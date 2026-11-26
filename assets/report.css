@@ -242,3 +242,11 @@ h1{letter-spacing:-.02em} h2{font-size:1.5rem;letter-spacing:-.015em}
 @media (prefers-reduced-motion:reduce){.bar,.bar .track i,.stack i{transition:none!important}}
 .analysis p,.analysis li,.meta-comment p{overflow-wrap:anywhere}
 @media (max-width:600px){.an-chart::before{content:"← 옆으로 밀어 보기 →";display:block;position:sticky;left:0;font-size:.78rem;color:var(--muted);margin:0 0 4px}}
+
+/* 사도 얼굴 아이콘 */
+.chip.has-ico{padding-left:4px}
+.chip.has-ico::before{display:none}
+.chip .sico,.bar .sico{width:24px;height:24px;border-radius:50%;flex:none;box-shadow:0 0 0 2px var(--c)}
+.bar .n{display:flex;align-items:center;gap:6px}
+.slot .face{position:absolute;top:8px;left:8px;width:34px;height:34px;border-radius:50%;box-shadow:0 0 0 2px var(--c);background:var(--paper)}
+.slot:has(.face){padding-top:46px}
