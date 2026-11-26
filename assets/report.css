@@ -248,5 +248,6 @@ h1{letter-spacing:-.02em} h2{font-size:1.5rem;letter-spacing:-.015em}
 .chip.has-ico::before{display:none}
 .chip .sico,.bar .sico{width:24px;height:24px;border-radius:50%;flex:none;box-shadow:0 0 0 2px var(--c)}
 .bar .n{display:flex;align-items:center;gap:6px}
-.slot .face{position:absolute;top:8px;left:8px;width:34px;height:34px;border-radius:50%;box-shadow:0 0 0 2px var(--c);background:var(--paper)}
-.slot:has(.face){padding-top:46px}
+.slot .face{position:absolute;top:8px;left:8px;width:52px;height:52px;border-radius:50%;box-shadow:0 0 0 2px var(--c);background:var(--paper)}
+.slot:has(.face){padding-top:66px}
+@media (max-width:640px){.slot .face{width:42px;height:42px}.formation .slot:has(.face){padding-top:56px}}

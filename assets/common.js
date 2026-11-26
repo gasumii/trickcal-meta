@@ -29,7 +29,9 @@ async function loadSadoInfo(){try{(await load("data/battle/sado_info.csv")).forE
 const perVar=p=>PER_LIST.includes(p)?`var(--${p})`:"var(--미분류)";
 function face(n,size,per){
   const i=SADO_INFO[n]||{},p=per||i["성격"]||"",ch=(n||"?").replace(/\(.*\)/,"").trim().slice(0,1);
-  return `<span class="face" style="--pc:${perVar(p)};--fs:${size||36}px" aria-hidden="true">${i["이미지"]?`<img src="assets/sado/${encodeURIComponent(i["이미지"])}" alt="" loading="lazy">`:`<b>${esc(ch)}</b>`}</span>`;
+  /* 얼굴 아이콘: sado_info의 이미지 칸, 비어 있으면 사도 DB에 있는 사도는 assets/sado/이름.webp(나무위키 기본 초상, © EPIDGames). 파일이 없으면 첫 글자 */
+  const src=i["이미지"]||(SADO_INFO[n]?n+".webp":"");
+  return `<span class="face" style="--pc:${perVar(p)};--fs:${size||36}px" aria-hidden="true">${src?`<img src="assets/sado/${encodeURIComponent(src)}" alt="" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('b'),{textContent:'${esc(ch)}'}))">`:`<b>${esc(ch)}</b>`}</span>`;
 }
 
 /* skills.csv 한 줄 → 계산용 데이터 */

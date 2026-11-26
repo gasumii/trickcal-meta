@@ -166,7 +166,7 @@ function buildBoard(){
 }
 function buildSlots(){
   $("slots").innerHTML=slots.map((s,i)=>s.name?`<tr class="slot" data-i="${i}"><td><span class="lane-tag">${rowOf(i)}</span></td>
-   <td style="white-space:nowrap"><strong>${esc(s.name)}</strong></td>
+   <td style="white-space:nowrap">${face(s.name,28)} <strong>${esc(s.name)}</strong></td>
    <td><select id="a${i}" data-k="aside" aria-label="어사이드">${[0,1,2,3].map(v=>`<option${v==s.aside?" selected":""}>${v}</option>`).join("")}</select></td>
    <td><input id="h${i}" type="checkbox" data-k="hi" ${s.hi?"checked":""} aria-label="고학년 사용"></td>
    <td class="pc"></td>
